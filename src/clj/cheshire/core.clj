@@ -24,6 +24,9 @@
     (.flush generator)
     (.toString sw)))
 
+;; alias for clojure-json users
+(def encode generate-string)
+
 (defn generate-smile
   "Returns a SMILE-encoded byte-array for the given Clojure object."
   [obj]
@@ -39,6 +42,9 @@
   (JsonExt/parse
    (.createJsonParser factory (StringReader. string))
    true (or keywords false) nil))
+
+;; alias for clojure-json users
+(def decode parse-string)
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes."

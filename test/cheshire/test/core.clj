@@ -33,3 +33,9 @@
              "double" 1.23 "boolean" true "nil" nil "string" "string"
              "vec" [1 2 3] "map" {"a" "b"} "list" (list "a" "b")}]
     (is (= obj (json/parse-smile (json/generate-smile obj))))))
+
+(deftest test-aliases
+  (is (= {"foo" "bar" "1" "bat" "2" "bang" "3" "biz"}
+         (json/decode
+          (json/encode
+           {:foo "bar" 1 "bat" (long 2) "bang" (bigint 3) "biz"})))))
