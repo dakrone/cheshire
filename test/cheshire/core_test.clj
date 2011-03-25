@@ -1,6 +1,6 @@
-(ns clj-json.core-test
+(ns cheshire.core-test
   (:use clojure.test)
-  (:require [clj-json.core :as json])
+  (:require [cheshire.core :as json])
   (:import (java.io StringReader BufferedReader)))
 
 (deftest test-string-round-trip

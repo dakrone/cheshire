@@ -1,5 +1,5 @@
-(ns clj-json.core
-  (:import (clj_json JsonExt)
+(ns cheshire.core
+  (:import (cheshire JsonExt)
            (org.codehaus.jackson.smile SmileFactory)
            (org.codehaus.jackson JsonFactory JsonParser JsonParser$Feature)
            (java.io StringWriter StringReader BufferedReader
