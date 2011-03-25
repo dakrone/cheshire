@@ -1,4 +1,4 @@
-(defproject cheshire "1.0.1"
+(defproject cheshire "1.0.2"
   :description "JSON and JSON SMILE encoding"
   :url "https://github.com/dakrone/cheshire"
   :source-path "src/clj"
