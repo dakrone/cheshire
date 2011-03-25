@@ -37,8 +37,8 @@
   "Returns the Clojure object corresponding to the given JSON-encoded string."
   [string & [keywords]]
   (JsonExt/parse
-    (.createJsonParser factory (StringReader. string))
-    true (or keywords false) nil))
+   (.createJsonParser factory (StringReader. string))
+   true (or keywords false) nil))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes."
@@ -50,9 +50,9 @@
 (defn- parsed-seq* [#^JsonParser parser keywords]
   (let [eof (Object.)]
     (lazy-seq
-      (let [elem (JsonExt/parse parser true keywords eof)]
-        (if-not (identical? elem eof)
-          (cons elem (parsed-seq* parser keywords)))))))
+     (let [elem (JsonExt/parse parser true keywords eof)]
+       (if-not (identical? elem eof)
+         (cons elem (parsed-seq* parser keywords)))))))
 
 (defn parsed-seq [#^BufferedReader reader & [keywords]]
   "Returns a lazy seq of Clojure objects corresponding to the JSON read from

@@ -1,4 +1,4 @@
-(ns cheshire.core-test
+(ns cheshire.test.core
   (:use clojure.test)
   (:require [cheshire.core :as json])
   (:import (java.io StringReader BufferedReader)))
@@ -11,18 +11,18 @@
 
 (deftest test-generate-accepts-float
   (is (= "3.14" (json/generate-string (float 3.14)))))
-  
+
 (deftest test-key-coercion
   (is (= {"foo" "bar" "1" "bat" "2" "bang" "3" "biz"}
          (json/parse-string
-           (json/generate-string
-             {:foo "bar" 1 "bat" (long 2) "bang" (bigint 3) "biz"})))))
+          (json/generate-string
+           {:foo "bar" 1 "bat" (long 2) "bang" (bigint 3) "biz"})))))
 
 (deftest test-keywords
   (is (= {:foo "bar" :bat 1}
          (json/parse-string
-           (json/generate-string {:foo "bar" :bat 1})
-           true))))
+          (json/generate-string {:foo "bar" :bat 1})
+          true))))
 
 (deftest test-parsed-seq
   (let [br (BufferedReader. (StringReader. "1\n2\n3\n"))]
