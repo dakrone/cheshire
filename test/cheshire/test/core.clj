@@ -1,5 +1,6 @@
 (ns cheshire.test.core
-  (:use clojure.test)
+  (:use [clojure.test]
+        [clojure.java.io :only [reader]])
   (:require [cheshire.core :as json])
   (:import (java.io StringReader StringWriter
                     BufferedReader BufferedWriter)
@@ -79,7 +80,10 @@
   (let [sw (StringWriter.)
         bw (BufferedWriter. sw)]
     (json/generate-stream {"foo" "bar"} bw)
-    (is (= "{\"foo\":\"bar\"}" (.toString sw)))))
+    (is (= "{\"foo\":\"bar\"}" (.toString sw))))
+  (is (= {(keyword "foo baz") "bar"}
+         (with-open [rdr (StringReader. "{\"foo baz\":\"bar\"}\n")]
+           (json/parse-stream rdr true)))))
 
 (deftest test-jsondotorg-pass1
   (let [string (slurp "test/pass1.json")
