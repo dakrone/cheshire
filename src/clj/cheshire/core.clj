@@ -26,6 +26,16 @@
     (.flush generator)
     (.toString sw)))
 
+(defn generate-stream
+  {:tag String
+   :doc "Returns a BufferedWriter for the given Clojure object with the.
+  JSON-encoded data written to the writer"}
+  [obj #^BufferedWriter writer & [date-format]]
+  (let [generator (.createJsonGenerator factory writer)]
+    (JsonExt/generate generator obj (or date-format default-date-format))
+    (.flush generator)
+    writer))
+
 ;; alias for clojure-json users
 (def encode generate-string)
 
@@ -43,6 +53,14 @@
   [string & [keywords]]
   (JsonExt/parse
    (.createJsonParser factory (StringReader. string))
+   true (or keywords false) nil))
+
+(defn parse-stream
+  "Returns the Clojure object corresponding to the given reader, reader must
+  implement BufferedReader."
+  [#^BufferedReader rdr & [keywords]]
+  (JsonExt/parse
+   (.createJsonParser factory rdr)
    true (or keywords false) nil))
 
 ;; alias for clojure-json users

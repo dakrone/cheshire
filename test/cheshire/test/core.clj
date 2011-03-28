@@ -1,7 +1,8 @@
 (ns cheshire.test.core
   (:use clojure.test)
   (:require [cheshire.core :as json])
-  (:import (java.io StringReader BufferedReader)
+  (:import (java.io StringReader StringWriter
+                    BufferedReader BufferedWriter)
            (java.util Date UUID)))
 
 (def test-obj {"int" 3 "long" 52001110638799097 "bigint" 9223372036854775808
@@ -70,3 +71,19 @@
            (json/decode
             (json/encode
              {:foo id}))))))
+
+(deftest test-streams
+  (is (= {"foo" "bar"}
+         (json/parse-stream
+          (BufferedReader. (StringReader. "{\"foo\":\"bar\"}\n")))))
+  (let [sw (StringWriter.)
+        bw (BufferedWriter. sw)]
+    (json/generate-stream {"foo" "bar"} bw)
+    (is (= "{\"foo\":\"bar\"}" (.toString sw)))))
+
+(deftest test-jsondotorg-pass1
+  (let [string (slurp "test/pass1.json")
+        decoded-json (json/decode string)
+        encoded-json (json/encode decoded-json)
+        re-decoded-json (json/decode encoded-json)]
+    (is (= decoded-json re-decoded-json))))
