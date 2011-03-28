@@ -38,6 +38,7 @@
 
 ;; alias for clojure-json users
 (def encode generate-string)
+(def encode-stream generate-stream)
 
 (defn generate-smile
   "Returns a SMILE-encoded byte-array for the given Clojure object."
@@ -65,6 +66,7 @@
 
 ;; alias for clojure-json users
 (def decode parse-string)
+(def decode-stream parse-stream)
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes."
