@@ -6,6 +6,8 @@
                     ByteArrayOutputStream))
   (:use (clojure.contrib [def :only (defvar-)])))
 
+(def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
+
 (defvar- #^JsonFactory factory
   (doto (JsonFactory.)
     (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS true)))
@@ -17,10 +19,10 @@
 (defn generate-string
   {:tag String
    :doc "Returns a JSON-encoding String for the given Clojure object."}
-  [obj]
+  [obj & [date-format]]
   (let [sw        (StringWriter.)
         generator (.createJsonGenerator factory sw)]
-    (JsonExt/generate generator obj)
+    (JsonExt/generate generator obj (or date-format default-date-format))
     (.flush generator)
     (.toString sw)))
 
@@ -29,10 +31,10 @@
 
 (defn generate-smile
   "Returns a SMILE-encoded byte-array for the given Clojure object."
-  [obj]
+  [obj & [date-format]]
   (let [baos (ByteArrayOutputStream.)
         generator (.createJsonGenerator smile-factory baos)]
-    (JsonExt/generate generator obj)
+    (JsonExt/generate generator obj (or date-format default-date-format))
     (.flush generator)
     (.toByteArray baos)))
 

@@ -4,6 +4,10 @@ import org.codehaus.jackson.JsonToken;
 import org.codehaus.jackson.JsonParser;
 import org.codehaus.jackson.JsonGenerator;
 import java.math.BigInteger;
+import java.util.Date;
+import java.util.UUID;
+import java.util.SimpleTimeZone;
+import java.text.SimpleDateFormat;
 import clojure.lang.ISeq;
 import clojure.lang.IPersistentSet;
 import clojure.lang.IPersistentMap;
@@ -19,7 +23,7 @@ import clojure.lang.Symbol;
 import clojure.lang.Seqable;
 
 public class JsonExt {
-    public static void generate(JsonGenerator jg, Object obj) throws Exception {
+    public static void generate(JsonGenerator jg, Object obj, String dateFormat) throws Exception {
 
         if (obj instanceof String) {
             jg.writeString((String) obj);
@@ -42,6 +46,13 @@ public class JsonExt {
                 jg.writeNumber((Float) obj);
 
             }
+
+        } else if (obj instanceof Date) {
+
+            SimpleDateFormat sdf = new SimpleDateFormat(dateFormat);
+            sdf.setTimeZone(new SimpleTimeZone(0, "UTC"));
+            jg.writeString(sdf.format((Date) obj));
+
         } else if (obj instanceof Boolean) {
 
             jg.writeBoolean((Boolean) obj);
@@ -70,7 +81,7 @@ public class JsonExt {
                 } else {
                     jg.writeFieldName((String) key);
                 }
-                generate(jg, me.val());
+                generate(jg, me.val(), dateFormat);
                 mSeq = mSeq.next();
             }
             jg.writeEndObject();
@@ -79,7 +90,7 @@ public class JsonExt {
             IPersistentVector vec = (IPersistentVector) obj;
             jg.writeStartArray();
             for (int i = 0; i < vec.count(); i++) {
-                generate(jg, vec.nth(i));
+                generate(jg, vec.nth(i), dateFormat);
             }
             jg.writeEndArray();
 
@@ -87,7 +98,7 @@ public class JsonExt {
             ISeq lSeq = ((Seqable) obj).seq();
             jg.writeStartArray();
             while (lSeq != null) {
-                generate(jg, lSeq.first());
+                generate(jg, lSeq.first(), dateFormat);
                 lSeq = lSeq.next();
             }
             jg.writeEndArray();
@@ -100,10 +111,15 @@ public class JsonExt {
             ISeq lSeq = ((Seqable) obj).seq();
             jg.writeStartArray();
             while (lSeq != null) {
-                generate(jg, lSeq.first());
+                generate(jg, lSeq.first(), dateFormat);
                 lSeq = lSeq.next();
             }
             jg.writeEndArray();
+
+        } else if (obj instanceof UUID) {
+            UUID s = (UUID) obj;
+            jg.writeString(s.toString());
+
 	}
 	else {
             throw new Exception("Cannot generate " + obj);

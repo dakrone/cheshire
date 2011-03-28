@@ -1,7 +1,8 @@
 (ns cheshire.test.core
   (:use clojure.test)
   (:require [cheshire.core :as json])
-  (:import (java.io StringReader BufferedReader)))
+  (:import (java.io StringReader BufferedReader)
+           (java.util Date UUID)))
 
 (def test-obj {"int" 3 "long" 52001110638799097 "bigint" 9223372036854775808
                "double" 1.23 "boolean" true "nil" nil "string" "string"
@@ -50,3 +51,22 @@
          (json/decode
           (json/encode
            {:foo "bar" 1 "bat" (long 2) "bang" (bigint 3) "biz"})))))
+
+(deftest test-date
+  (is (= {"foo" "1970-01-01T00:00:00Z"}
+         (json/decode
+          (json/encode
+           {:foo (Date. (long 0))}))))
+  (is (= {"foo" "1970-01-01"}
+         (json/decode
+          (json/encode
+           {:foo (Date. (long 0))} "yyyy-MM-dd")))
+      "encode with given date format"))
+
+(deftest test-uuid
+  (let [id (UUID/randomUUID)
+        id-str (str id)]
+    (is (= {"foo" id-str}
+           (json/decode
+            (json/encode
+             {:foo id}))))))
