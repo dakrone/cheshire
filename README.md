@@ -27,7 +27,7 @@ of both worlds.
     (generate-stream (clojure.java.io/writer "/tmp/foo") {:foo "bar" :baz 5})
 
     ;; generate some SMILE
-    (generate-string {:foo "bar" :baz 5})
+    (generate-smile {:foo "bar" :baz 5})
 
     ;; generate some JSON with Dates
     ;; the Date will be encoded as a string using
