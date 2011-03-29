@@ -136,4 +136,4 @@ Release under the MIT license. See LICENSE for the full license.
 
 ## Thanks
 Thanks go to Mark McGranaghan for allowing me to copy the clj-json
-code to get started on this
+code to get started on this and Jim Duey for the name. :)
