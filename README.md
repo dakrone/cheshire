@@ -127,6 +127,10 @@ Cheshire is right up there with clj-json (it's based on the same
 code), not quite as fast as clj-serializer (which is just
 serialization, not actually JSON).
 
+## Future Ideas/TODOs
+- move away from using Java entirely, use Protocols for the encoder
+- allow custom encoders (this should be doable once switched over to protocols)
+
 ## License
 Release under the MIT license. See LICENSE for the full license.
 
