@@ -1,4 +1,0 @@
-* Cheshire
-  - do some things with stuff
-
-Don't use yet.
