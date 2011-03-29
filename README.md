@@ -1,7 +1,26 @@
 # Cheshire
 
-<img src="http://dakrone.github.com/cheshire/cheshire_small.jpg" title=":)" />
+<img src="http://dakrone.github.com/cheshire/cheshire_small.jpg"
+title=":)" align="left">
+<small>
+'Cheshire Puss,' she began, rather timidly, as she did not at all know
+whether it would like the name: however, it only grinned a little
+wider.  'Come, it's pleased so far,' thought Alice, and she went
+on. 'Would you tell me, please, which way I ought to go from here?'
 
+'That depends a good deal on where you want to get to,' said the Cat.
+
+'I don't much care where--' said Alice.
+
+'Then it doesn't matter which way you go,' said the Cat.
+
+'--so long as I get SOMEWHERE,' Alice added as an explanation.
+
+'Oh, you're sure to do that,' said the Cat, 'if you only walk long
+enough.'
+</small>
+</img>
+<br clear=all /><br />
 Cheshire is fast JSON encoding, based off of clj-json and
 clojure-json, with additional features like Date/UUID/Set/Symbol
 encoding and SMILE support.
