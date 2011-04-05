@@ -1,7 +1,7 @@
 (ns cheshire.test.core
   (:use [clojure.test]
         [clojure.java.io :only [reader]])
-  (:require [cheshire.core :as json])
+  (:require [cheshire.encode :as json])
   (:import (java.io StringReader StringWriter
                     BufferedReader BufferedWriter)
            (java.util Date UUID)))
