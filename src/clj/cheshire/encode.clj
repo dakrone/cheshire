@@ -9,7 +9,7 @@
   (doto (JsonFactory.)
     (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS true)))
 
-(def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
+(def ^{:dynamic true} *date-format* "yyyy-MM-dd'T'HH:mm:ss'Z'")
 
 (defprotocol Jable
   (to-json [t jg]))
@@ -77,7 +77,7 @@
   {:to-json encode-seq})
 
 (defn- encode-date [d jg]
-  (let [sdf (SimpleDateFormat. default-date-format)]
+  (let [sdf (SimpleDateFormat. *date-format*)]
     (.setTimeZone sdf (SimpleTimeZone. 0 "UTC"))
     (.writeString jg (.format sdf d))))
 
@@ -117,7 +117,9 @@
   {:to-json encode-map})
 
 (defn- encode-symbol [s jg]
-  (.writeString jg (str (:ns (meta s)) "/" (:name (meta s)))))
+  (.writeString jg (str (:ns (meta (resolve s)))
+                        "/"
+                        (:name (meta (resolve s))))))
 
 (extend clojure.lang.Symbol
   Jable
