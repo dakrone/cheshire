@@ -60,9 +60,10 @@
           (json/encode
            {:foo (Date. (long 0))}))))
   (is (= {"foo" "1970-01-01"}
-         (json/decode
-          (json/encode
-           {:foo (Date. (long 0))} "yyyy-MM-dd")))
+         (binding [json/*date-format* "yyyy-MM-dd"]
+           (json/decode
+            (json/encode
+             {:foo (Date. (long 0))}))))
       "encode with given date format"))
 
 (deftest test-uuid
