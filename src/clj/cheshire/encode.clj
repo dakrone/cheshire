@@ -1,9 +1,12 @@
 (ns cheshire.encode
   (:require [cheshire.core :as core])
   (:import (java.io StringWriter)
-           (java.util SimpleTimeZone)
+           (java.util Date SimpleTimeZone)
            (java.text SimpleDateFormat)
-           (org.codehaus.jackson JsonFactory JsonParser JsonParser$Feature)))
+           (org.codehaus.jackson JsonFactory JsonGenerator JsonParser
+                                 JsonParser$Feature)))
+
+(set! *warn-on-reflection* true)
 
 (def ^{:private true :type JsonFactory} factory
   (doto (JsonFactory.)
@@ -33,21 +36,21 @@
 (def generate-stream core/generate-stream)
 (def generate-smile core/generate-smile)
 
-(defn- encode-nil [_ jg]
+(defn- encode-nil [_ ^JsonGenerator jg]
   (.writeNull jg))
 
 (extend nil
   Jable
   {:to-json encode-nil})
 
-(defn- encode-str [s jg]
+(defn- encode-str [^String s ^JsonGenerator jg]
   (.writeString jg (str s)))
 
 (extend java.lang.String
   Jable
   {:to-json encode-str})
 
-(defn- encode-number [n jg]
+(defn- encode-number [n ^JsonGenerator jg]
   (.writeNumber jg n))
 
 (extend java.lang.Integer
@@ -58,7 +61,7 @@
   Jable
   {:to-json encode-number})
 
-(defn- encode-seq [s jg]
+(defn- encode-seq [s ^JsonGenerator jg]
   (.writeStartArray jg)
   (doseq [i s]
     (to-json i jg))
@@ -76,7 +79,7 @@
   Jable
   {:to-json encode-seq})
 
-(defn- encode-date [d jg]
+(defn- encode-date [^Date d ^JsonGenerator jg]
   (let [sdf (SimpleDateFormat. *date-format*)]
     (.setTimeZone sdf (SimpleTimeZone. 0 "UTC"))
     (.writeString jg (.format sdf d))))
@@ -89,21 +92,21 @@
   Jable
   {:to-json encode-str})
 
-(defn- encode-bool [b jg]
+(defn- encode-bool [^Boolean b ^JsonGenerator jg]
   (.writeBoolean jg b))
 
 (extend java.lang.Boolean
   Jable
   {:to-json encode-bool})
 
-(defn- encode-named [k jg]
+(defn- encode-named [^clojure.lang.Keyword k ^JsonGenerator jg]
   (.writeString jg (name k)))
 
 (extend clojure.lang.Keyword
   Jable
   {:to-json encode-named})
 
-(defn- encode-map [m jg]
+(defn- encode-map [^clojure.lang.IPersistentMap m ^JsonGenerator jg]
   (.writeStartObject jg)
   (doseq [[k v] m]
     (.writeFieldName jg (if (instance? clojure.lang.Keyword k)
@@ -116,7 +119,7 @@
   Jable
   {:to-json encode-map})
 
-(defn- encode-symbol [s jg]
+(defn- encode-symbol [^clojure.lang.Symbol s ^JsonGenerator jg]
   (.writeString jg (str (:ns (meta (resolve s)))
                         "/"
                         (:name (meta (resolve s))))))
