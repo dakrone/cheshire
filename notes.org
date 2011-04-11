@@ -1,0 +1,11 @@
+* Notes
+  - Protocol-based encoding is about 7-8x slower than Java, see
+    results:
+
+Trail:  1
+cheshire                               2.68
+cheshire2                              15.16
+
+Trail:  2
+cheshire                               1.95
+cheshire2                              14.77
