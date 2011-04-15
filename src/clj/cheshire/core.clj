@@ -1,4 +1,5 @@
 (ns cheshire.core
+  (:use [cheshire.parse :only [parse]])
   (:import (cheshire JsonExt)
            (org.codehaus.jackson.smile SmileFactory)
            (org.codehaus.jackson JsonFactory JsonParser JsonParser$Feature)
@@ -56,30 +57,30 @@
 ;; Parsers
 (defn parse-string
   "Returns the Clojure object corresponding to the given JSON-encoded string.
-  keywords? should be true if keyword keys are needed, the default is false,
+  keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords."
   [^String string & [keywords?]]
-  (JsonExt/parse
+  (parse
    (.createJsonParser factory (StringReader. string))
    true (or keywords? false) nil))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
-  implement BufferedReader. keywords? should be true if keyword keys are needed,
+  implement BufferedReader. keywords? should be true if keyword keys are needed
   the default is false, maps will use strings as keywords.
 
   If laziness is needed, see parsed-seq."
   [^BufferedReader rdr & [keywords?]]
-  (JsonExt/parse
+  (parse
    (.createJsonParser factory rdr)
    true (or keywords? false) nil))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
-  keywords? should be true if keyword keys are needed, the default is false,
+  keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords."
   [bytes & [keywords?]]
-  (JsonExt/parse
+  (parse
    (.createJsonParser smile-factory bytes)
    true (or keywords? false) nil))
 
@@ -89,7 +90,7 @@
   [^JsonParser parser keywords?]
   (let [eof (Object.)]
     (lazy-seq
-     (let [elem (JsonExt/parse parser true keywords? eof)]
+     (let [elem (parse parser true keywords? eof)]
        (if-not (identical? elem eof)
          (cons elem (parsed-seq* parser keywords?)))))))
 
@@ -114,4 +115,3 @@
 (def decode parse-string)
 (def decode-stream parse-stream)
 (def decode-smile parse-smile)
-
