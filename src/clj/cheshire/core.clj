@@ -10,11 +10,11 @@
 (def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
 
 ;; Factory objects that are needed to do the encoding and decoding
-(def ^{:private true :type JsonFactory} factory
+(def ^{:private true :tag JsonFactory} factory
   (doto (JsonFactory.)
     (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS true)))
 
-(def ^{:private true :type SmileFactory} smile-factory
+(def ^{:private true :tag SmileFactory} smile-factory
   (SmileFactory.))
 
 ;; Generators
@@ -79,7 +79,7 @@
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
   keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords."
-  [bytes & [keywords?]]
+  [^bytes bytes & [keywords?]]
   (parse
    (.createJsonParser smile-factory bytes)
    true (or keywords? false) nil))

@@ -3,7 +3,7 @@
 
 (declare parse)
 
-(definline parse-object [jp fst? keywords? eof]
+(definline parse-object [^JsonParser jp fst? keywords? eof]
   `(do
      (.nextToken ~jp)
      (loop [mmap# (transient {})]
@@ -23,7 +23,7 @@
            (recur mmap#))
          (persistent! mmap#)))))
 
-(definline parse-array [jp fst? keywords? eof]
+(definline parse-array [^JsonParser jp fst? keywords? eof]
   `(do
      (.nextToken ~jp)
      (loop [vvec# (transient [])]
