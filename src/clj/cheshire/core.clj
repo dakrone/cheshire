@@ -1,8 +1,9 @@
 (ns cheshire.core
-  (:use [cheshire.parse :only [parse]])
-  (:import (cheshire JsonExt)
-           (org.codehaus.jackson.smile SmileFactory)
-           (org.codehaus.jackson JsonFactory JsonParser JsonParser$Feature)
+  (:use [cheshire.parse :only [parse]]
+        [cheshire.generate :only [generate]])
+  (:import (org.codehaus.jackson.smile SmileFactory)
+           (org.codehaus.jackson JsonFactory JsonParser JsonParser$Feature
+                                 JsonGenerator)
            (java.io StringWriter StringReader BufferedReader
                     ByteArrayOutputStream)))
 
@@ -26,7 +27,7 @@
   [obj & [date-format]]
   (let [sw (StringWriter.)
         generator (.createJsonGenerator factory sw)]
-    (JsonExt/generate generator obj (or date-format default-date-format))
+    (generate generator obj (or date-format default-date-format))
     (.flush generator)
     (.toString sw)))
 
@@ -38,7 +39,7 @@
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   [obj ^BufferedWriter writer & [^String date-format]]
   (let [generator (.createJsonGenerator factory writer)]
-    (JsonExt/generate generator obj (or date-format default-date-format))
+    (generate generator obj (or date-format default-date-format))
     (.flush generator)
     writer))
 
@@ -50,7 +51,7 @@
   [obj & [^String date-format]]
   (let [baos (ByteArrayOutputStream.)
         generator (.createJsonGenerator smile-factory baos)]
-    (JsonExt/generate generator obj (or date-format default-date-format))
+    (generate generator obj (or date-format default-date-format))
     (.flush generator)
     (.toByteArray baos)))
 
