@@ -1,9 +1,6 @@
 (defproject cheshire "1.1.1-SNAPSHOT"
   :description "JSON and JSON SMILE encoding, fast."
   :url "https://github.com/dakrone/cheshire"
-  :source-path "src/clj"
-  :java-source-path "src/jvm"
-  :javac-fork "true"
   :dependencies
   [[org.clojure/clojure "1.2.1"]
    [org.codehaus.jackson/jackson-core-asl "1.7.4"]
