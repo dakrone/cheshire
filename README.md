@@ -124,9 +124,9 @@ Work is underway to have custom object encoders while still being fast.
     clj-json                               2.16
     clj-json w/ keywords                   2.43
     clj-serializer                         2.13
-    cheshire                               3.15
-    cheshire-smile                         4.05
-    cheshire w/ keywords                   2.91
+    cheshire                               2.19
+    cheshire-smile                         2.20
+    cheshire w/ keywords                   2.12
     clojure printer/reader                 7.16
     clojure printer/reader w/ print-dup    12.29
     clojure-json                           20.55
@@ -135,16 +135,14 @@ Work is underway to have custom object encoders while still being fast.
     clj-json                               1.23
     clj-json w/ keywords                   2.17
     clj-serializer                         1.58
-    cheshire                               2.23
-    cheshire-smile                         2.88
-    cheshire w/ keywords                   2.92
+    cheshire                               1.49
+    cheshire-smile                         1.49
+    cheshire w/ keywords                   1.99
     clojure printer/reader                 5.97
     clojure printer/reader w/ print-dup    11.17
     clojure-json                           20.42
 
-Cheshire is right up there with clj-json (it's based on the same
-code), not quite as fast as clj-serializer (which is just
-serialization, not actually JSON).
+Cheshire is right up there with clj-json.
 
 ## Future Ideas/TODOs
 - move away from using Java entirely, use Protocols for the encoder
