@@ -1,7 +1,9 @@
 (ns cheshire.core
-  (:import (cheshire JsonExt)
-           (org.codehaus.jackson.smile SmileFactory)
-           (org.codehaus.jackson JsonFactory JsonParser JsonParser$Feature)
+  (:use [cheshire.parse :only [parse]]
+        [cheshire.generate :only [generate]])
+  (:import (org.codehaus.jackson.smile SmileFactory)
+           (org.codehaus.jackson JsonFactory JsonParser JsonParser$Feature
+                                 JsonGenerator)
            (java.io StringWriter StringReader BufferedReader
                     ByteArrayOutputStream)))
 
@@ -9,11 +11,11 @@
 (def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
 
 ;; Factory objects that are needed to do the encoding and decoding
-(def ^{:private true :type JsonFactory} factory
+(def ^{:private true :tag JsonFactory} factory
   (doto (JsonFactory.)
     (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS true)))
 
-(def ^{:private true :type SmileFactory} smile-factory
+(def ^{:private true :tag SmileFactory} smile-factory
   (SmileFactory.))
 
 ;; Generators
@@ -25,7 +27,7 @@
   [obj & [date-format]]
   (let [sw (StringWriter.)
         generator (.createJsonGenerator factory sw)]
-    (JsonExt/generate generator obj (or date-format default-date-format))
+    (generate generator obj (or date-format default-date-format))
     (.flush generator)
     (.toString sw)))
 
@@ -37,7 +39,7 @@
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   [obj ^BufferedWriter writer & [^String date-format]]
   (let [generator (.createJsonGenerator factory writer)]
-    (JsonExt/generate generator obj (or date-format default-date-format))
+    (generate generator obj (or date-format default-date-format))
     (.flush generator)
     writer))
 
@@ -49,37 +51,37 @@
   [obj & [^String date-format]]
   (let [baos (ByteArrayOutputStream.)
         generator (.createJsonGenerator smile-factory baos)]
-    (JsonExt/generate generator obj (or date-format default-date-format))
+    (generate generator obj (or date-format default-date-format))
     (.flush generator)
     (.toByteArray baos)))
 
 ;; Parsers
 (defn parse-string
   "Returns the Clojure object corresponding to the given JSON-encoded string.
-  keywords? should be true if keyword keys are needed, the default is false,
+  keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords."
   [^String string & [keywords?]]
-  (JsonExt/parse
+  (parse
    (.createJsonParser factory (StringReader. string))
    true (or keywords? false) nil))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
-  implement BufferedReader. keywords? should be true if keyword keys are needed,
+  implement BufferedReader. keywords? should be true if keyword keys are needed
   the default is false, maps will use strings as keywords.
 
   If laziness is needed, see parsed-seq."
   [^BufferedReader rdr & [keywords?]]
-  (JsonExt/parse
+  (parse
    (.createJsonParser factory rdr)
    true (or keywords? false) nil))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
-  keywords? should be true if keyword keys are needed, the default is false,
+  keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords."
-  [bytes & [keywords?]]
-  (JsonExt/parse
+  [^bytes bytes & [keywords?]]
+  (parse
    (.createJsonParser smile-factory bytes)
    true (or keywords? false) nil))
 
@@ -89,7 +91,7 @@
   [^JsonParser parser keywords?]
   (let [eof (Object.)]
     (lazy-seq
-     (let [elem (JsonExt/parse parser true keywords? eof)]
+     (let [elem (parse parser true keywords? eof)]
        (if-not (identical? elem eof)
          (cons elem (parsed-seq* parser keywords?)))))))
 
@@ -114,4 +116,3 @@
 (def decode parse-string)
 (def decode-stream parse-stream)
 (def decode-smile parse-smile)
-

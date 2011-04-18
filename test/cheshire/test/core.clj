@@ -91,3 +91,23 @@
         encoded-json (json/encode decoded-json)
         re-decoded-json (json/decode encoded-json)]
     (is (= decoded-json re-decoded-json))))
+
+(defn timed-tests [tests]
+  (let [start (System/nanoTime)]
+    (dotimes [i 1000]
+      (doseq [t tests]
+        (t)))
+    (/ (double (- (System/nanoTime) start)) 1000000.0)))
+
+#_(deftest test-performance
+  (let [tests (->> (ns-publics 'cheshire.test.core)
+                   (remove (comp (partial = 'test-performance) first))
+                   (map second)
+                   (filter (comp :test meta)))
+        start (System/nanoTime)]
+    (let [times (doall (map timed-tests (repeat 3 tests)))
+          min-time (apply min times)
+          max-time (apply max times)]
+      (prn min-time max-time)
+      (is (> 2000 min-time))
+      (is (> 5200 max-time)))))
