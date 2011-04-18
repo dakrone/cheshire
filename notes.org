@@ -18,3 +18,14 @@
   Trail:  2
   cheshire                               2.14
   cheshire2                              5.68
+
+  More hinting:
+  Trail:  1
+  cheshire                               2.22
+  cheshire2                              5.26
+
+  Trail:  2
+  cheshire                               1.58
+  cheshire2                              5.08
+
+  Down to 3.2x slower than the Java version

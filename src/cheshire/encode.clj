@@ -8,7 +8,7 @@
 
 (set! *warn-on-reflection* true)
 
-(def ^{:private true :type JsonFactory} factory
+(def ^{:private true :tag JsonFactory} factory
   (doto (JsonFactory.)
     (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS true)))
 
@@ -19,7 +19,7 @@
 
 (defn encode [obj & _]
   (let [sw (StringWriter.)
-        generator (.createJsonGenerator factory sw)]
+        generator (.createJsonGenerator ^JsonFactory factory sw)]
     (if obj
       (to-json obj generator)
       (.writeNull generator))
@@ -50,12 +50,8 @@
   Jable
   {:to-json encode-str})
 
-(defn- encode-number [n ^JsonGenerator jg]
+(defn- encode-number [^java.lang.Number n ^JsonGenerator jg]
   (.writeNumber jg n))
-
-(extend java.lang.Integer
-  Jable
-  {:to-json encode-number})
 
 (extend java.lang.Number
   Jable
