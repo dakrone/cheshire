@@ -35,7 +35,7 @@ of both worlds.
 
 ## Usage
 
-    [cheshire "1.1.0"]
+    [cheshire "1.1.1"]
 
 ### Encoding
 
