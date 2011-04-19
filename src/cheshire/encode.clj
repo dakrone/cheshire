@@ -26,14 +26,14 @@
     (.flush generator)
     (.toString sw)))
 
-(def parse-string core/parse-string)
-(def parse-stream core/parse-stream)
+(def parse-string core/parse)
+(def parse-stream core/parse)
 (def parse-smile core/parse-smile)
 (def parsed-seq core/parsed-seq)
 (def decode core/decode)
 
 (def generate-string encode)
-(def generate-stream core/generate-stream)
+(def generate-stream core/generate)
 (def generate-smile core/generate-smile)
 
 (defn- encode-nil [_ ^JsonGenerator jg]
@@ -123,4 +123,3 @@
 (extend clojure.lang.Symbol
   Jable
   {:to-json encode-symbol})
-

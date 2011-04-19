@@ -1,11 +1,10 @@
 (ns cheshire.core
-  (:use [cheshire.parse :only [parse]]
-        [cheshire.generate :only [generate]])
-  (:import (org.codehaus.jackson.smile SmileFactory)
-           (org.codehaus.jackson JsonFactory JsonParser JsonParser$Feature
-                                 JsonGenerator)
-           (java.io StringWriter StringReader BufferedReader
-                    ByteArrayOutputStream)))
+  (:require [cheshire.generate]
+            [cheshire.parse])
+  (:import (java.io ByteArrayOutputStream StringWriter)
+           (org.codehaus.jackson JsonFactory JsonGenerator JsonParser
+                                 JsonParser$Feature)
+           (org.codehaus.jackson.smile SmileFactory)))
 
 ;; default date format used to JSON-encode Date objects
 (def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -19,29 +18,29 @@
   (SmileFactory.))
 
 ;; Generators
+(defn ^String generate
+  "Generates JSON-encoded data into the given writeable, and returns the
+  writeable. writeable is anything that is accepted by Jackson's
+  JsonFactory/createJsonGenerator. Takes an optional date format string
+  that Date objects will be encoded with.
+
+  The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
+  [obj writeable & [^String date-format]]
+  (let [generator (.createJsonGenerator factory writeable)]
+    (cheshire.generate/generate generator obj
+                                (or date-format default-date-format))
+    (.flush generator)
+    writeable))
+
 (defn ^String generate-string
   "Returns a JSON-encoding String for the given Clojure object. Takes an
   optional date format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   [obj & [date-format]]
-  (let [sw (StringWriter.)
-        generator (.createJsonGenerator factory sw)]
-    (generate generator obj (or date-format default-date-format))
-    (.flush generator)
+  (let [sw (StringWriter.)]
+    (cheshire.generate/generate obj sw date-format)
     (.toString sw)))
-
-(defn ^String generate-stream
-  "Returns a BufferedWriter for the given Clojure object with the.
-  JSON-encoded data written to the writer. Takes an optional date
-  format string that Date objects will be encoded with.
-
-  The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  [obj ^BufferedWriter writer & [^String date-format]]
-  (let [generator (.createJsonGenerator factory writer)]
-    (generate generator obj (or date-format default-date-format))
-    (.flush generator)
-    writer))
 
 (defn generate-smile
   "Returns a SMILE-encoded byte-array for the given Clojure object.
@@ -51,38 +50,31 @@
   [obj & [^String date-format]]
   (let [baos (ByteArrayOutputStream.)
         generator (.createJsonGenerator smile-factory baos)]
-    (generate generator obj (or date-format default-date-format))
+    (cheshire.generate/generate generator obj
+                                (or date-format default-date-format))
     (.flush generator)
     (.toByteArray baos)))
 
 ;; Parsers
-(defn parse-string
-  "Returns the Clojure object corresponding to the given JSON-encoded string.
+
+(defn parse
+  "Returns the Clojure object corresponding to the given JSON.  parseable is
+  anything that is accepted by Jackson's JsonFactory/createJSonParser.
   keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords."
-  [^String string & [keywords?]]
-  (parse
-   (.createJsonParser factory (StringReader. string))
-   true (or keywords? false) nil))
-
-(defn parse-stream
-  "Returns the Clojure object corresponding to the given reader, reader must
-  implement BufferedReader. keywords? should be true if keyword keys are needed
-  the default is false, maps will use strings as keywords.
-
-  If laziness is needed, see parsed-seq."
-  [^BufferedReader rdr & [keywords?]]
-  (parse
-   (.createJsonParser factory rdr)
+  [parseable & [keywords?]]
+  (cheshire.parse/parse
+   (.createJsonParser factory parseable)
    true (or keywords? false) nil))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
-  keywords? should be true if keyword keys are needed, the default is false
-  maps will use strings as keywords."
-  [^bytes bytes & [keywords?]]
-  (parse
-   (.createJsonParser smile-factory bytes)
+  parseable is anything that is accepted by Jackson's
+  SmileFactory/createJsonParser. keywords? should be true if keyword keys are
+  needed, the default is false maps will use strings as keywords."
+  [parseable & [keywords?]]
+  (cheshire.parse/parse
+   (.createJsonParser smile-factory parseable)
    true (or keywords? false) nil))
 
 ;; Lazy parsers
@@ -91,7 +83,7 @@
   [^JsonParser parser keywords?]
   (let [eof (Object.)]
     (lazy-seq
-     (let [elem (parse parser true keywords? eof)]
+     (let [elem (cheshire.parse/parse parser true keywords? eof)]
        (if-not (identical? elem eof)
          (cons elem (parsed-seq* parser keywords?)))))))
 
@@ -100,19 +92,19 @@
   the given reader. The seq continues until the end of the reader is reached.
 
   If non-laziness is needed, see parse-stream."
-  [^BufferedReader reader & [keywords?]]
-  (parsed-seq* (.createJsonParser factory reader) (or keywords? false)))
+  [parseable & [keywords?]]
+  (parsed-seq* (.createJsonParser factory parseable) (or keywords? false)))
 
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
   the given reader. The seq continues until the end of the reader is reached."
-  [^BufferedReader reader & [keywords?]]
-  (parsed-seq* (.createJsonParser smile-factory reader) (or keywords? false)))
+  [parseable reader & [keywords?]]
+  (parsed-seq* (.createJsonParser smile-factory parseable) (or keywords? false)))
 
 ;; aliases for clojure-json users
 (def encode generate-string)
-(def encode-stream generate-stream)
+(def encode-stream generate)
 (def encode-smile generate-smile)
-(def decode parse-string)
-(def decode-stream parse-stream)
+(def decode parse)
+(def decode-stream parse)
 (def decode-smile parse-smile)
