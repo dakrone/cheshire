@@ -8,9 +8,28 @@
   `(.writeString ~jg ~str))
 
 (definline fail [obj]
-  `(throw (Exception. (str "Cannot generate " ~obj))))
+  `(throw (Exception. (str "Cannot generate " (class ~obj) ": " ~obj))))
 
-(defn generate [^JsonGenerator jg ^Object obj ^String date-format]
+(defmacro number-dispatch [^JsonGenerator jg obj]
+  (if (= 3 (:minor *clojure-version*))
+    (do
+      `(condp instance? ~obj
+         Integer (.writeNumber ~jg (int ~obj))
+         Long (.writeNumber ~jg (long ~obj))
+         Double (.writeNumber ~jg (double ~obj))
+         Float (.writeNumber ~jg (double ~obj))
+         clojure.lang.BigInt (.writeNumber ~jg (.toBigInteger (bigint ~obj)))
+         (fail ~obj)))
+    (do
+      `(condp instance? ~obj
+         Integer (.writeNumber ~jg (int ~obj))
+         Long (.writeNumber ~jg (long ~obj))
+         Double (.writeNumber ~jg (double ~obj))
+         Float (.writeNumber ~jg (float ~obj))
+         BigInteger (.writeNumber ~jg ^BigInteger ~obj)
+         (fail ~obj)))))
+
+(defn generate [^JsonGenerator jg obj ^String date-format]
   (condp instance? obj
     IPersistentCollection (condp instance? obj
                             clojure.lang.IPersistentMap
@@ -37,21 +56,18 @@
                               (doseq [item obj]
                                 (generate jg item date-format))
                               (.writeEndArray jg)))
-    Number (condp instance? obj
-             Integer (.writeNumber jg ^Integer obj)
-             Long (.writeNumber jg ^Long obj)
-             Float (.writeNumber jg ^Float obj)
-             Double (.writeNumber jg ^Double obj)
-             BigInteger (.writeNumber jg ^BigInteger obj)
-             (fail obj))
-    String (write-string jg ^String obj)
-    Keyword (write-string jg (name obj))
-    UUID (write-string jg (.toString obj))
-    Symbol (write-string jg (.toString obj))
-    Boolean (.writeBoolean jg ^Boolean obj)
+    Number (number-dispatch ^JsonGenerator jg obj)
+    String (write-string ^JsonGenerator jg ^String obj)
+    Keyword (write-string ^JsonGenerator jg (name obj))
+    UUID (write-string ^JsonGenerator jg (.toString obj))
+    Symbol (write-string ^JsonGenerator jg (.toString obj))
+    Boolean (.writeBoolean ^JsonGenerator jg ^Boolean obj)
     Date (let [sdf (doto (SimpleDateFormat. date-format)
                      (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
-           (write-string jg (.format sdf obj)))
+           (write-string ^JsonGenerator jg (.format sdf obj)))
     (if (nil? obj)
-      (.writeNull jg)
-      (fail obj))))
+      (.writeNull ^JsonGenerator jg)
+      ;; it must be a primative then
+      (try
+        (.writeNumber ^JsonGenerator jg obj)
+        (catch Exception e (fail obj))))))
