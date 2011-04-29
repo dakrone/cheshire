@@ -4,7 +4,7 @@
   (:import (org.codehaus.jackson.smile SmileFactory)
            (org.codehaus.jackson JsonFactory JsonParser JsonParser$Feature
                                  JsonGenerator)
-           (java.io StringWriter StringReader BufferedReader
+           (java.io StringWriter StringReader BufferedReader BufferedWriter
                     ByteArrayOutputStream)))
 
 ;; default date format used to JSON-encode Date objects
