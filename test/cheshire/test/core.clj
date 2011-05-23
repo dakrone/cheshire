@@ -14,7 +14,7 @@
   (is (= test-obj (json/parse-string (json/generate-string test-obj)))))
 
 (deftest test-generate-accepts-float
-  (is (= "3.14" (json/generate-string (Float. 3.14)))))
+  (is (= "3.14" (json/generate-string (float 3.14)))))
 
 (deftest test-keyword-encode
   (is (= {"key" "val"}
