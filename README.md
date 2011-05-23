@@ -35,7 +35,9 @@ of both worlds.
 
 ## Usage
 
-    [cheshire "1.1.2"]
+    [cheshire "1.1.3"]
+    
+    Cheshire v1.1.3 uses Jackson 1.8.1
 
 ### Encoding
 
