@@ -4,7 +4,7 @@
   :dependencies [[org.clojure/clojure "1.2.1"]
                  [org.codehaus.jackson/jackson-core-asl "1.8.2"]
                  [org.codehaus.jackson/jackson-smile "1.8.2"]]
-  :dev-dependencies [[marginalia "0.5.0"]
+  :dev-dependencies [[lein-marginalia "0.6.0"]
                      [lein-multi "1.0.0"]]
   :multi-deps {"1.2.0" [[org.clojure/clojure "1.2.0"]
                         [org.codehaus.jackson/jackson-core-asl "1.8.2"]
