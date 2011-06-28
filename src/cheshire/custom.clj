@@ -63,14 +63,14 @@
 (def generate-stream encode-stream)
 (def generate-smile encode-smile)
 
-(defn- encode-nil [_ ^JsonGenerator jg]
+(defn encode-nil [_ ^JsonGenerator jg]
   (.writeNull jg))
 
 (extend nil
   Jable
   {:to-json encode-nil})
 
-(defn- encode-str [^String s ^JsonGenerator jg]
+(defn encode-str [^String s ^JsonGenerator jg]
   (.writeString jg (str s)))
 
 (extend java.lang.String
@@ -150,3 +150,25 @@
 (extend clojure.lang.Symbol
   Jable
   {:to-json encode-symbol})
+
+
+(defn add-encoder
+  "Provide an encoder for a type not handled by Cheshire.
+
+   ex. (add-encoder java.net.URL encode-string)
+
+   See encode-str, encode-map, etc, in the cheshire.custom
+   namespace for encoder examples."
+  [^java.util.Class cls encoder]
+  (extend cls
+    Jable
+    {:to-json encoder}))
+
+(defn remove-encoder [cls]
+  "Remove encoder for a given type.
+
+   ex. (remove-encoder java.net.URL)"
+  (alter-var-root
+   #'Jable
+   #(assoc % :impls (dissoc (:impls %) cls)))
+  (clojure.core/-reset-methods Jable))
