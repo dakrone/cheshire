@@ -2,3 +2,4 @@ lib/*
 multi-lib/*
 coref
 classes/*
+.lein-failures

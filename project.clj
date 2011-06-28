@@ -12,6 +12,6 @@
                "1.2.1" [[org.clojure/clojure "1.2.1"]
                         [org.codehaus.jackson/jackson-core-asl "1.8.1"]
                         [org.codehaus.jackson/jackson-smile "1.8.1"]]
-               "1.3" [[org.clojure/clojure "1.3.0-alpha7"]
+               "1.3" [[org.clojure/clojure "1.3.0-beta1"]
                       [org.codehaus.jackson/jackson-core-asl "1.8.1"]
                       [org.codehaus.jackson/jackson-smile "1.8.1"]]})
