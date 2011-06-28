@@ -7,7 +7,7 @@
            (org.codehaus.jackson JsonFactory JsonGenerator JsonParser
                                  JsonParser$Feature)))
 
-(set! *warn-on-reflection* true)
+;;(set! *warn-on-reflection* true)
 
 (def ^{:private true :tag JsonFactory} factory
   (doto (JsonFactory.)
