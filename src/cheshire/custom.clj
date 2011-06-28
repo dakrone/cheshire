@@ -159,7 +159,7 @@
 
    See encode-str, encode-map, etc, in the cheshire.custom
    namespace for encoder examples."
-  [^java.util.Class cls encoder]
+  [cls encoder]
   (extend cls
     Jable
     {:to-json encoder}))
