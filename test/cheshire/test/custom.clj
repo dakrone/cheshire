@@ -1,7 +1,7 @@
 (ns cheshire.test.custom
   (:use [clojure.test]
         [clojure.java.io :only [reader]])
-  (:require [cheshire.custom :as json])
+  (:require [cheshire.custom :as json] :reload)
   (:import (java.io StringReader StringWriter
                     BufferedReader BufferedWriter)
            (java.util Date UUID)))
@@ -111,3 +111,15 @@
       (prn min-time max-time)
       (is (> 2000 min-time))
       (is (> 5200 max-time)))))
+
+
+(deftest test-add-remove-encoder
+  (do
+    (json/remove-encoder java.net.URL)
+    (json/add-encoder java.net.URL json/encode-str)
+    (is (= "\"http://foo.com\""
+           (json/generate-string (java.net.URL. "http://foo.com")))))
+  (do
+    (json/remove-encoder java.net.URL)
+    (is (thrown? IllegalArgumentException
+                 (json/generate-string (java.net.URL. "http://foo.com"))))))
