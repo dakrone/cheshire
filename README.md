@@ -35,9 +35,9 @@ of both worlds.
 
 ## Usage
 
-    [cheshire "1.1.3"]
+    [cheshire "1.1.4"]
     
-    Cheshire v1.1.3 uses Jackson 1.8.1
+    Cheshire v1.1.4 uses Jackson 1.8.2
 
 ### Encoding
 
@@ -115,7 +115,9 @@ Cheshire encoding supports:
 - Lazy decoding
 - [SMILE encoding/decoding](http://wiki.fasterxml.com/SmileFormatSpec)
 
-Work is underway to have custom object encoders while still being fast.
+Work is underway to have custom object encoders while still being
+fast. See custom.clj for an implementation, but keep in mind that this
+is still a work in progress.
 
 ## Speed
 
