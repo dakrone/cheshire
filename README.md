@@ -150,7 +150,8 @@ Cheshire is right up there with clj-json.
 
 ## Future Ideas/TODOs
 - move away from using Java entirely, use Protocols for the encoder
-- allow custom encoders (this should be doable once switched over to protocols)
+  (in progress, see custom.clj)
+- allow custom encoders (in progress, see custom.clj)
 
 ## License
 Release under the MIT license. See LICENSE for the full license.
