@@ -59,32 +59,59 @@
 (def generate-stream encode-stream)
 (def generate-smile encode-smile)
 
+;; generic encoders
 (defn encode-nil [_ ^JsonGenerator jg]
   (.writeNull jg))
 
+(defn encode-str [^String s ^JsonGenerator jg]
+  (.writeString jg (str s)))
+
+(defn encode-number [^java.lang.Number n ^JsonGenerator jg]
+  (.writeNumber jg n))
+
+(defn encode-seq [s ^JsonGenerator jg]
+  (.writeStartArray jg)
+  (doseq [i s]
+    (to-json i jg))
+  (.writeEndArray jg))
+
+(defn encode-date [^Date d ^JsonGenerator jg]
+  (let [sdf (SimpleDateFormat. *date-format*)]
+    (.setTimeZone sdf (SimpleTimeZone. 0 "UTC"))
+    (.writeString jg (.format sdf d))))
+
+(defn encode-bool [^Boolean b ^JsonGenerator jg]
+  (.writeBoolean jg b))
+
+(defn encode-named [^clojure.lang.Keyword k ^JsonGenerator jg]
+  (.writeString jg (name k)))
+
+(defn encode-map [^clojure.lang.IPersistentMap m ^JsonGenerator jg]
+  (.writeStartObject jg)
+  (doseq [[k v] m]
+    (.writeFieldName jg (if (instance? clojure.lang.Keyword k)
+                          (name k)
+                          (str k)))
+    (to-json v jg))
+  (.writeEndObject jg))
+
+(defn encode-symbol [^clojure.lang.Symbol s ^JsonGenerator jg]
+  (.writeString jg (str (:ns (meta (resolve s)))
+                        "/"
+                        (:name (meta (resolve s))))))
+
+;; extended implementations
 (extend nil
   Jable
   {:to-json encode-nil})
-
-(defn encode-str [^String s ^JsonGenerator jg]
-  (.writeString jg (str s)))
 
 (extend java.lang.String
   Jable
   {:to-json encode-str})
 
-(defn- encode-number [^java.lang.Number n ^JsonGenerator jg]
-  (.writeNumber jg n))
-
 (extend java.lang.Number
   Jable
   {:to-json encode-number})
-
-(defn- encode-seq [s ^JsonGenerator jg]
-  (.writeStartArray jg)
-  (doseq [i s]
-    (to-json i jg))
-  (.writeEndArray jg))
 
 (extend clojure.lang.ISeq
   Jable
@@ -98,11 +125,6 @@
   Jable
   {:to-json encode-seq})
 
-(defn- encode-date [^Date d ^JsonGenerator jg]
-  (let [sdf (SimpleDateFormat. *date-format*)]
-    (.setTimeZone sdf (SimpleTimeZone. 0 "UTC"))
-    (.writeString jg (.format sdf d))))
-
 (extend java.util.Date
   Jable
   {:to-json encode-date})
@@ -111,37 +133,17 @@
   Jable
   {:to-json encode-str})
 
-(defn- encode-bool [^Boolean b ^JsonGenerator jg]
-  (.writeBoolean jg b))
-
 (extend java.lang.Boolean
   Jable
   {:to-json encode-bool})
-
-(defn- encode-named [^clojure.lang.Keyword k ^JsonGenerator jg]
-  (.writeString jg (name k)))
 
 (extend clojure.lang.Keyword
   Jable
   {:to-json encode-named})
 
-(defn- encode-map [^clojure.lang.IPersistentMap m ^JsonGenerator jg]
-  (.writeStartObject jg)
-  (doseq [[k v] m]
-    (.writeFieldName jg (if (instance? clojure.lang.Keyword k)
-                          (name k)
-                          (str k)))
-    (to-json v jg))
-  (.writeEndObject jg))
-
 (extend clojure.lang.IPersistentMap
   Jable
   {:to-json encode-map})
-
-(defn- encode-symbol [^clojure.lang.Symbol s ^JsonGenerator jg]
-  (.writeString jg (str (:ns (meta (resolve s)))
-                        "/"
-                        (:name (meta (resolve s))))))
 
 (extend clojure.lang.Symbol
   Jable
