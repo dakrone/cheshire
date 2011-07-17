@@ -1,21 +1,17 @@
 (ns cheshire.custom
+  "Methods used for extending JSON generation to different Java classes.
+  Has the same public API as core.clj so they can be swapped in and out."
+  (:use [cheshire.factory])
   (:require [cheshire.core :as core])
   (:import (java.io BufferedWriter ByteArrayOutputStream StringWriter)
            (java.util Date SimpleTimeZone)
            (java.text SimpleDateFormat)
            (org.codehaus.jackson.smile SmileFactory)
-           (org.codehaus.jackson JsonFactory JsonGenerator JsonParser
-                                 JsonParser$Feature)))
+           (org.codehaus.jackson JsonFactory JsonGenerator JsonParser)))
 
 ;;(set! *warn-on-reflection* true)
 
-(def ^{:private true :tag JsonFactory} factory
-  (doto (JsonFactory.)
-    (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS true)))
-
-(def ^{:private true :tag SmileFactory} smile-factory
-  (SmileFactory.))
-
+;; default date format used to JSON-encode Date objects
 (def ^{:dynamic true} *date-format* "yyyy-MM-dd'T'HH:mm:ss'Z'")
 
 (defprotocol Jable

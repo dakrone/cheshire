@@ -1,22 +1,13 @@
 (ns cheshire.core
-  (:use [cheshire.parse :only [parse]]
-        [cheshire.generate :only [generate]])
-  (:import (org.codehaus.jackson.smile SmileFactory)
-           (org.codehaus.jackson JsonFactory JsonParser JsonParser$Feature
-                                 JsonGenerator)
+  (:use [cheshire.factory]
+        [cheshire.generate :only [generate]]
+        [cheshire.parse :only [parse]])
+  (:import (org.codehaus.jackson JsonParser)
            (java.io StringWriter StringReader BufferedReader BufferedWriter
                     ByteArrayOutputStream)))
 
 ;; default date format used to JSON-encode Date objects
 (def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
-
-;; Factory objects that are needed to do the encoding and decoding
-(def ^{:private true :tag JsonFactory} factory
-  (doto (JsonFactory.)
-    (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS true)))
-
-(def ^{:private true :tag SmileFactory} smile-factory
-  (SmileFactory.))
 
 ;; Generators
 (defn ^String generate-string
