@@ -203,7 +203,8 @@ encoding coming soon.
 - <del>move away from using Java entirely, use Protocols for the
   custom encoder</del> (see custom.clj)
 - <del>allow custom encoders</del> (see custom.clj)
-- figure out a way to encode namespace-qualified keywords
+- <del>figure out a way to encode namespace-qualified keywords</del>
+  done but not released yet
 - look into overriding the default encoding handlers with custom handlers
 - better handling when java numbers overflow ECMAScript's numbers
   (-2^31 to (2^31 - 1))
