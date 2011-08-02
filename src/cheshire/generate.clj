@@ -58,7 +58,10 @@
                               (.writeEndArray jg)))
     Number (number-dispatch ^JsonGenerator jg obj)
     String (write-string ^JsonGenerator jg ^String obj)
-    Keyword (write-string ^JsonGenerator jg (name obj))
+    Keyword (write-string ^JsonGenerator jg
+                          (if-let [ns (namespace obj)]
+                            (str ns "/" (name obj))
+                            (name obj)))
     UUID (write-string ^JsonGenerator jg (.toString obj))
     Symbol (write-string ^JsonGenerator jg (.toString obj))
     Boolean (.writeBoolean ^JsonGenerator jg ^Boolean obj)

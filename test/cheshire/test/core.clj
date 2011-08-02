@@ -111,3 +111,7 @@
       (prn min-time max-time)
       (is (> 2000 min-time))
       (is (> 5200 max-time)))))
+
+(deftest test-namespaced-keywords
+  (is (= "{\"foo\":\"user/bar\"}"
+         (json/encode {:foo :user/bar}))))

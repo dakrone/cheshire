@@ -123,3 +123,7 @@
     (json/remove-encoder java.net.URL)
     (is (thrown? IllegalArgumentException
                  (json/generate-string (java.net.URL. "http://foo.com"))))))
+
+(deftest test-namespaced-keywords
+  (is (= "{\"foo\":\"user/bar\"}"
+         (json/encode {:foo :user/bar}))))
