@@ -34,9 +34,9 @@ of both worlds.
 
 ## Usage
 
-    [cheshire "1.1.4"]
+    [cheshire "2.0.0"]
     
-    Cheshire v1.1.4 uses Jackson 1.8.2
+    Cheshire v2.0.0 uses Jackson 1.8.3
 
     ;; In your ns statement:
     (ns myns
