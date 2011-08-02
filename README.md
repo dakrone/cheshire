@@ -197,7 +197,7 @@ encoding coming soon.
 ## Known Issues
 - Any number (besides a BigInt or BigInteger) that gets encoded will
   wrap if it is below -2^31 or above 2^31 - 1, use BigIntegers if you
-  need to encode a very large number.
+  need to encode a very large number. This only effects clojure 1.3-beta1.
 
 ## Future Ideas/TODOs
 - <del>move away from using Java entirely, use Protocols for the
