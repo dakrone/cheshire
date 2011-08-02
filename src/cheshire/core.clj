@@ -12,7 +12,7 @@
   optional date format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  [obj & [date-format]]
+  [obj & [^String date-format]]
   (let [sw (StringWriter.)
         generator (.createJsonGenerator factory sw)]
     (generate generator obj (or date-format default-date-format))
@@ -48,7 +48,7 @@
   "Returns the Clojure object corresponding to the given JSON-encoded string.
   keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords."
-  [^String string & [keywords?]]
+  [^String string & [^Boolean keywords?]]
   (parse
    (.createJsonParser factory (StringReader. string))
    true (or keywords? false) nil))
@@ -59,7 +59,7 @@
   the default is false, maps will use strings as keywords.
 
   If laziness is needed, see parsed-seq."
-  [^BufferedReader rdr & [keywords?]]
+  [^BufferedReader rdr & [^Boolean keywords?]]
   (parse
    (.createJsonParser factory rdr)
    true (or keywords? false) nil))
@@ -68,7 +68,7 @@
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
   keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords."
-  [^bytes bytes & [keywords?]]
+  [^bytes bytes & [^Boolean keywords?]]
   (parse
    (.createJsonParser smile-factory bytes)
    true (or keywords? false) nil))
@@ -76,7 +76,7 @@
 ;; Lazy parsers
 (defn- parsed-seq*
   "Internal lazy-seq parser"
-  [^JsonParser parser keywords?]
+  [^JsonParser parser ^Boolean keywords?]
   (let [eof (Object.)]
     (lazy-seq
      (let [elem (parse parser true keywords? eof)]
@@ -88,13 +88,13 @@
   the given reader. The seq continues until the end of the reader is reached.
 
   If non-laziness is needed, see parse-stream."
-  [^BufferedReader reader & [keywords?]]
+  [^BufferedReader reader & [^Boolean keywords?]]
   (parsed-seq* (.createJsonParser factory reader) (or keywords? false)))
 
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
   the given reader. The seq continues until the end of the reader is reached."
-  [^BufferedReader reader & [keywords?]]
+  [^BufferedReader reader & [^Boolean keywords?]]
   (parsed-seq* (.createJsonParser smile-factory reader) (or keywords? false)))
 
 ;; aliases for clojure-json users
