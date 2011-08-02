@@ -1,7 +1,7 @@
 # Cheshire
 
 <img src="http://dakrone.github.com/cheshire/cheshire_small.jpg"
-title=":)" align="left">
+title=":)" align="left" padding="5px" />
 <small>
 'Cheshire Puss,' she began, rather timidly, as she did not at all know
 whether it would like the name: however, it only grinned a little
@@ -19,7 +19,6 @@ on. 'Would you tell me, please, which way I ought to go from here?'
 'Oh, you're sure to do that,' said the Cat, 'if you only walk long
 enough.'
 </small>
-</img>
 <br clear=all /><br />
 Cheshire is fast JSON encoding, based off of clj-json and
 clojure-json, with additional features like Date/UUID/Set/Symbol
@@ -38,6 +37,10 @@ of both worlds.
     [cheshire "1.1.4"]
     
     Cheshire v1.1.4 uses Jackson 1.8.2
+
+    ;; In your ns statement:
+    (ns myns
+      (:use [cheshire.core]))
 
 ### Encoding
 
@@ -80,6 +83,50 @@ of both worlds.
     ;; parse a SMILE stream lazily (keywords option also supported)
     (parsed-smile-seq (clojure.java.io/reader "/tmp/foo"))
 
+### Custom Encoders
+
+Custom encoding is supported from 2.0.0 and up, however there still
+may be bugs, if you encounter a bug, please open a github issue.
+
+    ;; Custom encoders allow you to swap out the api for the fast
+    ;; encoder with one that is slightly slower, but allows custom
+    ;; things to be encoded:
+    (ns myns
+      (:use [cheshire.custom]))
+    
+    ;; First, add a custom encoder for a class:
+    (add-encoder java.awt.Color
+                 (fn [c jsonGenerator]
+                   (.writeString jsonGenerator (str c))))
+
+    ;; There are also helpers for common encoding actions:
+    (add-encoder java.net.URL encode-str)
+    
+    ;; List of common encoders that can be used: (see custom.clj)
+    ;; encode-nil
+    ;; encode-number
+    ;; encode-seq
+    ;; encode-date
+    ;; encode-bool
+    ;; encode-named
+    ;; encade-map
+    ;; encade-symbol
+    
+    ;; Then you can use encode from the custom namespace as normal
+    (encode (java.awt.Color. 1 2 3))
+    ;; => "java.awt.Color[r=1,g=2,b=3]"
+    
+    ;; Custom encoders can also be removed:
+    (remove-encoder java.awt.Color)
+
+    ;; Decoding remains the same, you are responsible for doing custom decoding.
+
+Custom (slower) and Core (faster) encoding can be mixed and matched by
+requiring both namespaces and using the custom one only when you need
+to encode custom classes. The API methods for cheshire.core and
+cheshire.custom are exactly the same (except for add-encoder and
+remove-encoder in the custom namespace).
+
 There are also a few aliases for commonly used functions:
 
     encode -> generate-string
@@ -110,14 +157,12 @@ Cheshire encoding supports:
 - Date
 - UUID
 
+### Custom class encoding while still being (reasonably) fast
+
 ### Also supports
 - Stream encoding/decoding
 - Lazy decoding
 - [SMILE encoding/decoding](http://wiki.fasterxml.com/SmileFormatSpec)
-
-Work is underway to have custom object encoders while still being
-fast. See custom.clj for an implementation, but keep in mind that this
-is still a work in progress.
 
 ## Speed
 
@@ -146,12 +191,19 @@ is still a work in progress.
     clojure printer/reader w/ print-dup    11.17
     clojure-json                           20.42
 
-Cheshire is right up there with clj-json.
+Cheshire is right up there with clj-json. Benchmarks for custom
+encoding coming soon.
+
+## Known Issues
+- The custom encoder tests don't pass on clojure 1.3, this is due to
+  the way clojure handles large numbers and floats, however json is
+  actually being written correctly, so this failure can be ignored
 
 ## Future Ideas/TODOs
-- move away from using Java entirely, use Protocols for the encoder
-  (in progress, see custom.clj)
-- allow custom encoders (in progress, see custom.clj)
+- <del>move away from using Java entirely, use Protocols for the
+  custom encoder</del> (see custom.clj)
+- <del>allow custom encoders</del> (see custom.clj)
+- make it as fast as possible
 
 ## License
 Release under the MIT license. See LICENSE for the full license.
