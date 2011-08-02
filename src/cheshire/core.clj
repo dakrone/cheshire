@@ -6,9 +6,6 @@
            (java.io StringWriter StringReader BufferedReader BufferedWriter
                     ByteArrayOutputStream)))
 
-;; default date format used to JSON-encode Date objects
-(def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
-
 ;; Generators
 (defn ^String generate-string
   "Returns a JSON-encoding String for the given Clojure object. Takes an

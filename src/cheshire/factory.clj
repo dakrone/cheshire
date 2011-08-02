@@ -12,3 +12,5 @@
 (def ^{:tag SmileFactory} smile-factory
   (SmileFactory.))
 
+;; default date format used to JSON-encode Date objects
+(def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
