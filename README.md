@@ -203,6 +203,8 @@ encoding coming soon.
 - <del>move away from using Java entirely, use Protocols for the
   custom encoder</del> (see custom.clj)
 - <del>allow custom encoders</del> (see custom.clj)
+- figure out a way to encode namespace-qualified keywords
+- look into overriding the default encoding handlers with custom handlers
 - make it as fast as possible
 
 ## License
