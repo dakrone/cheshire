@@ -195,9 +195,9 @@ Cheshire is right up there with clj-json. Benchmarks for custom
 encoding coming soon.
 
 ## Known Issues
-- The custom encoder tests don't pass on clojure 1.3, this is due to
-  the way clojure handles large numbers and floats, however json is
-  actually being written correctly, so this failure can be ignored
+- Any number (besides a BigInt or BigInteger) that gets encoded will
+  wrap if it is below -2^31 or above 2^31 - 1, use BigIntegers if you
+  need to encode a very large number.
 
 ## Future Ideas/TODOs
 - <del>move away from using Java entirely, use Protocols for the
@@ -205,6 +205,8 @@ encoding coming soon.
 - <del>allow custom encoders</del> (see custom.clj)
 - figure out a way to encode namespace-qualified keywords
 - look into overriding the default encoding handlers with custom handlers
+- better handling when java numbers overflow ECMAScript's numbers
+  (-2^31 to (2^31 - 1))
 - make it as fast as possible
 
 ## License

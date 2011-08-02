@@ -6,9 +6,14 @@
                     BufferedReader BufferedWriter)
            (java.util Date UUID)))
 
-(def test-obj {"int" 3 "long" 52001110638799097 "bigint" 9223372036854775808
-               "double" 1.23 "boolean" true "nil" nil "string" "string"
-               "vec" [1 2 3] "map" {"a" "b"} "list" (list "a" "b")})
+(def test-obj {"int" 3 "long" (long -2147483647) "boolean" true
+               "LongObj" (Long/parseLong "2147483647") "double" 1.23
+               "nil" nil "string" "string" "vec" [1 2 3] "map" {"a" "b"}
+               "list" (list "a" "b")})
+
+(deftest t-bigint
+  (let [n 9223372036854775808]
+    (is (= n (:num (json/decode (json/encode {:num n}) true))))))
 
 (deftest test-string-round-trip
   (is (= test-obj (json/parse-string (json/generate-string test-obj)))))
