@@ -208,6 +208,7 @@ encoding coming soon.
 - look into overriding the default encoding handlers with custom handlers
 - better handling when java numbers overflow ECMAScript's numbers
   (-2^31 to (2^31 - 1))
+- handle encoding java.sql.Timestamp the same as java.util.Date
 - make it as fast as possible
 
 ## License
