@@ -1,6 +1,7 @@
 (ns cheshire.generate
   (:import (org.codehaus.jackson JsonGenerator)
            (java.util List Date SimpleTimeZone UUID)
+           (java.sql Timestamp)
            (java.text SimpleDateFormat)
            (clojure.lang IPersistentCollection Keyword Symbol)))
 
@@ -68,6 +69,10 @@
     Date (let [sdf (doto (SimpleDateFormat. date-format)
                      (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
            (write-string ^JsonGenerator jg (.format sdf obj)))
+    Timestamp (let [date (Date. (.getTime obj))
+                    sdf (doto (SimpleDateFormat. date-format)
+                          (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
+                (write-string ^JsonGenerator jg (.format sdf obj)))
     (if (nil? obj)
       (.writeNull ^JsonGenerator jg)
       ;; it must be a primative then

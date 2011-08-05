@@ -6,6 +6,7 @@
   (:import (java.io BufferedWriter ByteArrayOutputStream StringWriter)
            (java.util Date SimpleTimeZone)
            (java.text SimpleDateFormat)
+           (java.sql Timestamp)
            (org.codehaus.jackson.smile SmileFactory)
            (org.codehaus.jackson JsonFactory JsonGenerator JsonParser)))
 
@@ -162,6 +163,10 @@
 (extend java.util.Date
   JSONable
   {:to-json encode-date})
+
+(extend java.sql.Timestamp
+  JSONable
+  {:to-json #(encode-date (Date. (.getTime %1)) %2)})
 
 (extend java.util.UUID
   JSONable

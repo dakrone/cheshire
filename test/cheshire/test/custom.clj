@@ -4,6 +4,7 @@
   (:require [cheshire.custom :as json] :reload)
   (:import (java.io StringReader StringWriter
                     BufferedReader BufferedWriter)
+           (java.sql Timestamp)
            (java.util Date UUID)))
 
 (def test-obj {"int" 3 "long" (long -2147483647) "boolean" true
@@ -68,6 +69,17 @@
          (json/decode
           (json/encode
            {:foo (Date. (long 0))} "yyyy-MM-dd")))
+      "encode with given date format"))
+
+(deftest test-sql-timestamp
+  (is (= {"foo" "1970-01-01T00:00:00Z"}
+         (json/decode
+          (json/encode
+           {:foo (Timestamp. (long 0))}))))
+  (is (= {"foo" "1970-01-01"}
+         (json/decode
+          (json/encode
+           {:foo (Timestamp. (long 0))} "yyyy-MM-dd")))
       "encode with given date format"))
 
 (deftest test-uuid
