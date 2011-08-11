@@ -26,6 +26,8 @@ encoding and SMILE support.
 
 [Clojure code with docs](http://dakrone.github.com/cheshire/)
 
+[![Continuous Integration status](https://secure.travis-ci.org/dakrone/cheshire.png)](http://travis-ci.org/dakrone/cheshire)
+
 ## Why?
 
 clojure-json had really nice features (custom encoders), but was slow;
