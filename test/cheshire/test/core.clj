@@ -116,19 +116,6 @@
         (t)))
     (/ (double (- (System/nanoTime) start)) 1000000.0)))
 
-#_(deftest test-performance
-  (let [tests (->> (ns-publics 'cheshire.test.core)
-                   (remove (comp (partial = 'test-performance) first))
-                   (map second)
-                   (filter (comp :test meta)))
-        start (System/nanoTime)]
-    (let [times (doall (map timed-tests (repeat 3 tests)))
-          min-time (apply min times)
-          max-time (apply max times)]
-      (prn min-time max-time)
-      (is (> 2000 min-time))
-      (is (> 5200 max-time)))))
-
 (deftest test-namespaced-keywords
   (is (= "{\"foo\":\"user/bar\"}"
          (json/encode {:foo :user/bar}))))
