@@ -117,15 +117,24 @@
     (/ (double (- (System/nanoTime) start)) 1000000.0)))
 
 (deftest test-add-remove-encoder
-  (do
-    (json/remove-encoder java.net.URL)
-    (json/add-encoder java.net.URL json/encode-str)
-    (is (= "\"http://foo.com\""
-           (json/generate-string (java.net.URL. "http://foo.com")))))
-  (do
-    (json/remove-encoder java.net.URL)
-    (is (thrown? IllegalArgumentException
-                 (json/generate-string (java.net.URL. "http://foo.com"))))))
+  (json/remove-encoder java.net.URL)
+  (json/add-encoder java.net.URL json/encode-str)
+  (is (= "\"http://foo.com\""
+         (json/generate-string (java.net.URL. "http://foo.com"))))
+  (json/remove-encoder java.net.URL)
+  (is (thrown? IllegalArgumentException
+               (json/generate-string (java.net.URL. "http://foo.com")))))
+
+;; Test that default encoders can be removed if so desired.
+(deftest test-shadowing-default-encoder
+  (json/remove-encoder java.util.Date)
+  (json/add-encoder java.util.Date
+                    (fn [d jg] (json/encode-str "foo" jg)))
+  (is (= "\"foo\"" (json/generate-string (java.util.Date.))))
+  (json/remove-encoder java.util.Date)
+  (json/add-encoder java.util.Date json/encode-date)
+  (is (json/generate-string (java.util.Date.))
+      "shouldn't throw an exception after adding back the default."))
 
 (deftest test-namespaced-keywords
   (is (= "{\"foo\":\"user/bar\"}"
