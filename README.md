@@ -31,8 +31,7 @@ encoding and SMILE support.
 ## Why?
 
 clojure-json had really nice features (custom encoders), but was slow;
-clj-json had almost no features, but was very fast. I wanted the best
-of both worlds.
+clj-json had no features, but was fast. I wanted both.
 
 ## Usage
 
@@ -196,11 +195,6 @@ Cheshire encoding supports:
 Cheshire is right up there with clj-json. Benchmarks for custom
 encoding coming soon.
 
-## Known Issues
-- Any number (besides a BigInt or BigInteger) that gets encoded will
-  wrap if it is below -2^31 or above 2^31 - 1, use BigIntegers if you
-  need to encode a very large number. This only effects clojure 1.3-beta1.
-
 ## Future Ideas/TODOs
 - <del>move away from using Java entirely, use Protocols for the
   custom encoder</del> (see custom.clj)
@@ -218,5 +212,5 @@ encoding coming soon.
 Release under the MIT license. See LICENSE for the full license.
 
 ## Thanks
-Thanks go to Mark McGranaghan for allowing me to copy the clj-json
+Thanks go to Mark McGranaghan for allowing me to look at the clj-json
 code to get started on this and Jim Duey for the name. :)
