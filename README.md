@@ -45,82 +45,88 @@ clj-json had no features, but was fast. I wanted both.
 
 ### Encoding
 
-    ;; generate some json
-    (generate-string {:foo "bar" :baz 5})
+```clojure
+;; generate some json
+(generate-string {:foo "bar" :baz 5})
 
-    ;; write some json to a stream
-    (generate-stream (clojure.java.io/writer "/tmp/foo") {:foo "bar" :baz 5})
+;; write some json to a stream
+(generate-stream (clojure.java.io/writer "/tmp/foo") {:foo "bar" :baz 5})
 
-    ;; generate some SMILE
-    (generate-smile {:foo "bar" :baz 5})
+;; generate some SMILE
+(generate-smile {:foo "bar" :baz 5})
 
-    ;; generate some JSON with Dates
-    ;; the Date will be encoded as a string using
-    ;; the default date format: yyyy-MM-dd'T'HH:mm:ss'Z'
-    (generate-string {:foo "bar" :baz (Date. 0)})
+;; generate some JSON with Dates
+;; the Date will be encoded as a string using
+;; the default date format: yyyy-MM-dd'T'HH:mm:ss'Z'
+(generate-string {:foo "bar" :baz (Date. 0)})
 
-    ;; generate some JSON with Dates with custom Date encoding
-    (generate-string {:baz (Date. 0)} "yyyy-MM-dd")
+;; generate some JSON with Dates with custom Date encoding
+(generate-string {:baz (Date. 0)} "yyyy-MM-dd")
+```
 
 ### Decoding
 
-    ;; parse some json
-    (parse-string "{\"foo\":\"bar\"}")
-    ;; => {"foo" "bar"}
+```clojure
+;; parse some json
+(parse-string "{\"foo\":\"bar\"}")
+;; => {"foo" "bar"}
 
-    ;; parse some json and get keywords back
-    (parse-string "{\"foo\":\"bar\"}" true)
-    ;; => {:foo "bar"}
+;; parse some json and get keywords back
+(parse-string "{\"foo\":\"bar\"}" true)
+;; => {:foo "bar"}
 
-    ;; parse some SMILE (keywords option also supported)
-    (parse-smile <your-byte-array>)
+;; parse some SMILE (keywords option also supported)
+(parse-smile <your-byte-array>)
 
-    ;; parse a stream (keywords option also supported)
-    (parse-stream (clojure.java.io/reader "/tmp/foo"))
+;; parse a stream (keywords option also supported)
+(parse-stream (clojure.java.io/reader "/tmp/foo"))
 
-    ;; parse a stream lazily (keywords option also supported)
-    (parsed-seq (clojure.java.io/reader "/tmp/foo"))
+;; parse a stream lazily (keywords option also supported)
+(parsed-seq (clojure.java.io/reader "/tmp/foo"))
 
-    ;; parse a SMILE stream lazily (keywords option also supported)
-    (parsed-smile-seq (clojure.java.io/reader "/tmp/foo"))
+;; parse a SMILE stream lazily (keywords option also supported)
+(parsed-smile-seq (clojure.java.io/reader "/tmp/foo"))
+```
 
 ### Custom Encoders
 
 Custom encoding is supported from 2.0.0 and up, however there still
 may be bugs, if you encounter a bug, please open a github issue.
 
-    ;; Custom encoders allow you to swap out the api for the fast
-    ;; encoder with one that is slightly slower, but allows custom
-    ;; things to be encoded:
-    (ns myns
-      (:use [cheshire.custom]))
-    
-    ;; First, add a custom encoder for a class:
-    (add-encoder java.awt.Color
-                 (fn [c jsonGenerator]
-                   (.writeString jsonGenerator (str c))))
+```clojure
+;; Custom encoders allow you to swap out the api for the fast
+;; encoder with one that is slightly slower, but allows custom
+;; things to be encoded:
+(ns myns
+  (:use [cheshire.custom]))
 
-    ;; There are also helpers for common encoding actions:
-    (add-encoder java.net.URL encode-str)
-    
-    ;; List of common encoders that can be used: (see custom.clj)
-    ;; encode-nil
-    ;; encode-number
-    ;; encode-seq
-    ;; encode-date
-    ;; encode-bool
-    ;; encode-named
-    ;; encade-map
-    ;; encade-symbol
-    
-    ;; Then you can use encode from the custom namespace as normal
-    (encode (java.awt.Color. 1 2 3))
-    ;; => "java.awt.Color[r=1,g=2,b=3]"
-    
-    ;; Custom encoders can also be removed:
-    (remove-encoder java.awt.Color)
+;; First, add a custom encoder for a class:
+(add-encoder java.awt.Color
+             (fn [c jsonGenerator]
+               (.writeString jsonGenerator (str c))))
 
-    ;; Decoding remains the same, you are responsible for doing custom decoding.
+;; There are also helpers for common encoding actions:
+(add-encoder java.net.URL encode-str)
+
+;; List of common encoders that can be used: (see custom.clj)
+;; encode-nil
+;; encode-number
+;; encode-seq
+;; encode-date
+;; encode-bool
+;; encode-named
+;; encade-map
+;; encade-symbol
+
+;; Then you can use encode from the custom namespace as normal
+(encode (java.awt.Color. 1 2 3))
+;; => "java.awt.Color[r=1,g=2,b=3]"
+
+;; Custom encoders can also be removed:
+(remove-encoder java.awt.Color)
+
+;; Decoding remains the same, you are responsible for doing custom decoding.
+```
 
 Custom (slower) and Core (faster) encoding can be mixed and matched by
 requiring both namespaces and using the custom one only when you need
