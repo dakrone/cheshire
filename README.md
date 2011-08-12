@@ -31,7 +31,8 @@ encoding and SMILE support.
 ## Why?
 
 clojure-json had really nice features (custom encoders), but was slow;
-clj-json had no features, but was fast. I wanted both.
+clj-json had no features, but was fast. Cheshire encodes JSON fast,
+with the ability to use custom encoders.
 
 ## Usage
 
@@ -154,21 +155,23 @@ Cheshire encoding supports:
 - strings
 - lists
 - vectors
-- sets (clj-json does not yet support sets)
+- sets
 - maps
-- symbols (clj-json does not yet support symbols)
+- symbols
 - booleans
-- numbers (Integer, Long, BigInt, Double, Float)
+- numbers (Integer, Long, BigInt, Double, Float, primatives)
 
 ### Java classes
 - Date
 - UUID
+- java.sql.Timestamp (coming in the next release)
 
-### Custom class encoding while still being (reasonably) fast
+### Custom class encoding while still being fast
 
 ### Also supports
 - Stream encoding/decoding
 - Lazy decoding
+- Replacing default encoders for builtin types
 - [SMILE encoding/decoding](http://wiki.fasterxml.com/SmileFormatSpec)
 
 ## Speed
@@ -176,7 +179,7 @@ Cheshire encoding supports:
     Clojure version:  1.2.1
     Num roundtrips:   100000
 
-    Trail:  1
+    Trial:  1
     clj-json                               2.16
     clj-json w/ keywords                   2.43
     clj-serializer                         2.13
@@ -187,7 +190,7 @@ Cheshire encoding supports:
     clojure printer/reader w/ print-dup    12.29
     clojure-json                           20.55
     
-    Trail:  2
+    Trial:  2
     clj-json                               1.23
     clj-json w/ keywords                   2.17
     clj-serializer                         1.58
@@ -198,8 +201,7 @@ Cheshire encoding supports:
     clojure printer/reader w/ print-dup    11.17
     clojure-json                           20.42
 
-Cheshire is right up there with clj-json. Benchmarks for custom
-encoding coming soon.
+Benchmarks for custom encoding coming soon.
 
 ## Future Ideas/TODOs
 - <del>move away from using Java entirely, use Protocols for the
