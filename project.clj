@@ -1,4 +1,4 @@
-(defproject cheshire "2.0.1-SNAPSHOT"
+(defproject cheshire "2.0.1"
   :description "JSON and JSON SMILE encoding, fast."
   :url "https://github.com/dakrone/cheshire"
   :dependencies [[org.clojure/clojure "1.2.1"]
