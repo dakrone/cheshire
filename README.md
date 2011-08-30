@@ -159,12 +159,13 @@ Cheshire encoding supports:
 - maps
 - symbols
 - booleans
+- keywords (qualified and unqualified)
 - numbers (Integer, Long, BigInt, Double, Float, primatives)
 
 ### Java classes
 - Date
 - UUID
-- java.sql.Timestamp (coming in the next release)
+- java.sql.Timestamp
 
 ### Custom class encoding while still being fast
 
@@ -208,12 +209,11 @@ Benchmarks for custom encoding coming soon.
   custom encoder</del> (see custom.clj)
 - <del>allow custom encoders</del> (see custom.clj)
 - <del>figure out a way to encode namespace-qualified keywords</del>
-  done but not released yet
 - look into overriding the default encoding handlers with custom handlers
 - better handling when java numbers overflow ECMAScript's numbers
   (-2^31 to (2^31 - 1))
 - <del>handle encoding java.sql.Timestamp the same as
-  java.util.Date</del> done, will be in next release
+  java.util.Date</del>
 - make it as fast as possible
 
 ## License
