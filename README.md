@@ -36,9 +36,9 @@ with the ability to use custom encoders.
 
 ## Usage
 
-    [cheshire "2.0.0"]
+    [cheshire "2.0.1"]
     
-    Cheshire v2.0.0 uses Jackson 1.8.3
+    Cheshire v2.0.1 uses Jackson 1.8.5
 
     ;; In your ns statement:
     (ns myns
