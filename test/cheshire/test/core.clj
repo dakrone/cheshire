@@ -16,6 +16,10 @@
   (let [n 9223372036854775808]
     (is (= n (:num (json/decode (json/encode {:num n}) true))))))
 
+(deftest t-biginteger
+  (let [n (BigInteger. "42")]
+    (is (= n (:num (json/decode (json/encode {:num n}) true))))))
+
 (deftest test-string-round-trip
   (is (= test-obj (json/parse-string (json/generate-string test-obj)))))
 

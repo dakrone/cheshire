@@ -3,6 +3,7 @@
            (java.util List Date SimpleTimeZone UUID)
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
+           (java.math BigInteger)
            (clojure.lang IPersistentCollection Keyword Symbol)))
 
 (definline write-string [^JsonGenerator jg ^String str]
@@ -19,6 +20,7 @@
          Long (.writeNumber ~jg (long ~obj))
          Double (.writeNumber ~jg (double ~obj))
          Float (.writeNumber ~jg (double ~obj))
+         BigInteger (.writeNumber ~jg ^BigInteger ~obj)
          clojure.lang.BigInt (.writeNumber ~jg (.toBigInteger (bigint ~obj)))
          (fail ~obj)))
     (do
