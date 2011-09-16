@@ -36,9 +36,9 @@ with the ability to use custom encoders.
 
 ## Usage
 
-    [cheshire "2.0.1"]
+    [cheshire "2.0.2"]
     
-    Cheshire v2.0.1 uses Jackson 1.8.5
+    Cheshire v2.0.2 uses Jackson 1.8.5
 
     ;; In your ns statement:
     (ns myns
@@ -160,7 +160,7 @@ Cheshire encoding supports:
 - symbols
 - booleans
 - keywords (qualified and unqualified)
-- numbers (Integer, Long, BigInt, Double, Float, primatives)
+- numbers (Integer, Long, BigInteger, BigInt, Double, Float, primatives)
 
 ### Java classes
 - Date
