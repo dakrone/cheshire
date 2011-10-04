@@ -51,7 +51,7 @@ with the ability to use custom encoders.
 (generate-string {:foo "bar" :baz 5})
 
 ;; write some json to a stream
-(generate-stream (clojure.java.io/writer "/tmp/foo") {:foo "bar" :baz 5})
+(generate-stream {:foo "bar" :baz 5} (clojure.java.io/writer "/tmp/foo"))
 
 ;; generate some SMILE
 (generate-smile {:foo "bar" :baz 5})
