@@ -8,4 +8,7 @@
                      [lein-multi "1.0.0"]]
   :multi-deps {"1.2.1" [[org.clojure/clojure "1.2.1"]
                         [org.codehaus.jackson/jackson-core-asl "1.8.5"]
+                        [org.codehaus.jackson/jackson-smile "1.8.5"]]
+               "1.4.0" [[org.clojure/clojure "1.4.0-alpha1"]
+                        [org.codehaus.jackson/jackson-core-asl "1.8.5"]
                         [org.codehaus.jackson/jackson-smile "1.8.5"]]})
