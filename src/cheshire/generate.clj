@@ -10,10 +10,11 @@
   `(.writeString ~jg ~str))
 
 (definline fail [obj]
-  `(throw (Exception. (str "Cannot generate " (class ~obj) ": " ~obj))))
+  `(throw (Exception. (str "Cannot JSON encode object of class: "
+                           (class ~obj) ": " ~obj))))
 
 (defmacro number-dispatch [^JsonGenerator jg obj]
-  (if (= 3 (:minor *clojure-version*))
+  (if (< 2 (:minor *clojure-version*))
     (do
       `(condp instance? ~obj
          Integer (.writeNumber ~jg (int ~obj))
