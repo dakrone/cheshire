@@ -49,9 +49,10 @@
   keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords."
   [^String string & [^Boolean keywords?]]
-  (parse
-   (.createJsonParser factory (StringReader. string))
-   true (or keywords? false) nil))
+  (when string
+    (parse
+     (.createJsonParser factory (StringReader. string))
+     true (or keywords? false) nil)))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
