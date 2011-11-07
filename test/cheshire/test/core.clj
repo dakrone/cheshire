@@ -51,6 +51,9 @@
          (json/parse-string
           (json/generate-string {"foo" 'clojure.core/map})))))
 
+(deftest test-nil
+  (is (nil? (json/parse-string nil true))))
+
 (deftest test-parsed-seq
   (let [br (BufferedReader. (StringReader. "1\n2\n3\n"))]
     (is (= (list 1 2 3) (json/parsed-seq br)))))
