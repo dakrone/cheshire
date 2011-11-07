@@ -61,18 +61,20 @@
 
   If laziness is needed, see parsed-seq."
   [^BufferedReader rdr & [^Boolean keywords?]]
-  (parse
-   (.createJsonParser factory rdr)
-   true (or keywords? false) nil))
+  (when rdr
+    (parse
+     (.createJsonParser factory rdr)
+     true (or keywords? false) nil)))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
   keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords."
   [^bytes bytes & [^Boolean keywords?]]
-  (parse
-   (.createJsonParser smile-factory bytes)
-   true (or keywords? false) nil))
+  (when bytes
+    (parse
+     (.createJsonParser smile-factory bytes)
+     true (or keywords? false) nil)))
 
 ;; Lazy parsers
 (defn- parsed-seq*
@@ -90,13 +92,15 @@
 
   If non-laziness is needed, see parse-stream."
   [^BufferedReader reader & [^Boolean keywords?]]
-  (parsed-seq* (.createJsonParser factory reader) (or keywords? false)))
+  (when reader
+    (parsed-seq* (.createJsonParser factory reader) (or keywords? false))))
 
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
   the given reader. The seq continues until the end of the reader is reached."
   [^BufferedReader reader & [^Boolean keywords?]]
-  (parsed-seq* (.createJsonParser smile-factory reader) (or keywords? false)))
+  (when reader
+    (parsed-seq* (.createJsonParser smile-factory reader) (or keywords? false))))
 
 ;; aliases for clojure-json users
 (def encode generate-string)
