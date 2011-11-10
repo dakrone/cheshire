@@ -190,7 +190,7 @@ Cheshire encoding supports:
     clojure printer/reader                 7.16
     clojure printer/reader w/ print-dup    12.29
     clojure-json                           20.55
-    clojure.data.json                      11.28
+    clojure.data.json (0.1.2)              4.67
     
     Trial:  2
     clj-json                               1.23
@@ -202,7 +202,7 @@ Cheshire encoding supports:
     clojure printer/reader                 5.97
     clojure printer/reader w/ print-dup    11.17
     clojure-json                           20.42
-    clojure.data.json                      11.25
+    clojure.data.json (0.1.2)              4.12
 
 
 Benchmarks for custom encoding coming soon.
