@@ -20,6 +20,10 @@
   (let [n (BigInteger. "42")]
     (is (= n (:num (json/decode (json/encode {:num n}) true))))))
 
+(deftest t-bigdecimal
+  (let [n (BigDecimal. "42.5")]
+    (is (= (.doubleValue n) (:num (json/decode (json/encode {:num n}) true))))))
+
 (deftest test-string-round-trip
   (is (= test-obj (json/parse-string (json/generate-string test-obj)))))
 
