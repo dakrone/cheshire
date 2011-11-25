@@ -22,6 +22,7 @@
          Double (.writeNumber ~jg (double ~obj))
          Float (.writeNumber ~jg (double ~obj))
          BigInteger (.writeNumber ~jg ^BigInteger ~obj)
+         BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
          clojure.lang.BigInt (.writeNumber ~jg (.toBigInteger (bigint ~obj)))
          (fail ~obj)))
     (do
@@ -31,6 +32,7 @@
          Double (.writeNumber ~jg (double ~obj))
          Float (.writeNumber ~jg (float ~obj))
          BigInteger (.writeNumber ~jg ^BigInteger ~obj)
+         BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
          (fail ~obj)))))
 
 (defn generate [^JsonGenerator jg obj ^String date-format]
