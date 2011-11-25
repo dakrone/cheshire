@@ -9,6 +9,6 @@
   :multi-deps {"1.2.1" [[org.clojure/clojure "1.2.1"]
                         [org.codehaus.jackson/jackson-core-asl "1.9.2"]
                         [org.codehaus.jackson/jackson-smile "1.9.2"]]
-               "1.4.0" [[org.clojure/clojure "1.4.0-alpha1"]
+               "1.4.0" [[org.clojure/clojure "1.4.0-alpha2"]
                         [org.codehaus.jackson/jackson-core-asl "1.9.2"]
                         [org.codehaus.jackson/jackson-smile "1.9.2"]]})
