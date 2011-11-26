@@ -36,13 +36,15 @@ with the ability to use custom encoders.
 
 ## Usage
 
-    [cheshire "2.0.3"]
-    
-    Cheshire v2.0.3 uses Jackson 1.9.2
+```clojure
+[cheshire "2.0.3"]
 
-    ;; In your ns statement:
-    (ns myns
-      (:use [cheshire.core]))
+;; Cheshire v2.0.3 uses Jackson 1.9.2
+
+;; In your ns statement:
+(ns myns
+  (:use [cheshire.core]))
+```
 
 ### Encoding
 
