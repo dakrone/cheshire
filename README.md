@@ -148,9 +148,8 @@ There are also a few aliases for commonly used functions:
     decode-smile -> parse-smile
 
 ## Features
-Cheshire supports encoding standard clojure datastructures, but with a
-few addons. Right now it does not support custom encoders, but a few
-helpers were added to support commonly encoded classes.
+Cheshire supports encoding standard clojure datastructures, with a few
+additions.
 
 Cheshire encoding supports:
 
