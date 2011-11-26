@@ -4,7 +4,7 @@
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
            (java.math BigInteger)
-           (clojure.lang IPersistentCollection Keyword Symbol)))
+           (clojure.lang IPersistentCollection Keyword Ratio Symbol)))
 
 (definline write-string [^JsonGenerator jg ^String str]
   `(.writeString ~jg ~str))
@@ -23,6 +23,7 @@
          Float (.writeNumber ~jg (double ~obj))
          BigInteger (.writeNumber ~jg ^BigInteger ~obj)
          BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
+         Ratio (.writeNumber ~jg (double ~obj))
          clojure.lang.BigInt (.writeNumber ~jg (.toBigInteger (bigint ~obj)))
          (fail ~obj)))
     (do
@@ -33,6 +34,7 @@
          Float (.writeNumber ~jg (float ~obj))
          BigInteger (.writeNumber ~jg ^BigInteger ~obj)
          BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
+         Ratio (.writeNumber ~jg (double ~obj))
          (fail ~obj)))))
 
 (defn generate [^JsonGenerator jg obj ^String date-format]

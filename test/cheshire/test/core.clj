@@ -12,6 +12,10 @@
                "nil" nil "string" "string" "vec" [1 2 3] "map" {"a" "b"}
                "list" (list "a" "b")})
 
+(deftest t-ratio
+  (let [n 1/2]
+    (is (= (double n) (:num (json/decode (json/encode {:num n}) true))))))
+
 (deftest t-bigint
   (let [n 9223372036854775808]
     (is (= n (:num (json/decode (json/encode {:num n}) true))))))
