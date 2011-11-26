@@ -79,6 +79,11 @@
   [^java.lang.Number n ^JsonGenerator jg]
   (.writeNumber jg n))
 
+(defn encode-ratio
+  "Encode a clojure.lang.Ratio to the json generator."
+  [^clojure.lang.Ratio n ^JsonGenerator jg]
+  (.writeNumber jg (double n)))
+
 (defn encode-seq
   "Encode a seq to the json generator."
   [s ^JsonGenerator jg]
@@ -143,6 +148,10 @@
     {:to-json (fn encode-bigint
                 [^java.lang.Number n ^JsonGenerator jg]
                 (.writeNumber jg ^java.math.BigInteger (.toBigInteger n)))}))
+
+(extend clojure.lang.Ratio
+  JSONable
+  {:to-json encode-ratio})
 
 (extend java.lang.Number
   JSONable
