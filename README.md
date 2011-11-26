@@ -116,8 +116,9 @@ may be bugs, if you encounter a bug, please open a github issue.
 ;; encode-date
 ;; encode-bool
 ;; encode-named
-;; encade-map
-;; encade-symbol
+;; encode-map
+;; encode-symbol
+;; encode-ratio
 
 ;; Then you can use encode from the custom namespace as normal
 (encode (java.awt.Color. 1 2 3))
@@ -160,7 +161,7 @@ Cheshire encoding supports:
 - symbols
 - booleans
 - keywords (qualified and unqualified)
-- numbers (Integer, Long, BigInteger, BigInt, Double, Float, primatives)
+- numbers (Integer, Long, BigInteger, BigInt, Double, Float, Ratio, primatives)
 
 ### Java classes
 - Date
