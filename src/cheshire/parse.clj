@@ -3,7 +3,7 @@
 
 (declare parse)
 
-(definline parse-object [^JsonParser jp fst? keywords? eof]
+(definline parse-object [^JsonParser jp fst? keywords? eof array-coerce-fn]
   `(do
      (.nextToken ~jp)
      (loop [mmap# (transient {})]
@@ -18,29 +18,30 @@
                       mmap#
                       key#
                       (parse
-                       ~jp ~false ~keywords? ~eof))]
+                       ~jp ~false ~keywords? ~eof ~array-coerce-fn))]
            (.nextToken ~jp)
            (recur mmap#))
          (persistent! mmap#)))))
 
-(definline parse-array [^JsonParser jp fst? keywords? eof]
-  `(do
+(definline parse-array [^JsonParser jp fst? keywords? eof array-coerce-fn]
+  `(let [array-field-name# (.getCurrentName ~jp)]
      (.nextToken ~jp)
-     (loop [vvec# (transient [])]
+     (loop [coll# (transient (~array-coerce-fn array-field-name#))]
        (if-not (= (.getCurrentToken ~jp)
                   JsonToken/END_ARRAY)
-         (let [vvec# (conj!
-                     vvec#
+         (let [coll# (conj!
+                     coll#
                      (parse
                       ~jp
                       false
                       ~keywords?
-                      ~eof))]
+                      ~eof
+                      ~array-coerce-fn))]
            (.nextToken ~jp)
-           (recur vvec#))
-         (persistent! vvec#)))))
+           (recur coll#))
+         (persistent! coll#)))))
 
-(defn parse [^JsonParser jp fst? keywords? eof]
+(defn parse [^JsonParser jp fst? keywords? eof array-coerce-fn]
   (let [fst? (boolean fst?)
         keywords? (boolean keywords?)
         x (if fst?
@@ -53,8 +54,8 @@
     (if (= x eof)
       eof
       (case (.toString (.getCurrentToken jp))
-            "START_OBJECT" (parse-object jp fst? keywords? eof)
-            "START_ARRAY" (parse-array jp fst? keywords? eof)
+            "START_OBJECT" (parse-object jp fst? keywords? eof array-coerce-fn)
+            "START_ARRAY" (parse-array jp fst? keywords? eof array-coerce-fn)
             "VALUE_STRING" (.getText jp)
             "VALUE_NUMBER_INT" (.getNumberValue jp)
             "VALUE_NUMBER_FLOAT" (.getDoubleValue jp)
