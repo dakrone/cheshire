@@ -91,6 +91,21 @@ with the ability to use custom encoders.
 (parsed-smile-seq (clojure.java.io/reader "/tmp/foo"))
 ```
 
+In 2.0.4 (not yet released!) and up, Cheshire allows passing in a
+function to specify what kind of types to return, like so:
+
+```clojure
+;; In this example a function that checks for a certain key 
+(decode "{\"myarray\":[2,3,3,2],\"myset\":[1,2,2,1]}" true
+        (fn [field-name]
+          (if (= field-name "myset")
+            #{}
+            [])))
+;; => {:myarray [2 3 3 2], :myset #{1 2}}
+```
+The type must be "transient-able", so use either #{} or []
+
+
 ### Custom Encoders
 
 Custom encoding is supported from 2.0.0 and up, however there still
