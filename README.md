@@ -37,9 +37,9 @@ with the ability to use custom encoders.
 ## Usage
 
 ```clojure
-[cheshire "2.0.3"]
+[cheshire "2.0.4"]
 
-;; Cheshire v2.0.3 uses Jackson 1.9.2
+;; Cheshire v2.0.4 uses Jackson 1.9.2
 
 ;; In your ns statement:
 (ns myns
@@ -91,7 +91,7 @@ with the ability to use custom encoders.
 (parsed-smile-seq (clojure.java.io/reader "/tmp/foo"))
 ```
 
-In 2.0.4 (not yet released!) and up, Cheshire allows passing in a
+In 2.0.4 and up, Cheshire allows passing in a
 function to specify what kind of types to return, like so:
 
 ```clojure
