@@ -26,7 +26,9 @@
 (definline parse-array [^JsonParser jp fst? keywords? eof array-coerce-fn]
   `(let [array-field-name# (.getCurrentName ~jp)]
      (.nextToken ~jp)
-     (loop [coll# (transient (~array-coerce-fn array-field-name#))]
+     (loop [coll# (transient (if ~array-coerce-fn
+                               (~array-coerce-fn array-field-name#)
+                               []))]
        (if-not (= (.getCurrentToken ~jp)
                   JsonToken/END_ARRAY)
          (let [coll# (conj!
