@@ -147,3 +147,9 @@
 (deftest test-namespaced-keywords
   (is (= "{\"foo\":\"user/bar\"}"
          (json/encode {:foo :user/bar}))))
+
+(deftest test-array-coerce-fn
+  (is (= {"set" #{"a" "b"} "array" ["a" "b"]}
+         (json/decode
+          (json/encode {"set" #{"a" "b"} "array" ["a" "b"]}) false
+          (fn [field-name] (if (= "set" field-name) #{} []))))))
