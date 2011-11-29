@@ -136,7 +136,7 @@
          (json/encode {:foo :user/bar}))))
 
 (deftest test-array-coerce-fn
-  (is (= {"set" #{"a" "b"} "array" ["a" "b"]}
+  (is (= {"set" #{"a" "b"} "array" ["a" "b"] "map" {"a" 1}}
          (json/decode
-          (json/encode {"set" #{"a" "b"} "array" ["a" "b"]}) false
+          (json/encode {"set" #{"a" "b"} "array" ["a" "b"] "map" {"a" 1}}) false
           (fn [field-name] (if (= "set" field-name) #{} []))))))
