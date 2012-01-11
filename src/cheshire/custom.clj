@@ -126,9 +126,11 @@
   "Encode a clojure symbol to the json generator. Symbols will be encoded as
   <namespace>/<symbol-name>"
   [^clojure.lang.Symbol s ^JsonGenerator jg]
-  (.writeString jg (str (:ns (meta (resolve s)))
-                        "/"
-                        (:name (meta (resolve s))))))
+  (.writeString jg (if-let [sym (resolve s)]
+                     (str (:ns (meta sym))
+                          "/"
+                          (:name (meta sym)))
+                     (str s))))
 
 ;; extended implementations for clojure datastructures
 (extend nil

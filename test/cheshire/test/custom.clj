@@ -153,3 +153,7 @@
          (json/decode
           (json/encode {"set" #{"a" "b"} "array" ["a" "b"] "map" {"a" 1}}) false
           (fn [field-name] (if (= "set" field-name) #{} []))))))
+
+(deftest t-symbol-encoding-for-non-resolvable-symbols
+  (is (= "{\"foo\":\"clojure.core/map\",\"bar\":\"clojure.core/pam\"}"
+         (json/encode {:foo 'clojure.core/map :bar 'clojure.core/pam}))))
