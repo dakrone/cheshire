@@ -71,7 +71,11 @@
                             (str ns "/" (name obj))
                             (name obj)))
     UUID (write-string ^JsonGenerator jg (.toString obj))
-    Symbol (write-string ^JsonGenerator jg (.toString obj))
+    Symbol (write-string ^JsonGenerator jg (if-let [sym (resolve obj)]
+                                             (str (:ns (meta sym))
+                                                  "/"
+                                                  (:name (meta sym)))
+                                             (.toString obj )))
     Boolean (.writeBoolean ^JsonGenerator jg ^Boolean obj)
     Date (let [sdf (doto (SimpleDateFormat. date-format)
                      (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
