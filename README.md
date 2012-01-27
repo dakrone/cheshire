@@ -224,6 +224,26 @@ Cheshire encoding supports:
 
 Benchmarks for custom encoding coming soon.
 
+## Advanced customization for factories
+See
+[this page](http://jackson.codehaus.org/1.9.0/javadoc/org/codehaus/jackson/JsonParser.Feature.html)
+for a list of options that can be customized if desired. A custom
+factor can be used like so:
+
+```clojure
+(ns myns
+  (:require [cheshire.core :as core]
+            [cheshire.factory :as factory]))
+
+(binding [factory/*json-factory* (factory/make-json-factory
+                                  {:allow-non-numeric-numbers true})]
+  (json/decode "{\"foo\":NaN}" true))))))
+```
+
+See the `default-factory-options` map in factory.clj for a full list
+of configurable options. Smile factories can also be created, and
+factories work exactly the same with custom encoding.
+
 ## Future Ideas/TODOs
 - <del>move away from using Java entirely, use Protocols for the
   custom encoder</del> (see custom.clj)
