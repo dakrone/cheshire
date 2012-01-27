@@ -1,7 +1,8 @@
 (ns cheshire.test.custom
   (:use [clojure.test]
         [clojure.java.io :only [reader]])
-  (:require [cheshire.custom :as json] :reload)
+  (:require [cheshire.custom :as json] :reload
+            [cheshire.factory :as fact])
   (:import (java.io StringReader StringWriter
                     BufferedReader BufferedWriter)
            (java.sql Timestamp)
@@ -157,3 +158,9 @@
 (deftest t-symbol-encoding-for-non-resolvable-symbols
   (is (= "{\"foo\":\"clojure.core/map\",\"bar\":\"clojure.core/pam\"}"
          (json/encode {:foo 'clojure.core/map :bar 'clojure.core/pam}))))
+
+(deftest t-bindable-factories
+  (binding [fact/*json-factory* (fact/make-json-factory
+                                 {:allow-non-numeric-numbers true})]
+    (is (= (type Double/NaN)
+           (type (:foo (json/decode "{\"foo\":NaN}" true)))))))

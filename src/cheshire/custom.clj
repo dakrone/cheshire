@@ -10,9 +10,6 @@
            (org.codehaus.jackson.smile SmileFactory)
            (org.codehaus.jackson JsonFactory JsonGenerator JsonParser)))
 
-;; for testing only
-;;(set! *warn-on-reflection* true)
-
 ;; date format rebound for custom encoding
 (def ^{:dynamic true :private true} *date-format*)
 
@@ -22,7 +19,8 @@
 (defn ^String encode [obj & [^String date-format]]
   (binding [*date-format* (or date-format default-date-format)]
     (let [sw (StringWriter.)
-          generator (.createJsonGenerator ^JsonFactory json-factory sw)]
+          generator (.createJsonGenerator ^JsonFactory
+                                          (or *json-factory* json-factory) sw)]
       (if obj
         (to-json obj generator)
         (.writeNull generator))
@@ -31,7 +29,8 @@
 
 (defn ^String encode-stream [obj ^BufferedWriter w & [^String date-format]]
   (binding [*date-format* (or date-format default-date-format)]
-    (let [generator (.createJsonGenerator ^JsonFactory json-factory w)]
+    (let [generator (.createJsonGenerator ^JsonFactory
+                                          (or *json-factory* json-factory) w)]
       (to-json obj generator)
       (.flush generator)
       w)))
@@ -40,7 +39,9 @@
   [obj & [^String date-format]]
   (binding [*date-format* (or date-format default-date-format)]
     (let [baos (ByteArrayOutputStream.)
-          generator (.createJsonGenerator ^SmileFactory smile-factory baos)]
+          generator (.createJsonGenerator ^SmileFactory
+                                          (or *smile-factory* smile-factory)
+                                          baos)]
       (to-json obj generator)
       (.flush generator)
       (.toByteArray baos))))
