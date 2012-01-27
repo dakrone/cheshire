@@ -201,9 +201,9 @@ Cheshire encoding supports:
     clj-json                               2.16
     clj-json w/ keywords                   2.43
     clj-serializer                         2.13
-    cheshire                               2.19
+    cheshire                               2.08
     cheshire-smile                         2.20
-    cheshire w/ keywords                   2.12
+    cheshire w/ keywords                   1.97
     clojure printer/reader                 7.16
     clojure printer/reader w/ print-dup    12.29
     clojure-json                           20.55
@@ -213,9 +213,9 @@ Cheshire encoding supports:
     clj-json                               1.23
     clj-json w/ keywords                   2.17
     clj-serializer                         1.58
-    cheshire                               1.49
+    cheshire                               1.39
     cheshire-smile                         1.49
-    cheshire w/ keywords                   1.99
+    cheshire w/ keywords                   1.90
     clojure printer/reader                 5.97
     clojure printer/reader w/ print-dup    11.17
     clojure-json                           20.42
