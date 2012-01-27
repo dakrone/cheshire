@@ -31,7 +31,7 @@
 
 (defn ^String encode-stream [obj ^BufferedWriter w & [^String date-format]]
   (binding [*date-format* (or date-format default-date-format)]
-    (let [generator (.createJsonGenerator json-factory w)]
+    (let [generator (.createJsonGenerator ^JsonFactory json-factory w)]
       (to-json obj generator)
       (.flush generator)
       w)))
@@ -40,7 +40,7 @@
   [obj & [^String date-format]]
   (binding [*date-format* (or date-format default-date-format)]
     (let [baos (ByteArrayOutputStream.)
-          generator (.createJsonGenerator smile-factory baos)]
+          generator (.createJsonGenerator ^SmileFactory smile-factory baos)]
       (to-json obj generator)
       (.flush generator)
       (.toByteArray baos))))
@@ -177,7 +177,7 @@
 
 (extend java.sql.Timestamp
   JSONable
-  {:to-json #(encode-date (Date. (.getTime %1)) %2)})
+  {:to-json #(encode-date (Date. (.getTime ^java.sql.Timestamp %1)) %2)})
 
 (extend java.util.UUID
   JSONable

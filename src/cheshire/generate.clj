@@ -24,7 +24,8 @@
          BigInteger (.writeNumber ~jg ^BigInteger ~obj)
          BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
          Ratio (.writeNumber ~jg (double ~obj))
-         clojure.lang.BigInt (.writeNumber ~jg (.toBigInteger (bigint ~obj)))
+         clojure.lang.BigInt (.writeNumber ~jg ^clojure.lang.BigInt
+                                           (.toBigInteger (bigint ~obj)))
          (fail ~obj)))
     (do
       `(condp instance? ~obj
@@ -70,17 +71,17 @@
                           (if-let [ns (namespace obj)]
                             (str ns "/" (name obj))
                             (name obj)))
-    UUID (write-string ^JsonGenerator jg (.toString obj))
+    UUID (write-string ^JsonGenerator jg (.toString ^UUID obj))
     Symbol (write-string ^JsonGenerator jg (if-let [sym (resolve obj)]
                                              (str (:ns (meta sym))
                                                   "/"
                                                   (:name (meta sym)))
-                                             (.toString obj )))
+                                             (.toString ^Symbol obj)))
     Boolean (.writeBoolean ^JsonGenerator jg ^Boolean obj)
     Date (let [sdf (doto (SimpleDateFormat. date-format)
                      (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
            (write-string ^JsonGenerator jg (.format sdf obj)))
-    Timestamp (let [date (Date. (.getTime obj))
+    Timestamp (let [date (Date. (.getTime ^Timestamp obj))
                     sdf (doto (SimpleDateFormat. date-format)
                           (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
                 (write-string ^JsonGenerator jg (.format sdf obj)))

@@ -2,7 +2,8 @@
   (:use [cheshire.factory]
         [cheshire.generate :only [generate]]
         [cheshire.parse :only [parse]])
-  (:import (org.codehaus.jackson JsonParser)
+  (:import (org.codehaus.jackson JsonParser JsonFactory)
+           (org.codehaus.jackson.smile SmileFactory)
            (java.io StringWriter StringReader BufferedReader BufferedWriter
                     ByteArrayOutputStream)))
 
@@ -14,7 +15,7 @@
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   [obj & [^String date-format]]
   (let [sw (StringWriter.)
-        generator (.createJsonGenerator json-factory sw)]
+        generator (.createJsonGenerator ^JsonFactory json-factory sw)]
     (generate generator obj (or date-format default-date-format))
     (.flush generator)
     (.toString sw)))
@@ -26,7 +27,7 @@
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   [obj ^BufferedWriter writer & [^String date-format]]
-  (let [generator (.createJsonGenerator json-factory writer)]
+  (let [generator (.createJsonGenerator ^JsonFactory json-factory writer)]
     (generate generator obj (or date-format default-date-format))
     (.flush generator)
     writer))
@@ -38,7 +39,7 @@
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   [obj & [^String date-format]]
   (let [baos (ByteArrayOutputStream.)
-        generator (.createJsonGenerator smile-factory baos)]
+        generator (.createJsonGenerator ^SmileFactory smile-factory baos)]
     (generate generator obj (or date-format default-date-format))
     (.flush generator)
     (.toByteArray baos)))
@@ -53,7 +54,7 @@
   [^String string & [^Boolean keywords? array-coerce-fn]]
   (when string
     (parse
-     (.createJsonParser json-factory (StringReader. string))
+     (.createJsonParser ^JsonFactory json-factory (StringReader. string))
      true (or keywords? false) nil
      array-coerce-fn)))
 
@@ -67,7 +68,7 @@
   [^BufferedReader rdr & [^Boolean keywords? array-coerce-fn] ]
   (when rdr
     (parse
-     (.createJsonParser json-factory rdr)
+     (.createJsonParser ^JsonFactory json-factory rdr)
      true (or keywords? false) nil array-coerce-fn)))
 
 (defn parse-smile
@@ -79,7 +80,7 @@
   [^bytes bytes & [^Boolean keywords? array-coerce-fn]]
   (when bytes
     (parse
-     (.createJsonParser smile-factory bytes)
+     (.createJsonParser ^SmileFactory smile-factory bytes)
      true (or keywords? false) nil array-coerce-fn)))
 
 ;; Lazy parsers
@@ -100,7 +101,7 @@
   If non-laziness is needed, see parse-stream."
   [^BufferedReader reader & [^Boolean keywords? array-coerce-fn]]
   (when reader
-    (parsed-seq* (.createJsonParser json-factory reader)
+    (parsed-seq* (.createJsonParser ^JsonFactory json-factory reader)
                  (or keywords? false)
                  array-coerce-fn)))
 
@@ -111,7 +112,7 @@
   and returning the collection to be used for array values."
   [^BufferedReader reader & [^Boolean keywords? array-coerce-fn]]
   (when reader
-    (parsed-seq* (.createJsonParser smile-factory reader)
+    (parsed-seq* (.createJsonParser ^SmileFactory smile-factory reader)
                  (or keywords? false)
                  array-coerce-fn)))
 
