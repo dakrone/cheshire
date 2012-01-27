@@ -4,13 +4,70 @@
   (:import (org.codehaus.jackson.smile SmileFactory)
            (org.codehaus.jackson JsonFactory JsonParser$Feature)))
 
-;; Factory objects that are needed to do the encoding and decoding
-(def ^{:tag JsonFactory} factory
-  (doto (JsonFactory.)
-    (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS true)))
-
-(def ^{:tag SmileFactory} smile-factory
-  (SmileFactory.))
-
 ;; default date format used to JSON-encode Date objects
 (def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
+
+;; Factory objects that are needed to do the encoding and decoding
+(defn ^{:tag JsonFactory} make-json-factory
+  [opts]
+  (doto (JsonFactory.)
+    (.configure JsonParser$Feature/AUTO_CLOSE_SOURCE
+                ^Boolean (boolean (:auto-close-source opts)))
+    (.configure JsonParser$Feature/ALLOW_COMMENTS
+                (boolean (:allow-comments opts)))
+    (.configure JsonParser$Feature/ALLOW_UNQUOTED_FIELD_NAMES
+                (boolean (:allow-unquoted-field-names opts)))
+    (.configure JsonParser$Feature/ALLOW_SINGLE_QUOTES
+                (boolean (:allow-single-quotes opts)))
+    (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS
+                (boolean (:allow-unquoted-control-chars opts)))
+    (.configure JsonParser$Feature/ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER
+                (boolean (:allow-backslash-escaping opts)))
+    (.configure JsonParser$Feature/ALLOW_NUMERIC_LEADING_ZEROS
+                (boolean (:allow-numeric-leading-zeros opts)))
+    (.configure JsonParser$Feature/ALLOW_NON_NUMERIC_NUMBERS
+                (boolean (:allow-non-numeric-numbers opts)))
+    (.configure JsonParser$Feature/INTERN_FIELD_NAMES
+                (boolean (:intern-field-names opts)))
+    (.configure JsonParser$Feature/CANONICALIZE_FIELD_NAMES
+                (boolean (:canonicalize-field-names opts)))))
+
+(defn ^{:tag SmileFactory} make-smile-factory
+  [opts]
+  (doto (SmileFactory.)
+    (.configure JsonParser$Feature/AUTO_CLOSE_SOURCE
+                (boolean (:auto-close-source opts)))
+    (.configure JsonParser$Feature/ALLOW_COMMENTS
+                (boolean (:allow-comments opts)))
+    (.configure JsonParser$Feature/ALLOW_UNQUOTED_FIELD_NAMES
+                (boolean (:allow-unquoted-field-names opts)))
+    (.configure JsonParser$Feature/ALLOW_SINGLE_QUOTES
+                (boolean (:allow-single-quotes opts)))
+    (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS
+                (boolean (:allow-unquoted-control-chars opts)))
+    (.configure JsonParser$Feature/ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER
+                (boolean (:allow-backslash-escaping opts)))
+    (.configure JsonParser$Feature/ALLOW_NUMERIC_LEADING_ZEROS
+                (boolean (:allow-numeric-leading-zeros opts)))
+    (.configure JsonParser$Feature/ALLOW_NON_NUMERIC_NUMBERS
+                (boolean (:allow-non-numeric-numbers opts)))
+    (.configure JsonParser$Feature/INTERN_FIELD_NAMES
+                (boolean (:intern-field-names opts)))
+    (.configure JsonParser$Feature/CANONICALIZE_FIELD_NAMES
+                (boolean (:canonicalize-field-names opts)))))
+
+(defonce default-factory-options
+  {:auto-close-source false
+   :allow-comments false
+   :allow-unquoted-field-names false
+   :allow-single-quotes false
+   :allow-unquoted-control-chars true
+   :allow-backslash-escaping false
+   :allow-numeric-leading-zeros false
+   :allow-non-numeric-numbers false
+   :intern-field-names false
+   :canonicalize-field-names false})
+
+(defonce json-factory (make-json-factory default-factory-options))
+(defonce smile-factory (make-smile-factory default-factory-options))
+

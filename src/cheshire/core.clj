@@ -14,7 +14,7 @@
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   [obj & [^String date-format]]
   (let [sw (StringWriter.)
-        generator (.createJsonGenerator factory sw)]
+        generator (.createJsonGenerator json-factory sw)]
     (generate generator obj (or date-format default-date-format))
     (.flush generator)
     (.toString sw)))
@@ -26,7 +26,7 @@
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   [obj ^BufferedWriter writer & [^String date-format]]
-  (let [generator (.createJsonGenerator factory writer)]
+  (let [generator (.createJsonGenerator json-factory writer)]
     (generate generator obj (or date-format default-date-format))
     (.flush generator)
     writer))
@@ -53,7 +53,7 @@
   [^String string & [^Boolean keywords? array-coerce-fn]]
   (when string
     (parse
-     (.createJsonParser factory (StringReader. string))
+     (.createJsonParser json-factory (StringReader. string))
      true (or keywords? false) nil
      array-coerce-fn)))
 
@@ -67,7 +67,7 @@
   [^BufferedReader rdr & [^Boolean keywords? array-coerce-fn] ]
   (when rdr
     (parse
-     (.createJsonParser factory rdr)
+     (.createJsonParser json-factory rdr)
      true (or keywords? false) nil array-coerce-fn)))
 
 (defn parse-smile
@@ -100,7 +100,7 @@
   If non-laziness is needed, see parse-stream."
   [^BufferedReader reader & [^Boolean keywords? array-coerce-fn]]
   (when reader
-    (parsed-seq* (.createJsonParser factory reader)
+    (parsed-seq* (.createJsonParser json-factory reader)
                  (or keywords? false)
                  array-coerce-fn)))
 

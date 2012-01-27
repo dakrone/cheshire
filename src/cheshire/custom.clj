@@ -22,7 +22,7 @@
 (defn ^String encode [obj & [^String date-format]]
   (binding [*date-format* (or date-format default-date-format)]
     (let [sw (StringWriter.)
-          generator (.createJsonGenerator ^JsonFactory factory sw)]
+          generator (.createJsonGenerator ^JsonFactory json-factory sw)]
       (if obj
         (to-json obj generator)
         (.writeNull generator))
@@ -31,7 +31,7 @@
 
 (defn ^String encode-stream [obj ^BufferedWriter w & [^String date-format]]
   (binding [*date-format* (or date-format default-date-format)]
-    (let [generator (.createJsonGenerator factory w)]
+    (let [generator (.createJsonGenerator json-factory w)]
       (to-json obj generator)
       (.flush generator)
       w)))
