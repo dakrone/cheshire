@@ -53,6 +53,7 @@
   "Returns the Clojure object corresponding to the given JSON-encoded string.
   keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords.
+
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
   [^String string & [^Boolean keywords? array-coerce-fn]]
@@ -67,10 +68,11 @@
   "Returns the Clojure object corresponding to the given reader, reader must
   implement BufferedReader. keywords? should be true if keyword keys are needed
   the default is false, maps will use strings as keywords.
+
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
   If laziness is needed, see parsed-seq."
-  [^BufferedReader rdr & [^Boolean keywords? array-coerce-fn] ]
+  [^BufferedReader rdr & [^Boolean keywords? array-coerce-fn]]
   (when rdr
     (parse
      (.createJsonParser ^JsonFactory (or *json-factory* json-factory) rdr)
@@ -80,6 +82,7 @@
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
   keywords? should be true if keyword keys are needed, the default is false
   maps will use strings as keywords.
+
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
   [^bytes bytes & [^Boolean keywords? array-coerce-fn]]
@@ -101,6 +104,7 @@
 (defn parsed-seq
   "Returns a lazy seq of Clojure objects corresponding to the JSON read from
   the given reader. The seq continues until the end of the reader is reached.
+
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
   If non-laziness is needed, see parse-stream."
@@ -114,6 +118,7 @@
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
   the given reader. The seq continues until the end of the reader is reached.
+
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
   [^BufferedReader reader & [^Boolean keywords? array-coerce-fn]]
