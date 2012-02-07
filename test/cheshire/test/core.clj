@@ -1,10 +1,10 @@
 (ns cheshire.test.core
   (:use [clojure.test]
-        [clojure.java.io :only [reader]])
+        [clojure.java.io :only [file reader]])
   (:require [cheshire.core :as json]
             [cheshire.factory :as fact]
             [cheshire.parse :as parse])
-  (:import (java.io StringReader StringWriter
+  (:import (java.io FileInputStream StringReader StringWriter
                     BufferedReader BufferedWriter)
            (java.sql Timestamp)
            (java.util Date UUID)))
@@ -125,7 +125,11 @@
   (is (= {"one" 1, "foo" "bar"}
          (first (json/parsed-seq (reader "test/multi.json")))))
   (is (= {"two" 2, "foo" "bar"}
-         (second (json/parsed-seq (reader "test/multi.json"))))))
+         (second (json/parsed-seq (reader "test/multi.json")))))
+  (with-open [s (FileInputStream. (file "test/multi.json"))]
+    (let [r (reader s)]
+      (is (= [{"one" 1, "foo" "bar"} {"two" 2, "foo" "bar"}]
+             (json/parsed-seq r))))))
 
 (deftest test-jsondotorg-pass1
   (let [string (slurp "test/pass1.json")
