@@ -118,6 +118,12 @@
          (with-open [rdr (StringReader. "{\"foo baz\":\"bar\"}\n")]
            (json/parse-stream rdr true)))))
 
+(deftest test-multiple-objs-in-file
+  (is (= {"one" 1, "foo" "bar"}
+         (first (json/parsed-seq (reader "test/multi.json")))))
+  (is (= {"two" 2, "foo" "bar"}
+         (second (json/parsed-seq (reader "test/multi.json"))))))
+
 (deftest test-jsondotorg-pass1
   (let [string (slurp "test/pass1.json")
         decoded-json (json/decode string)
