@@ -198,28 +198,28 @@ Cheshire encoding supports:
     Num roundtrips:   100000
 
     Trial:  1
-    clj-json                               2.16
-    clj-json w/ keywords                   2.43
+    clj-json                               2.01
+    clj-json w/ keywords                   2.10
     clj-serializer                         2.13
-    cheshire                               2.08
-    cheshire-smile                         2.20
-    cheshire w/ keywords                   1.97
+    cheshire                               1.34
+    cheshire-smile                         1.36
+    cheshire w/ keywords                   1.77
     clojure printer/reader                 7.16
     clojure printer/reader w/ print-dup    12.29
     clojure-json                           20.55
-    clojure.data.json (0.1.2)              4.67
+    clojure.data.json (0.1.2)              3.89
     
     Trial:  2
-    clj-json                               1.23
-    clj-json w/ keywords                   2.17
+    clj-json                               1.19
+    clj-json w/ keywords                   2.04
     clj-serializer                         1.58
-    cheshire                               1.39
-    cheshire-smile                         1.49
-    cheshire w/ keywords                   1.90
+    cheshire                               1.33
+    cheshire-smile                         1.37
+    cheshire w/ keywords                   1.87
     clojure printer/reader                 5.97
     clojure printer/reader w/ print-dup    11.17
     clojure-json                           20.42
-    clojure.data.json (0.1.2)              4.12
+    clojure.data.json (0.1.2)              3.93
 
 
 Benchmarks for custom encoding coming soon.
