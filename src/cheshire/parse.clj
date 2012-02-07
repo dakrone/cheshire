@@ -32,13 +32,13 @@
        (if-not (= (.getCurrentToken ~jp)
                   JsonToken/END_ARRAY)
          (let [coll# (conj!
-                     coll#
-                     (parse
-                      ~jp
-                      false
-                      ~keywords?
-                      ~eof
-                      ~array-coerce-fn))]
+                      coll#
+                      (parse
+                       ~jp
+                       false
+                       ~keywords?
+                       ~eof
+                       ~array-coerce-fn))]
            (.nextToken ~jp)
            (recur coll#))
          (persistent! coll#)))))
