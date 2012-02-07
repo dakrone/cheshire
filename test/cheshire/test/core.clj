@@ -131,13 +131,6 @@
         re-decoded-json (json/decode encoded-json)]
     (is (= decoded-json re-decoded-json))))
 
-(defn timed-tests [tests]
-  (let [start (System/nanoTime)]
-    (dotimes [i 1000]
-      (doseq [t tests]
-        (t)))
-    (/ (double (- (System/nanoTime) start)) 1000000.0)))
-
 (deftest test-namespaced-keywords
   (is (= "{\"foo\":\"user/bar\"}"
          (json/encode {:foo :user/bar}))))
