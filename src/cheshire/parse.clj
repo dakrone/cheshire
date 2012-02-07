@@ -1,9 +1,14 @@
 (ns cheshire.parse
   (:import (org.codehaus.jackson JsonParser JsonToken)))
 
-(declare parse)
+(declare parse*)
 
-(definline parse-object [^JsonParser jp fst? keywords? eof array-coerce-fn]
+(def ^{:doc "Flag to determine whether float values should be returned as
+             BigDecimals to retain precision. Defaults to false."
+       :dynamic true}
+  *use-bigdecimals?* false)
+
+(definline parse-object [^JsonParser jp keywords? bd? array-coerce-fn]
   `(do
      (.nextToken ~jp)
      (loop [mmap# (transient {})]
@@ -14,16 +19,13 @@
                key# (if ~keywords?
                       (keyword key-str#)
                       key-str#)
-               mmap# (assoc!
-                      mmap#
-                      key#
-                      (parse
-                       ~jp ~false ~keywords? ~eof ~array-coerce-fn))]
+               mmap# (assoc! mmap# key#
+                             (parse* ~jp ~keywords? ~bd? ~array-coerce-fn))]
            (.nextToken ~jp)
            (recur mmap#))
          (persistent! mmap#)))))
 
-(definline parse-array [^JsonParser jp fst? keywords? eof array-coerce-fn]
+(definline parse-array [^JsonParser jp keywords? bd? array-coerce-fn]
   `(let [array-field-name# (.getCurrentName ~jp)]
      (.nextToken ~jp)
      (loop [coll# (transient (if ~array-coerce-fn
@@ -31,39 +33,30 @@
                                []))]
        (if-not (= (.getCurrentToken ~jp)
                   JsonToken/END_ARRAY)
-         (let [coll# (conj!
-                     coll#
-                     (parse
-                      ~jp
-                      false
-                      ~keywords?
-                      ~eof
-                      ~array-coerce-fn))]
+         (let [coll# (conj! coll#(parse* ~jp ~keywords? ~bd? ~array-coerce-fn))]
            (.nextToken ~jp)
            (recur coll#))
          (persistent! coll#)))))
 
+(defn parse* [^JsonParser jp keywords? bd? array-coerce-fn]
+  (condp = (.getCurrentToken jp)
+    JsonToken/START_OBJECT (parse-object jp keywords? bd? array-coerce-fn)
+    JsonToken/START_ARRAY (parse-array jp keywords? bd? array-coerce-fn)
+    JsonToken/VALUE_STRING (.getText jp)
+    JsonToken/VALUE_NUMBER_INT (.getNumberValue jp)
+    JsonToken/VALUE_NUMBER_FLOAT (if bd?
+                                   (.getDecimalValue jp)
+                                   (.getNumberValue jp))
+    JsonToken/VALUE_TRUE true
+    JsonToken/VALUE_FALSE false
+    JsonToken/VALUE_NULL nil
+    (throw
+     (Exception.
+      (str "Cannot parse " (pr-str (.getCurrentToken jp)))))))
+
 (defn parse [^JsonParser jp fst? keywords? eof array-coerce-fn]
-  (let [fst? (boolean fst?)
-        keywords? (boolean keywords?)
-        x (if fst?
-            (do
-              (.nextToken jp)
-              (if (nil? (.getCurrentToken jp))
-                eof
-                (Object.)))
-            (Object.))]
-    (if (= x eof)
+  (let [keywords? (boolean keywords?)]
+    (.nextToken jp)
+    (if (nil? (.getCurrentToken jp))
       eof
-      (case (.toString (.getCurrentToken jp))
-            "START_OBJECT" (parse-object jp fst? keywords? eof array-coerce-fn)
-            "START_ARRAY" (parse-array jp fst? keywords? eof array-coerce-fn)
-            "VALUE_STRING" (.getText jp)
-            "VALUE_NUMBER_INT" (.getNumberValue jp)
-            "VALUE_NUMBER_FLOAT" (.getDoubleValue jp)
-            "VALUE_TRUE" true
-            "VALUE_FALSE" false
-            "VALUE_NULL" nil
-            (throw
-             (Exception.
-              (str "Cannot parse " (pr-str (.getCurrentToken jp)))))))))
+      (parse* jp keywords? *use-bigdecimals?* array-coerce-fn))))

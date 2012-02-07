@@ -2,7 +2,8 @@
   (:use [clojure.test]
         [clojure.java.io :only [reader]])
   (:require [cheshire.core :as json]
-            [cheshire.factory :as fact])
+            [cheshire.factory :as fact]
+            [cheshire.parse :as parse])
   (:import (java.io StringReader StringWriter
                     BufferedReader BufferedWriter)
            (java.sql Timestamp)
@@ -27,7 +28,9 @@
 
 (deftest t-bigdecimal
   (let [n (BigDecimal. "42.5")]
-    (is (= (.doubleValue n) (:num (json/decode (json/encode {:num n}) true))))))
+    (is (= (.doubleValue n) (:num (json/decode (json/encode {:num n}) true))))
+    (binding [parse/*use-bigdecimals?* true]
+      (is (= n (:num (json/decode (json/encode {:num n}) true)))))))
 
 (deftest test-string-round-trip
   (is (= test-obj (json/parse-string (json/generate-string test-obj)))))
@@ -118,19 +121,18 @@
          (with-open [rdr (StringReader. "{\"foo baz\":\"bar\"}\n")]
            (json/parse-stream rdr true)))))
 
+(deftest test-multiple-objs-in-file
+  (is (= {"one" 1, "foo" "bar"}
+         (first (json/parsed-seq (reader "test/multi.json")))))
+  (is (= {"two" 2, "foo" "bar"}
+         (second (json/parsed-seq (reader "test/multi.json"))))))
+
 (deftest test-jsondotorg-pass1
   (let [string (slurp "test/pass1.json")
         decoded-json (json/decode string)
         encoded-json (json/encode decoded-json)
         re-decoded-json (json/decode encoded-json)]
     (is (= decoded-json re-decoded-json))))
-
-(defn timed-tests [tests]
-  (let [start (System/nanoTime)]
-    (dotimes [i 1000]
-      (doseq [t tests]
-        (t)))
-    (/ (double (- (System/nanoTime) start)) 1000000.0)))
 
 (deftest test-namespaced-keywords
   (is (= "{\"foo\":\"user/bar\"}"

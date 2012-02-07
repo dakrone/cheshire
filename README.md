@@ -189,6 +189,26 @@ Cheshire encoding supports:
 ### Also supports
 - Stream encoding/decoding
 - Lazy decoding
+- Arbitrary precision for decoded values:
+
+Cheshire will automatically use a BigInteger if needed for
+non-floating-point numbers, however, for floating-point numbers,
+Doubles will be used unless the `*use-bigdecimals?*` symbol is bound
+to true:
+
+```clojure
+(ns foo.bar
+  (require [cheshire.core :as json]
+           [cheshire.parse :as parse]))
+
+(json/decode "111111111111111111111111111111111.111111111111111111111111111111111111")
+;; => 1.1111111111111112E32 (a Double)
+
+(binding [parse/*use-bigdecimals?* true]
+  (json/decode "111111111111111111111111111111111.111111111111111111111111111111111111"))
+;; => 111111111111111111111111111111111.111111111111111111111111111111111111M (a BigDecimal)
+```
+
 - Replacing default encoders for builtin types
 - [SMILE encoding/decoding](http://wiki.fasterxml.com/SmileFormatSpec)
 
@@ -198,28 +218,28 @@ Cheshire encoding supports:
     Num roundtrips:   100000
 
     Trial:  1
-    clj-json                               2.16
-    clj-json w/ keywords                   2.43
+    clj-json                               2.01
+    clj-json w/ keywords                   2.10
     clj-serializer                         2.13
-    cheshire                               2.08
-    cheshire-smile                         2.20
-    cheshire w/ keywords                   1.97
+    cheshire                               1.34
+    cheshire-smile                         1.36
+    cheshire w/ keywords                   1.77
     clojure printer/reader                 7.16
     clojure printer/reader w/ print-dup    12.29
     clojure-json                           20.55
-    clojure.data.json (0.1.2)              4.67
+    clojure.data.json (0.1.2)              3.89
     
     Trial:  2
-    clj-json                               1.23
-    clj-json w/ keywords                   2.17
+    clj-json                               1.19
+    clj-json w/ keywords                   2.04
     clj-serializer                         1.58
-    cheshire                               1.39
-    cheshire-smile                         1.49
-    cheshire w/ keywords                   1.90
+    cheshire                               1.33
+    cheshire-smile                         1.37
+    cheshire w/ keywords                   1.87
     clojure printer/reader                 5.97
     clojure printer/reader w/ print-dup    11.17
     clojure-json                           20.42
-    clojure.data.json (0.1.2)              4.12
+    clojure.data.json (0.1.2)              3.93
 
 
 Benchmarks for custom encoding coming soon.
@@ -249,12 +269,12 @@ factories work exactly the same with custom encoding.
   custom encoder</del> (see custom.clj)
 - <del>allow custom encoders</del> (see custom.clj)
 - <del>figure out a way to encode namespace-qualified keywords</del>
-- look into overriding the default encoding handlers with custom handlers
-- better handling when java numbers overflow ECMAScript's numbers
-  (-2^31 to (2^31 - 1))
+- <del>look into overriding the default encoding handlers with custom handlers</del>
+- <del>better handling when java numbers overflow ECMAScript's numbers
+  (-2^31 to (2^31 - 1))</del>
 - <del>handle encoding java.sql.Timestamp the same as
   java.util.Date</del>
-- make it as fast as possible
+- make it as fast as possible (ongoing)
 
 ## License
 Release under the MIT license. See LICENSE for the full license.

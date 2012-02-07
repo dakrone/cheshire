@@ -61,8 +61,7 @@
     (parse
      (.createJsonParser ^JsonFactory (or *json-factory* json-factory)
                         (StringReader. string))
-     true (or keywords? false) nil
-     array-coerce-fn)))
+     true (or keywords? false) nil array-coerce-fn)))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
@@ -98,7 +97,7 @@
   (let [eof (Object.)]
     (lazy-seq
      (let [elem (parse parser true keywords? eof array-coerce-fn)]
-       (if-not (identical? elem eof)
+       (when-not (identical? elem eof)
          (cons elem (parsed-seq* parser keywords? array-coerce-fn)))))))
 
 (defn parsed-seq
