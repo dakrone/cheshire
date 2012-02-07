@@ -55,15 +55,17 @@
             (Object.))]
     (if (= x eof)
       eof
-      (case (.toString (.getCurrentToken jp))
-            "START_OBJECT" (parse-object jp fst? keywords? eof array-coerce-fn)
-            "START_ARRAY" (parse-array jp fst? keywords? eof array-coerce-fn)
-            "VALUE_STRING" (.getText jp)
-            "VALUE_NUMBER_INT" (.getNumberValue jp)
-            "VALUE_NUMBER_FLOAT" (.getDoubleValue jp)
-            "VALUE_TRUE" true
-            "VALUE_FALSE" false
-            "VALUE_NULL" nil
-            (throw
-             (Exception.
-              (str "Cannot parse " (pr-str (.getCurrentToken jp)))))))))
+      (condp = (.getCurrentToken jp)
+        JsonToken/START_OBJECT (parse-object jp fst? keywords?
+                                             eof array-coerce-fn)
+        JsonToken/START_ARRAY (parse-array jp fst? keywords?
+                                           eof array-coerce-fn)
+        JsonToken/VALUE_STRING (.getText jp)
+        JsonToken/VALUE_NUMBER_INT (.getNumberValue jp)
+        JsonToken/VALUE_NUMBER_FLOAT (.getDoubleValue jp)
+        JsonToken/VALUE_TRUE true
+        JsonToken/VALUE_FALSE false
+        JsonToken/VALUE_NULL nil
+        (throw
+         (Exception.
+          (str "Cannot parse " (pr-str (.getCurrentToken jp)))))))))
