@@ -189,6 +189,26 @@ Cheshire encoding supports:
 ### Also supports
 - Stream encoding/decoding
 - Lazy decoding
+- Arbitrary precision for decoded values:
+
+Cheshire will automatically use a BigInteger if needed for
+non-floating-point numbers, however, for floating-point numbers,
+Doubles will be used unless the `*use-bigdecimals?*` symbol is bound
+to true:
+
+```clojure
+(ns foo.bar
+  (require [cheshire.core :as json]
+           [cheshire.parse :as parse]))
+
+(json/decode "111111111111111111111111111111111.111111111111111111111111111111111111")
+;; => 1.1111111111111112E32 (a Double)
+
+(binding [parse/*use-bigdecimals?* true]
+  (json/decode "111111111111111111111111111111111.111111111111111111111111111111111111"))
+;; => 111111111111111111111111111111111.111111111111111111111111111111111111M (a BigDecimal)
+```
+
 - Replacing default encoders for builtin types
 - [SMILE encoding/decoding](http://wiki.fasterxml.com/SmileFormatSpec)
 
@@ -249,12 +269,12 @@ factories work exactly the same with custom encoding.
   custom encoder</del> (see custom.clj)
 - <del>allow custom encoders</del> (see custom.clj)
 - <del>figure out a way to encode namespace-qualified keywords</del>
-- look into overriding the default encoding handlers with custom handlers
-- better handling when java numbers overflow ECMAScript's numbers
-  (-2^31 to (2^31 - 1))
+- <del>look into overriding the default encoding handlers with custom handlers</del>
+- <del>better handling when java numbers overflow ECMAScript's numbers
+  (-2^31 to (2^31 - 1))</del>
 - <del>handle encoding java.sql.Timestamp the same as
   java.util.Date</del>
-- make it as fast as possible
+- make it as fast as possible (ongoing)
 
 ## License
 Release under the MIT license. See LICENSE for the full license.
