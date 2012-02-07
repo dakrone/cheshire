@@ -3,7 +3,12 @@
 
 (declare parse*)
 
-(definline parse-object [^JsonParser jp keywords? array-coerce-fn]
+(def ^{:doc "Flag to determine whether float values should be returned as
+             BigDecimals to retain precision. Defaults to false."
+       :dynamic true}
+  *use-bigdecimals?* false)
+
+(definline parse-object [^JsonParser jp keywords? bd? array-coerce-fn]
   `(do
      (.nextToken ~jp)
      (loop [mmap# (transient {})]
@@ -15,12 +20,12 @@
                       (keyword key-str#)
                       key-str#)
                mmap# (assoc! mmap# key#
-                             (parse* ~jp ~keywords? ~array-coerce-fn))]
+                             (parse* ~jp ~keywords? ~bd? ~array-coerce-fn))]
            (.nextToken ~jp)
            (recur mmap#))
          (persistent! mmap#)))))
 
-(definline parse-array [^JsonParser jp keywords? array-coerce-fn]
+(definline parse-array [^JsonParser jp keywords? bd? array-coerce-fn]
   `(let [array-field-name# (.getCurrentName ~jp)]
      (.nextToken ~jp)
      (loop [coll# (transient (if ~array-coerce-fn
@@ -28,18 +33,20 @@
                                []))]
        (if-not (= (.getCurrentToken ~jp)
                   JsonToken/END_ARRAY)
-         (let [coll# (conj! coll#(parse* ~jp ~keywords? ~array-coerce-fn))]
+         (let [coll# (conj! coll#(parse* ~jp ~keywords? ~bd? ~array-coerce-fn))]
            (.nextToken ~jp)
            (recur coll#))
          (persistent! coll#)))))
 
-(defn parse* [^JsonParser jp keywords? array-coerce-fn]
+(defn parse* [^JsonParser jp keywords? bd? array-coerce-fn]
   (condp = (.getCurrentToken jp)
-    JsonToken/START_OBJECT (parse-object jp keywords? array-coerce-fn)
-    JsonToken/START_ARRAY (parse-array jp  keywords? array-coerce-fn)
+    JsonToken/START_OBJECT (parse-object jp keywords? bd? array-coerce-fn)
+    JsonToken/START_ARRAY (parse-array jp keywords? bd? array-coerce-fn)
     JsonToken/VALUE_STRING (.getText jp)
     JsonToken/VALUE_NUMBER_INT (.getNumberValue jp)
-    JsonToken/VALUE_NUMBER_FLOAT (.getDoubleValue jp)
+    JsonToken/VALUE_NUMBER_FLOAT (if bd?
+                                   (.getDecimalValue jp)
+                                   (.getNumberValue jp))
     JsonToken/VALUE_TRUE true
     JsonToken/VALUE_FALSE false
     JsonToken/VALUE_NULL nil
@@ -52,4 +59,4 @@
     (.nextToken jp)
     (if (nil? (.getCurrentToken jp))
       eof
-      (parse* jp keywords? array-coerce-fn))))
+      (parse* jp keywords? *use-bigdecimals?* array-coerce-fn))))
