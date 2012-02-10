@@ -63,6 +63,28 @@
          (json/parse-string
           (json/generate-string {"foo" 'clojure.core/map})))))
 
+(deftest test-accepts-java-map
+  (is (= {"foo" 1}
+         (json/parse-string
+          (json/generate-string (doto (java.util.HashMap.)
+                                  (.put "foo" 1)))))))
+
+(deftest test-accepts-java-list
+  (is (= [1 2 3]
+         (json/parse-string
+          (json/generate-string (doto (java.util.ArrayList. 3)
+                                  (.add 1)
+                                  (.add 2)
+                                  (.add 3)))))))
+
+(deftest test-accepts-java-set
+  (is (= {"set" [1 2 3]}
+         (json/parse-string
+          (json/generate-string {"set" (doto (java.util.HashSet. 3)
+                                         (.add 1)
+                                         (.add 2)
+                                         (.add 3))})))))
+
 (deftest test-nil
   (is (nil? (json/parse-string nil true))))
 
