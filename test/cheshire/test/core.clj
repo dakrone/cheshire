@@ -18,6 +18,9 @@
   (let [n 1/2]
     (is (= (double n) (:num (json/decode (json/encode {:num n}) true))))))
 
+(deftest t-long-wrap-around
+  (is (= 2147483648 (json/decode (json/encode 2147483648)))))
+
 (deftest t-bigint
   (let [n 9223372036854775808]
     (is (= n (:num (json/decode (json/encode {:num n}) true))))))
