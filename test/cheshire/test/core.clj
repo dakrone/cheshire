@@ -172,7 +172,9 @@
 
 (deftest t-symbol-encoding-for-non-resolvable-symbols
   (is (= "{\"foo\":\"clojure.core/map\",\"bar\":\"clojure.core/pam\"}"
-         (json/encode {:foo 'clojure.core/map :bar 'clojure.core/pam}))))
+         (json/encode {:foo 'clojure.core/map :bar 'clojure.core/pam})))
+  (is (= "{\"foo\":\"foo.bar/baz\",\"bar\":\"clojure.core/pam\"}"
+         (json/encode {:foo 'foo.bar/baz :bar 'clojure.core/pam}))))
 
 (deftest t-bindable-factories
   (binding [fact/*json-factory* (fact/make-json-factory

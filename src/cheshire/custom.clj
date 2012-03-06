@@ -124,14 +124,9 @@
   (.writeEndObject jg))
 
 (defn encode-symbol
-  "Encode a clojure symbol to the json generator. Symbols will be encoded as
-  <namespace>/<symbol-name>"
+  "Encode a clojure symbol to the json generator."
   [^clojure.lang.Symbol s ^JsonGenerator jg]
-  (.writeString jg (if-let [sym (resolve s)]
-                     (str (:ns (meta sym))
-                          "/"
-                          (:name (meta sym)))
-                     (str s))))
+  (.writeString jg (str s)))
 
 ;; extended implementations for clojure datastructures
 (extend nil
