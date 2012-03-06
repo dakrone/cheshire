@@ -80,6 +80,11 @@
   [^java.lang.Number n ^JsonGenerator jg]
   (.writeNumber jg n))
 
+(defn encode-long
+  "Encode anything implementing java.lang.Number to the json generator."
+  [^Long n ^JsonGenerator jg]
+  (.writeNumber jg (long n)))
+
 (defn encode-ratio
   "Encode a clojure.lang.Ratio to the json generator."
   [^clojure.lang.Ratio n ^JsonGenerator jg]
@@ -150,6 +155,10 @@
 (extend clojure.lang.Ratio
   JSONable
   {:to-json encode-ratio})
+
+(extend Long
+  JSONable
+  {:to-json encode-long})
 
 (extend java.lang.Number
   JSONable
