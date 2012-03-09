@@ -199,6 +199,10 @@
   JSONable
   {:to-json encode-seq})
 
+(extend clojure.lang.IPersistentList
+  JSONable
+  {:to-json encode-seq})
+
 (extend java.util.Date
   JSONable
   {:to-json encode-date})

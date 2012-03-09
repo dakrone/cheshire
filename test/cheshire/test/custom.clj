@@ -169,4 +169,5 @@
 
 (deftest t-persistent-queue
   (let [q (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)]
-    (is (= q (json/decode (json/encode q))))))
+    (is (= q (json/decode (json/encode q))))
+    (is (= q (json/decode (json/encode* q))))))
