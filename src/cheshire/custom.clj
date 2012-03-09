@@ -8,7 +8,8 @@
            (java.text SimpleDateFormat)
            (java.sql Timestamp)
            (org.codehaus.jackson.smile SmileFactory)
-           (org.codehaus.jackson JsonFactory JsonGenerator JsonParser)))
+           (org.codehaus.jackson JsonFactory JsonGenerator
+                                 JsonGenerationException JsonParser)))
 
 ;; date format rebound for custom encoding
 (def ^{:dynamic true :private true} *date-format*)
@@ -16,18 +17,24 @@
 (defprotocol JSONable
   (to-json [t jg]))
 
-(defn ^String encode [obj & [^String date-format]]
+(defn ^String encode* [obj & [^String date-format]]
   (binding [*date-format* (or date-format default-date-format)]
     (let [sw (StringWriter.)
-          generator (.createJsonGenerator ^JsonFactory
-                                          (or *json-factory* json-factory) sw)]
+          generator (.createJsonGenerator
+                     ^JsonFactory (or *json-factory* json-factory) sw)]
       (if obj
         (to-json obj generator)
         (.writeNull generator))
       (.flush generator)
       (.toString sw))))
 
-(defn ^String encode-stream [obj ^BufferedWriter w & [^String date-format]]
+(defn ^String encode [obj & [^String date-format]]
+  (try
+    (core/encode obj date-format)
+    (catch JsonGenerationException _
+      (encode* obj date-format))))
+
+(defn ^String encode-stream* [obj ^BufferedWriter w & [^String date-format]]
   (binding [*date-format* (or date-format default-date-format)]
     (let [generator (.createJsonGenerator ^JsonFactory
                                           (or *json-factory* json-factory) w)]
@@ -35,7 +42,13 @@
       (.flush generator)
       w)))
 
-(defn encode-smile
+(defn ^String encode-stream [obj ^BufferedWriter w & [^String date-format]]
+  (try
+    (core/encode-stream obj w date-format)
+    (catch JsonGenerationException _
+      (encode-stream* obj date-format))))
+
+(defn encode-smile*
   [obj & [^String date-format]]
   (binding [*date-format* (or date-format default-date-format)]
     (let [baos (ByteArrayOutputStream.)
@@ -45,6 +58,13 @@
       (to-json obj generator)
       (.flush generator)
       (.toByteArray baos))))
+
+(defn encode-smile
+  [obj & [^String date-format]]
+  (try
+    (core/encode-smile obj date-format)
+    (catch JsonGenerationException _
+      (encode-smile* obj date-format))))
 
 ;; there are no differences in parsing, but these are here to make
 ;; this a self-contained namespace if desired
@@ -59,8 +79,11 @@
 
 ;; aliases for encoding
 (def generate-string encode)
+(def generate-string* encode*)
 (def generate-stream encode-stream)
+(def generate-stream* encode-stream*)
 (def generate-smile encode-smile)
+(def generate-smile* encode-smile*)
 
 ;; Generic encoders, these can be used by someone writing a custom
 ;; encoder if so desired, after transforming an arbitrary data
@@ -132,77 +155,6 @@
   "Encode a clojure symbol to the json generator."
   [^clojure.lang.Symbol s ^JsonGenerator jg]
   (.writeString jg (str s)))
-
-;; extended implementations for clojure datastructures
-(extend nil
-  JSONable
-  {:to-json encode-nil})
-
-(extend java.lang.String
-  JSONable
-  {:to-json encode-str})
-
-;; This is lame, thanks for changing all the BigIntegers to BigInts
-;; in 1.3 clojure/core :-/
-(when (not= {:major 1 :minor 2} (select-keys *clojure-version* [:major :minor]))
-  ;; Use Class/forName so it only resolves if it's running on clojure 1.3
-  (extend (Class/forName "clojure.lang.BigInt")
-    JSONable
-    {:to-json (fn encode-bigint
-                [^java.lang.Number n ^JsonGenerator jg]
-                (.writeNumber jg ^java.math.BigInteger (.toBigInteger n)))}))
-
-(extend clojure.lang.Ratio
-  JSONable
-  {:to-json encode-ratio})
-
-(extend Long
-  JSONable
-  {:to-json encode-long})
-
-(extend java.lang.Number
-  JSONable
-  {:to-json encode-number})
-
-(extend clojure.lang.ISeq
-  JSONable
-  {:to-json encode-seq})
-
-(extend clojure.lang.IPersistentVector
-  JSONable
-  {:to-json encode-seq})
-
-(extend clojure.lang.IPersistentSet
-  JSONable
-  {:to-json encode-seq})
-
-(extend java.util.Date
-  JSONable
-  {:to-json encode-date})
-
-(extend java.sql.Timestamp
-  JSONable
-  {:to-json #(encode-date (Date. (.getTime ^java.sql.Timestamp %1)) %2)})
-
-(extend java.util.UUID
-  JSONable
-  {:to-json encode-str})
-
-(extend java.lang.Boolean
-  JSONable
-  {:to-json encode-bool})
-
-(extend clojure.lang.Keyword
-  JSONable
-  {:to-json encode-named})
-
-(extend clojure.lang.IPersistentMap
-  JSONable
-  {:to-json encode-map})
-
-(extend clojure.lang.Symbol
-  JSONable
-  {:to-json encode-symbol})
 
 ;; Utility methods to add and remove encoders
 (defn add-encoder
