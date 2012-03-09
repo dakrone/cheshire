@@ -66,6 +66,8 @@
                             (generate-array jg obj date-format)
                             clojure.lang.IPersistentSet
                             (generate jg (seq obj) date-format)
+                            clojure.lang.IPersistentList
+                            (generate-array jg obj date-format)
                             clojure.lang.ISeq
                             (generate-array jg obj date-format))
     Map (generate-map jg obj date-format)
