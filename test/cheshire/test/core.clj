@@ -171,3 +171,7 @@
 (deftest t-persistent-queue
   (let [q (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)]
     (is (= q (json/decode (json/encode q))))))
+
+(deftest t-namespaced-keywords
+  (is (= {:foo/bar "baz/eggplant"}
+         (json/decode (json/encode {:foo/bar :baz/eggplant}) true))))
