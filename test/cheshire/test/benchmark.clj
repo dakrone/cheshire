@@ -4,7 +4,8 @@
             [cheshire.custom :as custom]
             [criterium.core :as bench]))
 
-;; These tests just print out results, nothing else
+;; These tests just print out results, nothing else, they also
+;; currently don't work with clojure 1.2 (but the regular tests do)
 
 (def test-obj {"int" 3 "long" (long -2147483647) "boolean" true
                "LongObj" (Long/parseLong "2147483647") "double" 1.23

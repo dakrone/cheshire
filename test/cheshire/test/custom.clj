@@ -36,35 +36,32 @@
       (is (= n (:num (json/decode (json/encode {:num n}) true)))))))
 
 (deftest test-string-round-trip
-  (is (= test-obj (json/parse-string (json/generate-string test-obj)))))
+  (is (= test-obj (json/decode (json/encode test-obj)))))
 
 (deftest test-generate-accepts-float
-  (is (= "3.14" (json/generate-string 3.14))))
+  (is (= "3.14" (json/encode 3.14))))
 
 (deftest test-keyword-encode
   (is (= {"key" "val"}
-         (json/parse-string (json/generate-string {:key "val"})))))
+         (json/decode (json/encode {:key "val"})))))
 
 (deftest test-generate-set
   (is (= {"set" ["a" "b"]}
-         (json/parse-string (json/generate-string {"set" #{"a" "b"}})))))
+         (json/decode (json/encode {"set" #{"a" "b"}})))))
 
 (deftest test-key-coercion
   (is (= {"foo" "bar" "1" "bat" "2" "bang" "3" "biz"}
-         (json/parse-string
-          (json/generate-string
+         (json/decode
+          (json/encode
            {:foo "bar" 1 "bat" (long 2) "bang" (bigint 3) "biz"})))))
 
 (deftest test-keywords
   (is (= {:foo "bar" :bat 1}
-         (json/parse-string
-          (json/generate-string {:foo "bar" :bat 1})
-          true))))
+         (json/decode (json/encode {:foo "bar" :bat 1}) true))))
 
 (deftest test-symbols
   (is (= {"foo" "clojure.core/map"}
-         (json/parse-string
-          (json/generate-string {"foo" 'clojure.core/map})))))
+         (json/decode (json/encode {"foo" 'clojure.core/map})))))
 
 (deftest test-parsed-seq
   (let [br (BufferedReader. (StringReader. "1\n2\n3\n"))]
@@ -92,22 +89,15 @@
 
 (deftest test-sql-timestamp
   (is (= {"foo" "1970-01-01T00:00:00Z"}
-         (json/decode
-          (json/encode
-           {:foo (Timestamp. (long 0))}))))
+         (json/decode (json/encode {:foo (Timestamp. (long 0))}))))
   (is (= {"foo" "1970-01-01"}
-         (json/decode
-          (json/encode
-           {:foo (Timestamp. (long 0))} "yyyy-MM-dd")))
+         (json/decode (json/encode {:foo (Timestamp. (long 0))} "yyyy-MM-dd")))
       "encode with given date format"))
 
 (deftest test-uuid
   (let [id (UUID/randomUUID)
         id-str (str id)]
-    (is (= {"foo" id-str}
-           (json/decode
-            (json/encode
-             {:foo id}))))))
+    (is (= {"foo" id-str} (json/decode (json/encode {:foo id}))))))
 
 (deftest test-streams
   (is (= {"foo" "bar"}
@@ -138,20 +128,20 @@
   (json/remove-encoder java.net.URL)
   (json/add-encoder java.net.URL json/encode-str)
   (is (= "\"http://foo.com\""
-         (json/generate-string (java.net.URL. "http://foo.com"))))
+         (json/encode (java.net.URL. "http://foo.com"))))
   (json/remove-encoder java.net.URL)
   (is (thrown? IllegalArgumentException
-               (json/generate-string (java.net.URL. "http://foo.com")))))
+               (json/encode (java.net.URL. "http://foo.com")))))
 
 ;; Test that default encoders can be bypassed if so desired.
 (deftest test-shadowing-default-encoder
   (json/remove-encoder java.util.Date)
   (json/add-encoder java.util.Date
                     (fn [d jg] (json/encode-str "foo" jg)))
-  (is (= "\"foo\"" (json/generate-string* (java.util.Date.))))
+  (is (= "\"foo\"" (json/encode* (java.util.Date.))))
   (json/remove-encoder java.util.Date)
   (json/add-encoder java.util.Date json/encode-date)
-  (is (json/generate-string (java.util.Date.))
+  (is (json/encode (java.util.Date.))
       "shouldn't throw an exception after adding back the default."))
 
 (deftest test-namespaced-keywords
