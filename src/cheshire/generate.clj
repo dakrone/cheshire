@@ -1,5 +1,5 @@
 (ns cheshire.generate
-  (:import (org.codehaus.jackson JsonGenerator)
+  (:import (org.codehaus.jackson JsonGenerator JsonGenerationException)
            (java.util Date Map List Set SimpleTimeZone UUID)
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
@@ -10,8 +10,8 @@
   `(.writeString ~jg ~str))
 
 (definline fail [obj]
-  `(throw (Exception. (str "Cannot JSON encode object of class: "
-                           (class ~obj) ": " ~obj))))
+  `(throw (JsonGenerationException. (str "Cannot JSON encode object of class: "
+                                         (class ~obj) ": " ~obj))))
 
 (defmacro number-dispatch [^JsonGenerator jg obj]
   (if (< 2 (:minor *clojure-version*))
