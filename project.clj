@@ -16,4 +16,5 @@
                         [org.codehaus.jackson/jackson-smile "1.9.5"]]}
   :test-selectors {:default  #(not (:benchmark %))
                    :benchmark :benchmark
-                   :all (constantly true)})
+                   :all (constantly true)}
+  :jvm-opts ["-Xmx512M"])

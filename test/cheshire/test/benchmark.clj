@@ -14,11 +14,11 @@
 (deftest ^{:benchmark true} t-bench-core
   (println "---------- Core Benchmarks ----------")
   (bench/with-progress-reporting
-    (bench/bench (core/decode (core/encode test-obj)) :verbose))
+    (bench/quick-bench (core/decode (core/encode test-obj)) :verbose))
   (println "-------------------------------------"))
 
 (deftest ^{:benchmark true} t-bench-custom
   (println "--------- Custom Benchmarks ---------")
   (bench/with-progress-reporting
-    (bench/bench (custom/decode (custom/encode test-obj)) :verbose))
+    (bench/quick-bench (custom/decode (custom/encode test-obj)) :verbose))
   (println "-------------------------------------"))
