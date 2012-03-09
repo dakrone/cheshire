@@ -139,6 +139,7 @@
   (json/add-encoder java.util.Date
                     (fn [d jg] (json/encode-str "foo" jg)))
   (is (= "\"foo\"" (json/encode* (java.util.Date.))))
+  (is (= "\"foo\"" (json/encode* :foo)))
   (json/remove-encoder java.util.Date)
   (json/add-encoder java.util.Date json/encode-date)
   (is (json/encode (java.util.Date.))

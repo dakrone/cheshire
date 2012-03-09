@@ -156,6 +156,77 @@
   [^clojure.lang.Symbol s ^JsonGenerator jg]
   (.writeString jg (str s)))
 
+;; extended implementations for clojure datastructures
+(extend nil
+  JSONable
+  {:to-json encode-nil})
+
+(extend java.lang.String
+  JSONable
+  {:to-json encode-str})
+
+;; This is lame, thanks for changing all the BigIntegers to BigInts
+;; in 1.3 clojure/core :-/
+(when (not= {:major 1 :minor 2} (select-keys *clojure-version* [:major :minor]))
+  ;; Use Class/forName so it only resolves if it's running on clojure 1.3
+  (extend (Class/forName "clojure.lang.BigInt")
+    JSONable
+    {:to-json (fn encode-bigint
+                [^java.lang.Number n ^JsonGenerator jg]
+                (.writeNumber jg ^java.math.BigInteger (.toBigInteger n)))}))
+
+(extend clojure.lang.Ratio
+  JSONable
+  {:to-json encode-ratio})
+
+(extend Long
+  JSONable
+  {:to-json encode-long})
+
+(extend java.lang.Number
+  JSONable
+  {:to-json encode-number})
+
+(extend clojure.lang.ISeq
+  JSONable
+  {:to-json encode-seq})
+
+(extend clojure.lang.IPersistentVector
+  JSONable
+  {:to-json encode-seq})
+
+(extend clojure.lang.IPersistentSet
+  JSONable
+  {:to-json encode-seq})
+
+(extend java.util.Date
+  JSONable
+  {:to-json encode-date})
+
+(extend java.sql.Timestamp
+  JSONable
+  {:to-json #(encode-date (Date. (.getTime ^java.sql.Timestamp %1)) %2)})
+
+(extend java.util.UUID
+  JSONable
+  {:to-json encode-str})
+
+(extend java.lang.Boolean
+  JSONable
+  {:to-json encode-bool})
+
+(extend clojure.lang.Keyword
+  JSONable
+  {:to-json encode-named})
+
+(extend clojure.lang.IPersistentMap
+  JSONable
+  {:to-json encode-map})
+
+(extend clojure.lang.Symbol
+  JSONable
+  {:to-json encode-symbol})
+
 ;; Utility methods to add and remove encoders
 (defn add-encoder
   "Provide an encoder for a type not handled by Cheshire.
