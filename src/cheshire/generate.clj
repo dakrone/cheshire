@@ -45,7 +45,7 @@
      (.writeStartObject ~jg)
      (doseq [[k# v#] ~obj]
        (.writeFieldName ~jg (if (keyword? k#)
-                              (name k#)
+                              (.substring (str k#) 1)
                               (str k#)))
        (generate ~jg v# ~date-format))
      (.writeEndObject ~jg)))
