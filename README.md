@@ -38,9 +38,9 @@ encoders.
 ## Usage
 
 ```clojure
-[cheshire "2.2.2"]
+[cheshire "3.0.0"]
 
-;; Cheshire v2.2.2 uses Jackson 1.9.5
+;; Cheshire v3.0.0 uses Jackson 1.9.5
 
 ;; In your ns statement:
 (ns myns
@@ -150,11 +150,11 @@ bug, please open a github issue.
 ;; Decoding remains the same, you are responsible for doing custom decoding.
 ```
 
-In version 3.0.0, custom encoding first attempts to encode the object
-using the core encoding (because it would be faster). If the encoding
-fails, it uses the custom encoding mechanics to encode the JSON. If
-this is undesirable, use the `generate-string*`, `generate-stream*`
-and `generate-smile*` methods to overwrite this.
+In version 3.0.0 and above, custom encoding first attempts to encode
+the object using the core encoding (because it would be faster). If
+the encoding fails, it uses the custom encoding mechanics to encode
+the JSON. If this is undesirable, use the `generate-string*`,
+`generate-stream*` and `generate-smile*` methods to overwrite this.
 
 Custom (slower) and Core (faster) encoding can be mixed and matched by
 requiring both namespaces and using the custom one only when you need
