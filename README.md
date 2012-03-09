@@ -32,7 +32,8 @@ encoding and SMILE support.
 
 clojure-json had really nice features (custom encoders), but was slow;
 clj-json had no features, but was fast. Cheshire encodes JSON fast,
-with the ability to use custom encoders.
+with added support for more types and the ability to use custom
+encoders.
 
 ## Usage
 
@@ -66,6 +67,8 @@ with the ability to use custom encoders.
 ;; generate some JSON with Dates with custom Date encoding
 (generate-string {:baz (Date. 0)} "yyyy-MM-dd")
 ```
+
+In the event encoding fails, Cheshire will throw a JsonGenerationException.
 
 ### Decoding
 
@@ -108,8 +111,8 @@ The type must be "transient-able", so use either #{} or []
 
 ### Custom Encoders
 
-Custom encoding is supported from 2.0.0 and up, however there still
-may be bugs, if you encounter a bug, please open a github issue.
+Custom encoding is supported from 2.0.0 and up, if you encounter a
+bug, please open a github issue.
 
 ```clojure
 ;; Custom encoders allow you to swap out the api for the fast
@@ -147,11 +150,20 @@ may be bugs, if you encounter a bug, please open a github issue.
 ;; Decoding remains the same, you are responsible for doing custom decoding.
 ```
 
+In version 3.0.0, custom encoding first attempts to encode the object
+using the core encoding (because it would be faster). If the encoding
+fails, it uses the custom encoding mechanics to encode the JSON. If
+this is undesirable, use the `generate-string*`, `generate-stream*`
+and `generate-smile*` methods to overwrite this.
+
 Custom (slower) and Core (faster) encoding can be mixed and matched by
 requiring both namespaces and using the custom one only when you need
 to encode custom classes. The API methods for cheshire.core and
-cheshire.custom are exactly the same (except for add-encoder and
-remove-encoder in the custom namespace).
+cheshire.custom are exactly the same (except for add-encoder,
+remove-encoder and the methods ending with '*' in the custom
+namespace).
+
+### Aliases
 
 There are also a few aliases for commonly used functions:
 
@@ -177,7 +189,9 @@ Cheshire encoding supports:
 - symbols
 - booleans
 - keywords (qualified and unqualified)
-- numbers (Integer, Long, BigInteger, BigInt, Double, Float, Ratio, primatives)
+- numbers (Integer, Long, BigInteger, BigInt, Double, Float, Ratio,
+  primatives)
+- clojure.lang.PersistentQueue
 
 ### Java classes
 - Date
@@ -242,13 +256,17 @@ to true:
     clojure.data.json (0.1.2)              3.93
 
 
-Benchmarks for custom encoding coming soon.
+<del>Benchmarks for custom encoding coming soon.</del> - check out the
+benchmarks in `cheshire.test.benchmark`; or run `lein test
+:benchmark`. If you have scenarios where Cheshire is not performing as
+well as expected (compared to a different library), please let me
+know.
 
 ## Advanced customization for factories
 See
 [this page](http://jackson.codehaus.org/1.9.0/javadoc/org/codehaus/jackson/JsonParser.Feature.html)
-for a list of options that can be customized if desired. A custom
-factor can be used like so:
+for a list of features that can be customized if desired. A custom
+factory can be used like so:
 
 ```clojure
 (ns myns
@@ -260,9 +278,10 @@ factor can be used like so:
   (json/decode "{\"foo\":NaN}" true))))))
 ```
 
-See the `default-factory-options` map in factory.clj for a full list
-of configurable options. Smile factories can also be created, and
-factories work exactly the same with custom encoding.
+See the `default-factory-options` map in
+[factory.clj](https://github.com/dakrone/cheshire/blob/master/src/cheshire/factory.clj)
+for a full list of configurable options. Smile factories can also be
+created, and factories work exactly the same with custom encoding.
 
 ## Future Ideas/TODOs
 - <del>move away from using Java entirely, use Protocols for the
@@ -274,11 +293,14 @@ factories work exactly the same with custom encoding.
   (-2^31 to (2^31 - 1))</del>
 - <del>handle encoding java.sql.Timestamp the same as
   java.util.Date</del>
+- <del>add benchmarking</del>
+- get criterium benchmarking ignored for 1.2.1 lein-multi tests
+  (probably requires lein2 to come out first for profiles)
 - make it as fast as possible (ongoing)
 
 ## License
 Release under the MIT license. See LICENSE for the full license.
 
 ## Thanks
-Thanks go to Mark McGranaghan for allowing me to look at the clj-json
-code to get started on this and Jim Duey for the name. :)
+Thanks go to Mark McGranaghan for clj-json and Jim Duey for the name
+suggestion. :)
