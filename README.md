@@ -296,6 +296,8 @@ created, and factories work exactly the same with custom encoding.
 - <del>add benchmarking</del>
 - get criterium benchmarking ignored for 1.2.1 lein-multi tests
   (probably requires lein2 to come out first for profiles)
+- look into faster exception handling by pre-allocating an exception
+  object instead of creating one on-the-fly (maybe ask Steve?)
 - make it as fast as possible (ongoing)
 
 ## License
