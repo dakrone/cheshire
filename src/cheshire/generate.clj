@@ -9,11 +9,12 @@
 (definline write-string [^JsonGenerator jg ^String str]
   `(.writeString ~jg ~str))
 
-(definline fail [obj]
-  `(throw (JsonGenerationException. (str "Cannot JSON encode object of class: "
-                                         (class ~obj) ": " ~obj))))
+(definline fail [obj ^Exception e]
+  `(throw (or ~e (JsonGenerationException.
+                  (str "Cannot JSON encode object of class: "
+                       (class ~obj) ": " ~obj)))))
 
-(defmacro number-dispatch [^JsonGenerator jg obj]
+(defmacro number-dispatch [^JsonGenerator jg obj ^Exception e]
   (if (< 2 (:minor *clojure-version*))
     (do
       `(condp instance? ~obj
@@ -26,7 +27,7 @@
          Ratio (.writeNumber ~jg (double ~obj))
          clojure.lang.BigInt (.writeNumber ~jg ^clojure.lang.BigInt
                                            (.toBigInteger (bigint ~obj)))
-         (fail ~obj)))
+         (fail ~obj ~e)))
     (do
       `(condp instance? ~obj
          Integer (.writeNumber ~jg (int ~obj))
@@ -36,45 +37,46 @@
          BigInteger (.writeNumber ~jg ^BigInteger ~obj)
          BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
          Ratio (.writeNumber ~jg (double ~obj))
-         (fail ~obj)))))
+         (fail ~obj ~e)))))
 
 (declare generate)
 
-(definline generate-map [^JsonGenerator jg obj ^String date-format]
+(definline generate-map [^JsonGenerator jg obj ^String date-format ^Exception e]
   `(do
      (.writeStartObject ~jg)
      (doseq [[k# v#] ~obj]
        (.writeFieldName ~jg (if (keyword? k#)
                               (.substring (str k#) 1)
                               (str k#)))
-       (generate ~jg v# ~date-format))
+       (generate ~jg v# ~date-format ~e))
      (.writeEndObject ~jg)))
 
-(definline generate-array [^JsonGenerator jg obj ^String date-format]
+(definline generate-array [^JsonGenerator jg obj ^String date-format
+                           ^Exception e]
   `(do
      (.writeStartArray ~jg)
      (doseq [item# ~obj]
-       (generate ~jg item# ~date-format))
+       (generate ~jg item# ~date-format ~e))
      (.writeEndArray ~jg)))
 
-(defn generate [^JsonGenerator jg obj ^String date-format]
+(defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex]
   (condp instance? obj
     IPersistentCollection (condp instance? obj
                             clojure.lang.IPersistentMap
-                            (generate-map jg obj date-format)
+                            (generate-map jg obj date-format ex)
                             clojure.lang.IPersistentVector
-                            (generate-array jg obj date-format)
+                            (generate-array jg obj date-format ex)
                             clojure.lang.IPersistentSet
-                            (generate jg (seq obj) date-format)
+                            (generate jg (seq obj) date-format ex)
                             clojure.lang.IPersistentList
-                            (generate-array jg obj date-format)
+                            (generate-array jg obj date-format ex)
                             clojure.lang.ISeq
-                            (generate-array jg obj date-format))
-    Map (generate-map jg obj date-format)
-    List (generate-array jg obj date-format)
-    Set (generate jg (seq obj) date-format)
-    Number (number-dispatch ^JsonGenerator jg obj)
-    String (write-string ^JsonGenerator jg ^String obj)
+                            (generate-array jg obj date-format ex))
+    Map (generate-map jg obj date-format ex)
+    List (generate-array jg obj date-format ex)
+    Set (generate jg (seq obj) date-format ex)
+    Number (number-dispatch ^JsonGenerator jg obj ex)
+    String (write-string ^JsonGenerator jg ^String obj )
     Keyword (write-string ^JsonGenerator jg
                           (if-let [ns (namespace obj)]
                             (str ns "/" (name obj))
@@ -94,4 +96,4 @@
       ;; it must be a primative then
       (try
         (.writeNumber ^JsonGenerator jg obj)
-        (catch Exception e (fail obj))))))
+        (catch Exception e (fail obj ex))))))

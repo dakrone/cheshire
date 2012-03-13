@@ -14,6 +14,10 @@
 ;; date format rebound for custom encoding
 (def ^{:dynamic true :private true} *date-format*)
 
+;; pre-allocated exception for fast-failing core attempt for custom encoding
+(def ^{:private true} core-failure (JsonGenerationException.
+                                    "Cannot custom JSON encode object"))
+
 (defprotocol JSONable
   (to-json [t jg]))
 
@@ -30,7 +34,7 @@
 
 (defn ^String encode [obj & [^String date-format]]
   (try
-    (core/encode obj date-format)
+    (core/encode obj date-format core-failure)
     (catch JsonGenerationException _
       (encode* obj date-format))))
 
@@ -44,7 +48,7 @@
 
 (defn ^String encode-stream [obj ^BufferedWriter w & [^String date-format]]
   (try
-    (core/encode-stream obj w date-format)
+    (core/encode-stream obj w date-format core-failure)
     (catch JsonGenerationException _
       (encode-stream* obj date-format))))
 
@@ -62,7 +66,7 @@
 (defn encode-smile
   [obj & [^String date-format]]
   (try
-    (core/encode-smile obj date-format)
+    (core/encode-smile obj date-format core-failure)
     (catch JsonGenerationException _
       (encode-smile* obj date-format))))
 

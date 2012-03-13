@@ -13,11 +13,11 @@
   optional date format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  [obj & [^String date-format]]
+  [obj & [^String date-format ^Exception e]]
   (let [sw (StringWriter.)
         generator (.createJsonGenerator ^JsonFactory (or *json-factory*
                                                          json-factory) sw)]
-    (generate generator obj (or date-format default-date-format))
+    (generate generator obj (or date-format default-date-format) e)
     (.flush generator)
     (.toString sw)))
 
@@ -27,10 +27,10 @@
   format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  [obj ^BufferedWriter writer & [^String date-format]]
+  [obj ^BufferedWriter writer & [^String date-format ^Exception e]]
   (let [generator (.createJsonGenerator ^JsonFactory (or *json-factory*
                                                          json-factory) writer)]
-    (generate generator obj (or date-format default-date-format))
+    (generate generator obj (or date-format default-date-format) e)
     (.flush generator)
     writer))
 
@@ -39,12 +39,12 @@
   Takes an optional date format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  [obj & [^String date-format]]
+  [obj & [^String date-format ^Exception e]]
   (let [baos (ByteArrayOutputStream.)
         generator (.createJsonGenerator ^SmileFactory
                                         (or *smile-factory* smile-factory)
                                         baos)]
-    (generate generator obj (or date-format default-date-format))
+    (generate generator obj (or date-format default-date-format) e)
     (.flush generator)
     (.toByteArray baos)))
 
