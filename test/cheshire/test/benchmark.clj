@@ -27,6 +27,18 @@
 
 (deftest ^{:benchmark true} t-bench-custom
   (println "--------- Custom Benchmarks ---------")
+  (println "[+] Custom, no custom fields:")
   (bench/with-progress-reporting
     (bench/quick-bench (custom/decode (custom/encode test-obj)) :verbose))
+  (println "- - - - - - - - - - - - - - - - - - -")
+  (custom/add-encoder java.net.URL custom/encode-str)
+  (is (= "\"http://foo.com\"" (custom/encode (java.net.URL. "http://foo.com"))))
+  (let [custom-obj (assoc test-obj "url" (java.net.URL. "http://foo.com"))]
+    (println "[+] Custom, all custom fields:")
+    (bench/with-progress-reporting
+      (bench/quick-bench (custom/decode (custom/encode custom-obj)) :verbose))
+    (println "- - - - - - - - - - - - - - - - - - -")
+    (println "[+] Custom, bypass core with custom fields:")
+    (bench/with-progress-reporting
+      (bench/quick-bench (custom/decode (custom/encode* custom-obj)) :verbose)))
   (println "-------------------------------------"))
