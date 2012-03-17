@@ -3,6 +3,9 @@
         [clojure.test.generative]
         [clojure.test :only [deftest is]]))
 
+;; determines whether generative stuff is printed to stdout
+(def verbose true)
+
 (defn encode-equality [x]
   [x (decode (encode x))])
 
@@ -36,13 +39,15 @@
 
 (defspec map-keyword-json-encoding
   encode-equality-keys
-  [^{:tag (hash-map keyword (hash-map keyword (list int 2) 2) 2)} a]
+  [^{:tag (hash-map keyword (hash-map keyword (list int 10) 10) 10)} a]
   (is (= (first %) (last %))))
 
 (deftest ^{:generative true} t-generative
   ;; I want the seeds to change every time, set the number higher if
   ;; you have more than 16 CPU cores
   (let [seeds (take 16 (repeatedly #(rand-int 1024)))]
+    (when-not verbose
+      (reset! report-fn identity))
     (println "Seeds:" seeds)
     (binding [*msec* 15000
               *seeds* seeds
