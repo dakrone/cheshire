@@ -90,15 +90,17 @@
      (.createJsonParser ^SmileFactory (or *smile-factory* smile-factory) bytes)
      true (or keywords? false) nil array-coerce-fn)))
 
+(def ^{:doc "Object used to determine end of lazy parsing attempt."}
+  eof (Object.))
+
 ;; Lazy parsers
 (defn- parsed-seq*
   "Internal lazy-seq parser"
   [^JsonParser parser ^Boolean keywords? array-coerce-fn]
-  (let [eof (Object.)]
-    (lazy-seq
-     (let [elem (parse parser true keywords? eof array-coerce-fn)]
-       (when-not (identical? elem eof)
-         (cons elem (parsed-seq* parser keywords? array-coerce-fn)))))))
+  (lazy-seq
+   (let [elem (parse parser true keywords? eof array-coerce-fn)]
+     (when-not (identical? elem eof)
+       (cons elem (parsed-seq* parser keywords? array-coerce-fn))))))
 
 (defn parsed-seq
   "Returns a lazy seq of Clojure objects corresponding to the JSON read from
