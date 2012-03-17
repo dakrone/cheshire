@@ -49,7 +49,7 @@
     (when-not verbose
       (reset! report-fn identity))
     (println "Seeds:" seeds)
-    (binding [*msec* 15000
+    (binding [*msec* 25000
               *seeds* seeds
               *verbose* false]
       (doall (map deref (test-namespaces 'cheshire.test.generative))))))
