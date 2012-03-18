@@ -16,28 +16,26 @@
 
 (defmacro number-dispatch [^JsonGenerator jg obj ^Exception e]
   (if (< 2 (:minor *clojure-version*))
-    (do
-      `(condp instance? ~obj
-         Integer (.writeNumber ~jg (int ~obj))
-         Long (.writeNumber ~jg (long ~obj))
-         Double (.writeNumber ~jg (double ~obj))
-         Float (.writeNumber ~jg (double ~obj))
-         BigInteger (.writeNumber ~jg ^BigInteger ~obj)
-         BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
-         Ratio (.writeNumber ~jg (double ~obj))
-         clojure.lang.BigInt (.writeNumber ~jg ^clojure.lang.BigInt
-                                           (.toBigInteger (bigint ~obj)))
-         (fail ~obj ~e)))
-    (do
-      `(condp instance? ~obj
-         Integer (.writeNumber ~jg (int ~obj))
-         Long (.writeNumber ~jg (long ~obj))
-         Double (.writeNumber ~jg (double ~obj))
-         Float (.writeNumber ~jg (float ~obj))
-         BigInteger (.writeNumber ~jg ^BigInteger ~obj)
-         BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
-         Ratio (.writeNumber ~jg (double ~obj))
-         (fail ~obj ~e)))))
+    `(condp instance? ~obj
+       Integer (.writeNumber ~jg (int ~obj))
+       Long (.writeNumber ~jg (long ~obj))
+       Double (.writeNumber ~jg (double ~obj))
+       Float (.writeNumber ~jg (double ~obj))
+       BigInteger (.writeNumber ~jg ^BigInteger ~obj)
+       BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
+       Ratio (.writeNumber ~jg (double ~obj))
+       clojure.lang.BigInt (.writeNumber ~jg ^clojure.lang.BigInt
+                                         (.toBigInteger (bigint ~obj)))
+       (fail ~obj ~e))
+    `(condp instance? ~obj
+       Integer (.writeNumber ~jg (int ~obj))
+       Long (.writeNumber ~jg (long ~obj))
+       Double (.writeNumber ~jg (double ~obj))
+       Float (.writeNumber ~jg (float ~obj))
+       BigInteger (.writeNumber ~jg ^BigInteger ~obj)
+       BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
+       Ratio (.writeNumber ~jg (double ~obj))
+       (fail ~obj ~e))))
 
 (declare generate)
 
