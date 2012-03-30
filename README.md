@@ -38,9 +38,9 @@ encoders.
 ## Usage
 
 ```clojure
-[cheshire "3.0.0"]
+[cheshire "3.1.0"]
 
-;; Cheshire v3.0.0 uses Jackson 1.9.5
+;; Cheshire v3.0.0 uses Jackson 2.0.0
 
 ;; In your ns statement:
 (ns myns
@@ -264,7 +264,9 @@ know.
 
 ## Advanced customization for factories
 See
-[this page](http://jackson.codehaus.org/1.9.0/javadoc/org/codehaus/jackson/JsonParser.Feature.html)
+[this](http://fasterxml.github.com/jackson-core/javadoc/2.0.0/com/fasterxml/jackson/core/JsonFactory.Feature.html)
+and
+[this](http://fasterxml.github.com/jackson-core/javadoc/2.0.0/com/fasterxml/jackson/core/JsonParser.Feature.html)
 for a list of features that can be customized if desired. A custom
 factory can be used like so:
 
