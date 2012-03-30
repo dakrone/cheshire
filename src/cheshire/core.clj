@@ -2,8 +2,8 @@
   (:use [cheshire.factory]
         [cheshire.generate :only [generate]]
         [cheshire.parse :only [parse]])
-  (:import (org.codehaus.jackson JsonParser JsonFactory)
-           (org.codehaus.jackson.smile SmileFactory)
+  (:import (com.fasterxml.jackson.core JsonParser JsonFactory)
+           (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (java.io StringWriter StringReader BufferedReader BufferedWriter
                     ByteArrayOutputStream)))
 

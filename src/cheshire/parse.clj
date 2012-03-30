@@ -1,5 +1,5 @@
 (ns cheshire.parse
-  (:import (org.codehaus.jackson JsonParser JsonToken)))
+  (:import (com.fasterxml.jackson.core JsonParser JsonToken)))
 
 (declare parse*)
 

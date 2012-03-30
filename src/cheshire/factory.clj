@@ -1,8 +1,9 @@
 (ns cheshire.factory
   "Factories used for JSON/SMILE generation, used by both the core and
  custom generators."
-  (:import (org.codehaus.jackson.smile SmileFactory)
-           (org.codehaus.jackson JsonFactory JsonParser$Feature)))
+  (:import (com.fasterxml.jackson.dataformat.smile SmileFactory)
+           (com.fasterxml.jackson.core JsonFactory JsonFactory$Feature
+                                       JsonParser$Feature)))
 
 ;; default date format used to JSON-encode Date objects
 (def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -40,9 +41,9 @@
                   (boolean (:allow-numeric-leading-zeros opts)))
       (.configure JsonParser$Feature/ALLOW_NON_NUMERIC_NUMBERS
                   (boolean (:allow-non-numeric-numbers opts)))
-      (.configure JsonParser$Feature/INTERN_FIELD_NAMES
+      (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
                   (boolean (:intern-field-names opts)))
-      (.configure JsonParser$Feature/CANONICALIZE_FIELD_NAMES
+      (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
                   (boolean (:canonicalize-field-names opts))))))
 
 (defn ^SmileFactory make-smile-factory
@@ -65,9 +66,9 @@
                   (boolean (:allow-numeric-leading-zeros opts)))
       (.configure JsonParser$Feature/ALLOW_NON_NUMERIC_NUMBERS
                   (boolean (:allow-non-numeric-numbers opts)))
-      (.configure JsonParser$Feature/INTERN_FIELD_NAMES
+      (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
                   (boolean (:intern-field-names opts)))
-      (.configure JsonParser$Feature/CANONICALIZE_FIELD_NAMES
+      (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
                   (boolean (:canonicalize-field-names opts))))))
 
 (defonce ^JsonFactory json-factory (make-json-factory default-factory-options))

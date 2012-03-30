@@ -1,5 +1,5 @@
 (ns cheshire.generate
-  (:import (org.codehaus.jackson JsonGenerator JsonGenerationException)
+  (:import (com.fasterxml.jackson.core JsonGenerator JsonGenerationException)
            (java.util Date Map List Set SimpleTimeZone UUID)
            (java.sql Timestamp)
            (java.text SimpleDateFormat)

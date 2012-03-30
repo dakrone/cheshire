@@ -7,9 +7,9 @@
            (java.util Date SimpleTimeZone)
            (java.text SimpleDateFormat)
            (java.sql Timestamp)
-           (org.codehaus.jackson.smile SmileFactory)
-           (org.codehaus.jackson JsonFactory JsonGenerator
-                                 JsonGenerationException JsonParser)))
+           (com.fasterxml.jackson.dataformat.smile SmileFactory)
+           (com.fasterxml.jackson.core JsonFactory JsonGenerator
+                                       JsonGenerationException JsonParser)))
 
 ;; date format rebound for custom encoding
 (def ^{:dynamic true :private true} *date-format*)
