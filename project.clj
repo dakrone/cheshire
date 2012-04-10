@@ -10,7 +10,7 @@
                                   [criterium "0.2.0"]
                                   [org.clojure/test.generative "0.1.4"]]}
              :1.2 {:dependencies [[org.clojure/clojure "1.2.1"]]}
-             :1.4 {:dependencies [[org.clojure/clojure "1.4.0-beta4"]]}}
+             :1.4 {:dependencies [[org.clojure/clojure "1.4.0-beta7"]]}}
   :aliases {"all" ["with-profile" "dev,1.2:dev:dev,1.4"]}
   :test-selectors {:default  #(not (:benchmark %))
                    :benchmark :benchmark
