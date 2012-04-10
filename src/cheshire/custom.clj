@@ -43,12 +43,9 @@
      (encode obj nil))
   ([obj opt-map]
      (try
-       (core/encode obj :date-format (:date-format opt-map)
-                    :pretty (:pretty opt-map)
-                    :ex core-failure)
+       (core/encode obj (merge opt-map {:ex core-failure}))
        (catch JsonGenerationException _
-         (encode* obj :date-format (:date-format opt-map)
-                  :pretty (:pretty opt-map))))))
+         (encode* obj opt-map)))))
 
 (defn ^String encode-stream*
   ([obj ^BufferedWriter w]
@@ -69,12 +66,9 @@
      (encode-stream obj w nil))
   ([obj ^BufferedWriter w opt-map]
      (try
-       (core/encode-stream obj w :date-format (:date-format opt-map)
-                           :pretty (:pretty opt-map)
-                           :ex core-failure)
+       (core/encode-stream obj w (merge opt-map {:ex core-failure}))
        (catch JsonGenerationException _
-         (encode-stream* obj :date-format (:date-format opt-map)
-                         :pretty (:pretty opt-map))))))
+         (encode-stream* obj opt-map)))))
 
 (defn encode-smile*
   ([obj]
@@ -94,9 +88,9 @@
      (encode-smile* obj nil))
   ([obj opt-map]
      (try
-       (core/encode-smile obj (:date-format opt-map) core-failure)
+       (core/encode-smile obj (merge opt-map {:ex core-failure}))
        (catch JsonGenerationException _
-         (encode-smile* obj (:date-format opt-map))))))
+         (encode-smile* obj opt-map)))))
 
 ;; there are no differences in parsing, but these are here to make
 ;; this a self-contained namespace if desired
