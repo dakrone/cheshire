@@ -103,7 +103,7 @@
          (json/decode (json/encode {:foo (Date. (long 0))}))))
   (is (= {"foo" "1970-01-01"}
          (json/decode (json/encode {:foo (Date. (long 0))}
-                                   :date-format "yyyy-MM-dd")))
+                                   {:date-format "yyyy-MM-dd"})))
       "encode with given date format"))
 
 (deftest test-sql-timestamp
@@ -111,7 +111,7 @@
          (json/decode (json/encode {:foo (Timestamp. (long 0))}))))
   (is (= {"foo" "1970-01-01"}
          (json/decode (json/encode {:foo (Timestamp. (long 0))}
-                                   :date-format "yyyy-MM-dd")))
+                                   {:date-format "yyyy-MM-dd"})))
       "encode with given date format"))
 
 (deftest test-uuid
@@ -182,4 +182,4 @@
   (is (= (str "{\n  \"foo\" : 1,\n  \"bar\" : {\n    "
               "\"quux\" : [ 1, 2, 3 ],\n    \"baz\" : 2\n  }\n}")
          (json/encode {:foo 1 :bar {:baz 2 :quux [1 2 3]}}
-                      :pretty true))))
+                      {:pretty true}))))

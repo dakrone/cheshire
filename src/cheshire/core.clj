@@ -13,16 +13,20 @@
   optional date format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  [obj & {:keys [date-format ex pretty]}]
-  (let [sw (StringWriter.)
-        generator (.createJsonGenerator ^JsonFactory (or *json-factory*
-                                                         json-factory) sw)
-        generator (if pretty
-                    (doto generator .useDefaultPrettyPrinter)
-                    generator)]
-    (generate generator obj (or date-format default-date-format) ex)
-    (.flush generator)
-    (.toString sw)))
+  ([obj]
+     (generate-string obj nil))
+  ([obj opt-map]
+     (let [sw (StringWriter.)
+           generator (.createJsonGenerator ^JsonFactory (or *json-factory*
+                                                            json-factory) sw)
+           generator (if (:pretty opt-map)
+                       (doto generator .useDefaultPrettyPrinter)
+                       generator)]
+       (generate generator obj
+                 (or (:date-format opt-map) default-date-format)
+                 (:ex opt-map))
+       (.flush generator)
+       (.toString sw))))
 
 (defn ^String generate-stream
   "Returns a BufferedWriter for the given Clojure object with the.
@@ -30,29 +34,35 @@
   format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  [obj ^BufferedWriter writer & {:keys [date-format ex pretty]}]
-  (let [generator (.createJsonGenerator ^JsonFactory (or *json-factory*
-                                                         json-factory) writer)
-        generator (if pretty
-                    (doto generator .useDefaultPrettyPrinter)
-                    generator)]
-    (generate generator obj (or date-format default-date-format) ex)
-    (.flush generator)
-    writer))
+  ([obj ^BufferedWriter writer]
+     (generate-stream obj writer nil))
+  ([obj ^BufferedWriter writer opt-map]
+     (let [generator (.createJsonGenerator ^JsonFactory (or *json-factory*
+                                                            json-factory) writer)
+           generator (if (:pretty opt-map)
+                       (doto generator .useDefaultPrettyPrinter)
+                       generator)]
+       (generate generator obj (or (:date-format opt-map) default-date-format)
+                 (:ex opt-map))
+       (.flush generator)
+       writer)))
 
 (defn generate-smile
   "Returns a SMILE-encoded byte-array for the given Clojure object.
   Takes an optional date format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  [obj & {:keys [date-format ex]}]
-  (let [baos (ByteArrayOutputStream.)
-        generator (.createJsonGenerator ^SmileFactory
-                                        (or *smile-factory* smile-factory)
-                                        baos)]
-    (generate generator obj (or date-format default-date-format) ex)
-    (.flush generator)
-    (.toByteArray baos)))
+  ([obj]
+     (generate-smile obj nil))
+  ([obj opt-map]
+     (let [baos (ByteArrayOutputStream.)
+           generator (.createJsonGenerator ^SmileFactory
+                                           (or *smile-factory* smile-factory)
+                                           baos)]
+       (generate generator obj (or (:date-format opt-map) default-date-format)
+                 (:ex opt-map))
+       (.flush generator)
+       (.toByteArray baos))))
 
 ;; Parsers
 (defn parse-string

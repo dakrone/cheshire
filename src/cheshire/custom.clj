@@ -21,54 +21,82 @@
 (defprotocol JSONable
   (to-json [t jg]))
 
-(defn ^String encode* [obj & [^String date-format]]
-  (binding [*date-format* (or date-format default-date-format)]
-    (let [sw (StringWriter.)
-          generator (.createJsonGenerator
-                     ^JsonFactory (or *json-factory* json-factory) sw)]
-      (if obj
-        (to-json obj generator)
-        (.writeNull generator))
-      (.flush generator)
-      (.toString sw))))
+(defn ^String encode*
+  ([obj]
+     (encode* obj nil))
+  ([obj opt-map]
+     (binding [*date-format* (or (:date-format opt-map) default-date-format)]
+       (let [sw (StringWriter.)
+             generator (.createJsonGenerator
+                        ^JsonFactory (or *json-factory* json-factory) sw)
+             generator (if (:pretty opt-map)
+                         (doto generator .useDefaultPrettyPrinter)
+                         generator)]
+         (if obj
+           (to-json obj generator)
+           (.writeNull generator))
+         (.flush generator)
+         (.toString sw)))))
 
-(defn ^String encode [obj & [^String date-format]]
-  (try
-    (core/encode obj date-format core-failure)
-    (catch JsonGenerationException _
-      (encode* obj date-format))))
+(defn ^String encode
+  ([obj]
+     (encode obj nil))
+  ([obj opt-map]
+     (try
+       (core/encode obj :date-format (:date-format opt-map)
+                    :pretty (:pretty opt-map)
+                    :ex core-failure)
+       (catch JsonGenerationException _
+         (encode* obj :date-format (:date-format opt-map)
+                  :pretty (:pretty opt-map))))))
 
-(defn ^String encode-stream* [obj ^BufferedWriter w & [^String date-format]]
-  (binding [*date-format* (or date-format default-date-format)]
-    (let [generator (.createJsonGenerator ^JsonFactory
-                                          (or *json-factory* json-factory) w)]
-      (to-json obj generator)
-      (.flush generator)
-      w)))
+(defn ^String encode-stream*
+  ([obj ^BufferedWriter w]
+     (encode-stream* obj w nil))
+  ([obj ^BufferedWriter w opt-map]
+     (binding [*date-format* (or (:date-format opt-map) default-date-format)]
+       (let [generator (.createJsonGenerator ^JsonFactory
+                                             (or *json-factory* json-factory) w)
+             generator (if (:pretty opt-map)
+                         (doto generator .useDefaultPrettyPrinter)
+                         generator)]
+         (to-json obj generator)
+         (.flush generator)
+         w))))
 
-(defn ^String encode-stream [obj ^BufferedWriter w & [^String date-format]]
-  (try
-    (core/encode-stream obj w date-format core-failure)
-    (catch JsonGenerationException _
-      (encode-stream* obj date-format))))
+(defn ^String encode-stream
+  ([obj ^BufferedWriter w]
+     (encode-stream obj w nil))
+  ([obj ^BufferedWriter w opt-map]
+     (try
+       (core/encode-stream obj w :date-format (:date-format opt-map)
+                           :pretty (:pretty opt-map)
+                           :ex core-failure)
+       (catch JsonGenerationException _
+         (encode-stream* obj :date-format (:date-format opt-map)
+                         :pretty (:pretty opt-map))))))
 
 (defn encode-smile*
-  [obj & [^String date-format]]
-  (binding [*date-format* (or date-format default-date-format)]
-    (let [baos (ByteArrayOutputStream.)
-          generator (.createJsonGenerator ^SmileFactory
-                                          (or *smile-factory* smile-factory)
-                                          baos)]
-      (to-json obj generator)
-      (.flush generator)
-      (.toByteArray baos))))
+  ([obj]
+     (encode-smile* obj nil))
+  ([obj opt-map]
+     (binding [*date-format* (or (:date-format opt-map) default-date-format)]
+       (let [baos (ByteArrayOutputStream.)
+             generator (.createJsonGenerator ^SmileFactory
+                                             (or *smile-factory* smile-factory)
+                                             baos)]
+         (to-json obj generator)
+         (.flush generator)
+         (.toByteArray baos)))))
 
 (defn encode-smile
-  [obj & [^String date-format]]
-  (try
-    (core/encode-smile obj date-format core-failure)
-    (catch JsonGenerationException _
-      (encode-smile* obj date-format))))
+  ([obj]
+     (encode-smile* obj nil))
+  ([obj opt-map]
+     (try
+       (core/encode-smile obj (:date-format opt-map) core-failure)
+       (catch JsonGenerationException _
+         (encode-smile* obj (:date-format opt-map))))))
 
 ;; there are no differences in parsing, but these are here to make
 ;; this a self-contained namespace if desired
