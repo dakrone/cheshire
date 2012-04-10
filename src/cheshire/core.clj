@@ -13,11 +13,14 @@
   optional date format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  [obj & [^String date-format ^Exception e]]
+  [obj & {:keys [date-format ex pretty]}]
   (let [sw (StringWriter.)
         generator (.createJsonGenerator ^JsonFactory (or *json-factory*
-                                                         json-factory) sw)]
-    (generate generator obj (or date-format default-date-format) e)
+                                                         json-factory) sw)
+        generator (if pretty
+                    (doto generator .useDefaultPrettyPrinter)
+                    generator)]
+    (generate generator obj (or date-format default-date-format) ex)
     (.flush generator)
     (.toString sw)))
 
@@ -27,10 +30,13 @@
   format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  [obj ^BufferedWriter writer & [^String date-format ^Exception e]]
+  [obj ^BufferedWriter writer & {:keys [date-format ex pretty]}]
   (let [generator (.createJsonGenerator ^JsonFactory (or *json-factory*
-                                                         json-factory) writer)]
-    (generate generator obj (or date-format default-date-format) e)
+                                                         json-factory) writer)
+        generator (if pretty
+                    (doto generator .useDefaultPrettyPrinter)
+                    generator)]
+    (generate generator obj (or date-format default-date-format) ex)
     (.flush generator)
     writer))
 
@@ -39,12 +45,12 @@
   Takes an optional date format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  [obj & [^String date-format ^Exception e]]
+  [obj & {:keys [date-format ex]}]
   (let [baos (ByteArrayOutputStream.)
         generator (.createJsonGenerator ^SmileFactory
                                         (or *smile-factory* smile-factory)
                                         baos)]
-    (generate generator obj (or date-format default-date-format) e)
+    (generate generator obj (or date-format default-date-format) ex)
     (.flush generator)
     (.toByteArray baos)))
 
