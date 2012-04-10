@@ -182,4 +182,4 @@
   (is (= (str "{\n  \"foo\" : 1,\n  \"bar\" : {\n    "
               "\"quux\" : [ 1, 2, 3 ],\n    \"baz\" : 2\n  }\n}")
          (json/encode {:foo 1 :bar {:baz 2 :quux [1 2 3]}}
-                      :pretty :yesplease))))
+                      :pretty true))))
