@@ -65,7 +65,16 @@ encoders.
 (generate-string {:foo "bar" :baz (Date. 0)})
 
 ;; generate some JSON with Dates with custom Date encoding
-(generate-string {:baz (Date. 0)} "yyyy-MM-dd")
+(generate-string {:baz (Date. 0)} {:date-format "yyyy-MM-dd"})
+
+;; generate some JSON with pretty formatting
+(generate-string {:foo "bar" :baz {:eggplant [1 2 3]}} {:pretty true})
+;; {
+;;   "foo" : "bar",
+;;   "baz" : {
+;;     "eggplant" : [ 1, 2, 3 ]
+;;   }
+;; }
 ```
 
 In the event encoding fails, Cheshire will throw a JsonGenerationException.
@@ -296,10 +305,9 @@ created, and factories work exactly the same with custom encoding.
 - <del>handle encoding java.sql.Timestamp the same as
   java.util.Date</del>
 - <del>add benchmarking</del>
-- get criterium benchmarking ignored for 1.2.1 lein-multi tests
-  (probably requires lein2 to come out first for profiles)
-- look into faster exception handling by pre-allocating an exception
-  object instead of creating one on-the-fly (maybe ask Steve?)
+- get criterium benchmarking ignored for 1.2.1 profile
+- <del> look into faster exception handling by pre-allocating an exception
+  object instead of creating one on-the-fly (maybe ask Steve?)</del>
 - make it as fast as possible (ongoing)
 
 ## License
