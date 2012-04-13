@@ -179,7 +179,7 @@
          (json/decode (json/encode {:foo/bar :baz/eggplant}) true))))
 
 (deftest t-pretty-print
-  (is (= (str "{\n  \"foo\" : 1,\n  \"bar\" : {\n    "
-              "\"quux\" : [ 1, 2, 3 ],\n    \"baz\" : 2\n  }\n}")
-         (json/encode {:foo 1 :bar {:baz 2 :quux [1 2 3]}}
+  (is (= (str "{\n  \"foo\" : 1,\n  \"bar\" : [ {\n    \"baz\" : 2\n  }, "
+              "\"quux\", [ 1, 2, 3 ] ]\n}")
+         (json/encode {:foo 1 :bar [{:baz 2} :quux [1 2 3]]}
                       {:pretty true}))))
