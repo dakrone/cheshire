@@ -2,6 +2,8 @@
   (:use [clojure.test])
   (:require [cheshire.core :as core]
             [cheshire.custom :as custom]
+            [clojure.data.json :as cj]
+            [clj-json.core :as clj-json]
             [criterium.core :as bench]))
 
 ;; These tests just print out results, nothing else, they also
@@ -18,6 +20,19 @@
                "list" '("a" "b")
                "set" #{"a" "b"}
                "keyword" :foo})
+
+(deftest ^{:benchmark true} t-bench-clj-json
+  (println "-------- clj-json Benchmarks --------")
+  (bench/with-progress-reporting
+    (bench/quick-bench (clj-json/parse-string
+                        (clj-json/generate-string test-obj)) :verbose))
+  (println "-------------------------------------"))
+
+(deftest ^{:benchmark true} t-bench-clojure-json
+  (println "-------- Data.json Benchmarks -------")
+  (bench/with-progress-reporting
+    (bench/quick-bench (cj/read-json (cj/json-str test-obj)) :verbose))
+  (println "-------------------------------------"))
 
 (deftest ^{:benchmark true} t-bench-core
   (println "---------- Core Benchmarks ----------")
