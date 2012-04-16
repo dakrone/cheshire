@@ -42,11 +42,13 @@
 (definline generate-map [^JsonGenerator jg obj ^String date-format ^Exception e]
   `(do
      (.writeStartObject ~jg)
-     (doseq [[k# v#] ~obj]
-       (.writeFieldName ~jg (if (keyword? k#)
-                              (.substring (str k#) 1)
-                              (str k#)))
-       (generate ~jg v# ~date-format ~e))
+     (doseq [m# ~obj]
+       (let [k# (key m#)
+             v# (val m#)]
+         (.writeFieldName ~jg (if (keyword? k#)
+                                (.substring (str k#) 1)
+                                (str k#)))
+         (generate ~jg v# ~date-format ~e)))
      (.writeEndObject ~jg)))
 
 (definline generate-array [^JsonGenerator jg obj ^String date-format
