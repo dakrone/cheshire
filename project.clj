@@ -5,7 +5,7 @@
   :dependencies [[org.clojure/clojure "1.4.0"]
                  [com.fasterxml.jackson.core/jackson-core "2.0.0"]
                  [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.0.0"]]
-  :profiles {:dev {:dependencies [[criterium "0.2.0"]
+  :profiles {:dev {:dependencies [[criterium "0.2.1"]
                                   [org.clojure/test.generative "0.1.4"]
                                   [org.clojure/data.json "0.1.2"]
                                   [clj-json "0.5.0"]]}
