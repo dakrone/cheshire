@@ -24,6 +24,8 @@
        BigInteger (.writeNumber ~jg ^BigInteger ~obj)
        BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
        Ratio (.writeNumber ~jg (double ~obj))
+       Short (.writeNumber ~jg (int ~obj))
+       Byte (.writeNumber ~jg (int ~obj))
        clojure.lang.BigInt (.writeNumber ~jg ^clojure.lang.BigInt
                                          (.toBigInteger (bigint ~obj)))
        (fail ~obj ~e))
@@ -35,6 +37,8 @@
        BigInteger (.writeNumber ~jg ^BigInteger ~obj)
        BigDecimal (.writeNumber ~jg ^BigDecimal ~obj)
        Ratio (.writeNumber ~jg (double ~obj))
+       Short (.writeNumber ~jg (int ~obj))
+       Byte (.writeNumber ~jg (int ~obj))
        (fail ~obj ~e))))
 
 (declare generate)

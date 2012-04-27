@@ -12,7 +12,7 @@
 (def test-obj {"int" 3 "long" (long -2147483647) "boolean" true
                "LongObj" (Long/parseLong "2147483647") "double" 1.23
                "nil" nil "string" "string" "vec" [1 2 3] "map" {"a" "b"}
-               "list" (list "a" "b")})
+               "list" (list "a" "b") "short" (short 21) "byte" (byte 3)})
 
 (deftest t-ratio
   (let [n 1/2]
@@ -36,7 +36,7 @@
       (is (= n (:num (json/decode (json/encode {:num n}) true)))))))
 
 (deftest test-string-round-trip
-  (is (= test-obj (json/decode (json/encode test-obj)))))
+  (is (= test-obj (json/decode (json/encode* test-obj)))))
 
 (deftest test-generate-accepts-float
   (is (= "3.14" (json/encode 3.14))))
