@@ -75,7 +75,9 @@
                             clojure.lang.IPersistentList
                             (generate-array jg obj date-format ex)
                             clojure.lang.ISeq
-                            (generate-array jg obj date-format ex))
+                            (generate-array jg obj date-format ex)
+                            clojure.lang.Associative
+                            (generate-map jg obj date-format ex))
     Map (generate-map jg obj date-format ex)
     List (generate-array jg obj date-format ex)
     Set (generate jg (seq obj) date-format ex)
