@@ -270,6 +270,9 @@
   JSONable
   {:to-json encode-symbol})
 
+(extend clojure.lang.Associative
+  JSONable
+  {:to-json encode-map})
 ;; Utility methods to add and remove encoders
 (defn add-encoder
   "Provide an encoder for a type not handled by Cheshire.
