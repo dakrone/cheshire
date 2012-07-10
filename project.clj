@@ -1,4 +1,4 @@
-(defproject cheshire "4.0.1-SNAPSHOT"
+(defproject cheshire "4.0.1"
   :description "JSON and JSON SMILE encoding, fast."
   :url "https://github.com/dakrone/cheshire"
   :warn-on-reflection false
