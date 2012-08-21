@@ -13,7 +13,7 @@
              :1.2 {:dependencies [[org.clojure/clojure "1.2.1"]]}
              :1.3 {:dependencies [[org.clojure/clojure "1.3.0"]]}}
   :aliases {"all" ["with-profile" "dev,1.2:dev,1.3:dev"]}
-  :plugins [[lein-expectations "0.0.5"]]
+  :plugins [[lein-expectations "0.0.7"]]
   :test-selectors {:default  #(and (not (:benchmark %))
                                    (not (:generative %)))
                    :benchmark :benchmark

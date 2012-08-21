@@ -1,5 +1,6 @@
 (ns cheshire.test.core
   (:use [expectations.scenarios]
+        [clojure.test]
         [clojure.java.io :only [file reader]])
   (:require [cheshire.core :as json]
             [cheshire.factory :as fact]
