@@ -57,3 +57,17 @@
     (bench/with-progress-reporting
       (bench/quick-bench (custom/decode (custom/encode* custom-obj)) :verbose)))
   (println "-------------------------------------"))
+
+(deftest ^{:benchmark true} t-bench-custom-kw-coercion
+  (println "---- Custom keyword-fn Benchmarks ---")
+  (let [t (core/encode test-obj)]
+    (println "[+] (fn [k] (keyword k))")
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/decode t (fn [k] (keyword k)))))
+    (println "[+] basic 'true' keyword-fn")
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/decode t true)))
+    (println "[+] no keyword-fn")
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/decode t))))
+  (println "-------------------------------------"))
