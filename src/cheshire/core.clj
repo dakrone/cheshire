@@ -70,8 +70,8 @@
 ;; Parsers
 (defn parse-string
   "Returns the Clojure object corresponding to the given JSON-encoded string.
-  keywords? should be true if keyword keys are needed, the default is false
-  maps will use strings as keywords.
+  An optional key-fn argument can be either true (to coerce keys to keywords),
+  false to leave them as strings, or a function to provide custom coercion.
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
@@ -84,8 +84,9 @@
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
-  implement BufferedReader. keywords? should be true if keyword keys are needed
-  the default is false, maps will use strings as keywords.
+  implement BufferedReader. An optional key-fn argument can be either true (to
+  coerce keys to keywords),false to leave them as strings, or a function to
+  provide custom coercion.
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
@@ -98,8 +99,8 @@
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
-  keywords? should be true if keyword keys are needed, the default is false
-  maps will use strings as keywords.
+  An optional key-fn argument can be either true (to coerce keys to keywords),
+  false to leave them as strings, or a function to provide custom coercion.
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
