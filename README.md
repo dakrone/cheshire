@@ -223,6 +223,7 @@ Cheshire encoding supports:
 - Lazy decoding
 - Pretty-printing JSON generation
 - Unicode escaping
+- Custom keyword coercion
 - Arbitrary precision for decoded values:
 
 Cheshire will automatically use a BigInteger if needed for
