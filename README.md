@@ -94,6 +94,11 @@ In the event encoding fails, Cheshire will throw a JsonGenerationException.
 (parse-string "{\"foo\":\"bar\"}" true)
 ;; => {:foo "bar"}
 
+;; parse some json and munge keywords with a custom function
+(parse-string "{\"foo\":\"bar\"}" (fn [k] (keyword (.toUpperCase k))))
+;; => {:FOO "bar"}
+
+
 ;; parse some SMILE (keywords option also supported)
 (parse-smile <your-byte-array>)
 
