@@ -224,6 +224,8 @@ Cheshire encoding supports:
 - Pretty-printing JSON generation
 - Unicode escaping
 - Custom keyword coercion
+- Pretty-printing JSON generation
+- Unicode escaping
 - Arbitrary precision for decoded values:
 
 Cheshire will automatically use a BigInteger if needed for
