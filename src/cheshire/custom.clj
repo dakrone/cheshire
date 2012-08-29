@@ -9,6 +9,7 @@
            (java.sql Timestamp)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (com.fasterxml.jackson.core JsonFactory JsonGenerator
+                                       JsonGenerator$Feature
                                        JsonGenerationException JsonParser)))
 
 ;; date format rebound for custom encoding
@@ -28,10 +29,11 @@
      (binding [*date-format* (or (:date-format opt-map) default-date-format)]
        (let [sw (StringWriter.)
              generator (.createJsonGenerator
-                        ^JsonFactory (or *json-factory* json-factory) sw)
-             generator (if (:pretty opt-map)
-                         (doto generator .useDefaultPrettyPrinter)
-                         generator)]
+                        ^JsonFactory (or *json-factory* json-factory) sw)]
+         (when (:pretty opt-map)
+           (.useDefaultPrettyPrinter generator))
+         (when (:escape-non-ascii opt-map)
+           (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
          (if obj
            (to-json obj generator)
            (.writeNull generator))
@@ -52,11 +54,12 @@
      (encode-stream* obj w nil))
   ([obj ^BufferedWriter w opt-map]
      (binding [*date-format* (or (:date-format opt-map) default-date-format)]
-       (let [generator (.createJsonGenerator ^JsonFactory
-                                             (or *json-factory* json-factory) w)
-             generator (if (:pretty opt-map)
-                         (doto generator .useDefaultPrettyPrinter)
-                         generator)]
+       (let [generator (.createJsonGenerator
+                        ^JsonFactory (or *json-factory* json-factory) w)]
+         (when (:pretty opt-map)
+           (.useDefaultPrettyPrinter generator))
+         (when (:escape-non-ascii opt-map)
+           (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
          (to-json obj generator)
          (.flush generator)
          w))))

@@ -75,6 +75,10 @@ encoders.
 ;;     "eggplant" : [ 1, 2, 3 ]
 ;;   }
 ;; }
+
+;; generate JSON escaping UTF-8
+(generate-string {:foo "It costs £100"} {:escape-non-ascii true})
+;; => "{\"foo\":\"It costs \\u00A3100\"}"
 ```
 
 In the event encoding fails, Cheshire will throw a JsonGenerationException.
@@ -212,6 +216,8 @@ Cheshire encoding supports:
 ### Also supports
 - Stream encoding/decoding
 - Lazy decoding
+- Pretty-printing JSON generation
+- Unicode escaping
 - Arbitrary precision for decoded values:
 
 Cheshire will automatically use a BigInteger if needed for

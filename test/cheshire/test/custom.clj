@@ -182,3 +182,7 @@
               "\"quux\", [ 1, 2, 3 ] ]\n}")
          (json/encode {:foo 1 :bar [{:baz 2} :quux [1 2 3]]}
                       {:pretty true}))))
+
+(deftest t-unicode-escaping
+  (is (= "{\"foo\":\"It costs \\u00A3100\"}"
+         (json/encode {:foo "It costs £100"} {:escape-non-ascii true}))))

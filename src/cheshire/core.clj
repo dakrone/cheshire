@@ -2,7 +2,8 @@
   (:use [cheshire.factory]
         [cheshire.generate :only [generate]]
         [cheshire.parse :only [parse]])
-  (:import (com.fasterxml.jackson.core JsonParser JsonFactory)
+  (:import (com.fasterxml.jackson.core JsonParser JsonFactory
+                                       JsonGenerator$Feature)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (java.io StringWriter StringReader BufferedReader BufferedWriter
                     ByteArrayOutputStream)))
@@ -17,11 +18,12 @@
      (generate-string obj nil))
   ([obj opt-map]
      (let [sw (StringWriter.)
-           generator (.createJsonGenerator ^JsonFactory (or *json-factory*
-                                                            json-factory) sw)
-           generator (if (:pretty opt-map)
-                       (doto generator .useDefaultPrettyPrinter)
-                       generator)]
+           generator (.createJsonGenerator
+                      ^JsonFactory (or *json-factory* json-factory) sw)]
+       (when (:pretty opt-map)
+         (.useDefaultPrettyPrinter generator))
+       (when (:escape-non-ascii opt-map)
+         (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
        (generate generator obj
                  (or (:date-format opt-map) default-date-format)
                  (:ex opt-map))
@@ -37,11 +39,12 @@
   ([obj ^BufferedWriter writer]
      (generate-stream obj writer nil))
   ([obj ^BufferedWriter writer opt-map]
-     (let [generator (.createJsonGenerator ^JsonFactory (or *json-factory*
-                                                            json-factory) writer)
-           generator (if (:pretty opt-map)
-                       (doto generator .useDefaultPrettyPrinter)
-                       generator)]
+     (let [generator (.createJsonGenerator
+                      ^JsonFactory (or *json-factory* json-factory) writer)]
+       (when (:pretty opt-map)
+         (.useDefaultPrettyPrinter generator))
+       (when (:escape-non-ascii opt-map)
+         (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
        (generate generator obj (or (:date-format opt-map) default-date-format)
                  (:ex opt-map))
        (.flush generator)

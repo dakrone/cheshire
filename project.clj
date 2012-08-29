@@ -10,8 +10,9 @@
                                   [org.clojure/data.json "0.1.2"]
                                   [clj-json "0.5.0"]]}
              :1.2 {:dependencies [[org.clojure/clojure "1.2.1"]]}
-             :1.3 {:dependencies [[org.clojure/clojure "1.3.0"]]}}
-  :aliases {"all" ["with-profile" "dev,1.2:dev,1.3:dev"]}
+             :1.3 {:dependencies [[org.clojure/clojure "1.3.0"]]}
+             :1.5 {:dependencies [[org.clojure/clojure "1.5.0-alpha3"]]}}
+  :aliases {"all" ["with-profile" "dev,1.2:dev,1.3:dev:dev,1.5"]}
   :test-selectors {:default  #(and (not (:benchmark %))
                                    (not (:generative %)))
                    :benchmark :benchmark
