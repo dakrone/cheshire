@@ -193,7 +193,3 @@
   (is (= {"foo" "bar"} (json/decode "{\"foo\": \"bar\"}" nil)))
   (is (= {"foo" "bar"} (json/decode "{\"foo\": \"bar\"}" false)))
   (is (= {:foo "bar"} (json/decode "{\"foo\": \"bar\"}" true))))
-
-(deftest t-unicode-escaping
-  (is (= "{\"foo\":\"It costs \\u00A3100\"}"
-         (json/encode {:foo "It costs £100"} {:escape-non-ascii true}))))
