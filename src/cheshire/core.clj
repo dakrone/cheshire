@@ -70,44 +70,45 @@
 ;; Parsers
 (defn parse-string
   "Returns the Clojure object corresponding to the given JSON-encoded string.
-  keywords? should be true if keyword keys are needed, the default is false
-  maps will use strings as keywords.
+  An optional key-fn argument can be either true (to coerce keys to keywords),
+  false to leave them as strings, or a function to provide custom coercion.
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  [^String string & [^Boolean keywords? array-coerce-fn]]
+  [^String string & [key-fn array-coerce-fn]]
   (when string
     (parse
      (.createJsonParser ^JsonFactory (or *json-factory* json-factory)
                         (StringReader. string))
-     true (or keywords? false) nil array-coerce-fn)))
+     key-fn nil array-coerce-fn)))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
-  implement BufferedReader. keywords? should be true if keyword keys are needed
-  the default is false, maps will use strings as keywords.
+  implement BufferedReader. An optional key-fn argument can be either true (to
+  coerce keys to keywords),false to leave them as strings, or a function to
+  provide custom coercion.
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
   If laziness is needed, see parsed-seq."
-  [^BufferedReader rdr & [^Boolean keywords? array-coerce-fn]]
+  [^BufferedReader rdr & [key-fn array-coerce-fn]]
   (when rdr
     (parse
      (.createJsonParser ^JsonFactory (or *json-factory* json-factory) rdr)
-     true (or keywords? false) nil array-coerce-fn)))
+     key-fn nil array-coerce-fn)))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
-  keywords? should be true if keyword keys are needed, the default is false
-  maps will use strings as keywords.
+  An optional key-fn argument can be either true (to coerce keys to keywords),
+  false to leave them as strings, or a function to provide custom coercion.
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  [^bytes bytes & [^Boolean keywords? array-coerce-fn]]
+  [^bytes bytes & [key-fn array-coerce-fn]]
   (when bytes
     (parse
      (.createJsonParser ^SmileFactory (or *smile-factory* smile-factory) bytes)
-     true (or keywords? false) nil array-coerce-fn)))
+     key-fn nil array-coerce-fn)))
 
 (def ^{:doc "Object used to determine end of lazy parsing attempt."}
   eof (Object.))
@@ -115,11 +116,11 @@
 ;; Lazy parsers
 (defn- parsed-seq*
   "Internal lazy-seq parser"
-  [^JsonParser parser ^Boolean keywords? array-coerce-fn]
+  [^JsonParser parser key-fn array-coerce-fn]
   (lazy-seq
-   (let [elem (parse parser true keywords? eof array-coerce-fn)]
+   (let [elem (parse parser key-fn eof array-coerce-fn)]
      (when-not (identical? elem eof)
-       (cons elem (parsed-seq* parser keywords? array-coerce-fn))))))
+       (cons elem (parsed-seq* parser key-fn array-coerce-fn))))))
 
 (defn parsed-seq
   "Returns a lazy seq of Clojure objects corresponding to the JSON read from
@@ -128,12 +129,11 @@
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
   If non-laziness is needed, see parse-stream."
-  [^BufferedReader reader & [^Boolean keywords? array-coerce-fn]]
+  [^BufferedReader reader & [key-fn array-coerce-fn]]
   (when reader
     (parsed-seq* (.createJsonParser ^JsonFactory
                                     (or *json-factory* json-factory) reader)
-                 (or keywords? false)
-                 array-coerce-fn)))
+                 key-fn array-coerce-fn)))
 
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
@@ -141,12 +141,11 @@
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  [^BufferedReader reader & [^Boolean keywords? array-coerce-fn]]
+  [^BufferedReader reader & [key-fn array-coerce-fn]]
   (when reader
     (parsed-seq* (.createJsonParser ^SmileFactory
                                     (or *smile-factory* smile-factory) reader)
-                 (or keywords? false)
-                 array-coerce-fn)))
+                 key-fn array-coerce-fn)))
 
 ;; aliases for clojure-json users
 (def encode generate-string)

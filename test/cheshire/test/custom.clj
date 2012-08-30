@@ -186,3 +186,10 @@
 (deftest t-unicode-escaping
   (is (= "{\"foo\":\"It costs \\u00A3100\"}"
          (json/encode {:foo "It costs £100"} {:escape-non-ascii true}))))
+
+(deftest t-custom-keyword-fn
+  (is (= {:FOO "bar"} (json/decode "{\"foo\": \"bar\"}"
+                                   (fn [k] (keyword (.toUpperCase k))))))
+  (is (= {"foo" "bar"} (json/decode "{\"foo\": \"bar\"}" nil)))
+  (is (= {"foo" "bar"} (json/decode "{\"foo\": \"bar\"}" false)))
+  (is (= {:foo "bar"} (json/decode "{\"foo\": \"bar\"}" true))))
