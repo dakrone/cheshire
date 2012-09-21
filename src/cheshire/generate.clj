@@ -71,7 +71,7 @@
                             clojure.lang.IPersistentVector
                             (generate-array jg obj date-format ex)
                             clojure.lang.IPersistentSet
-                            (generate jg (seq obj) date-format ex)
+                            (generate-array jg obj date-format ex)
                             clojure.lang.IPersistentList
                             (generate-array jg obj date-format ex)
                             clojure.lang.ISeq
@@ -80,7 +80,7 @@
                             (generate-map jg obj date-format ex))
     Map (generate-map jg obj date-format ex)
     List (generate-array jg obj date-format ex)
-    Set (generate jg (seq obj) date-format ex)
+    Set (generate-array jg obj date-format ex)
     Number (number-dispatch ^JsonGenerator jg obj ex)
     String (write-string ^JsonGenerator jg ^String obj )
     Keyword (write-string ^JsonGenerator jg
