@@ -49,6 +49,18 @@
   (is (= {"set" ["a" "b"]}
          (json/decode (json/encode {"set" #{"a" "b"}})))))
 
+(deftest test-generate-empty-set
+  (is (= {"set" ["a" "b"]}
+         (json/decode (json/encode {"set" #{}})))))
+
+(deftest test-generate-empty-set
+  (is (= {"set" []}
+         (json/decode (json/encode {"set" #{}})))))
+
+(deftest test-generate-empty-array
+  (is (= {"array" []}
+         (json/decode (json/encode {"array" []})))))
+
 (deftest test-key-coercion
   (is (= {"foo" "bar" "1" "bat" "2" "bang" "3" "biz"}
          (json/decode
@@ -81,6 +93,10 @@
                                             (.add 1)
                                             (.add 2)
                                             (.add 3))})))))
+
+(deftest test-accepts-empty-java-set
+  (is (= {"set" []}
+         (json/decode (json/encode {"set" (doto (java.util.HashSet. 3))})))))
 
 (deftest test-nil
   (is (nil? (json/decode nil true))))
