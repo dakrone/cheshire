@@ -50,10 +50,6 @@
          (json/decode (json/encode {"set" #{"a" "b"}})))))
 
 (deftest test-generate-empty-set
-  (is (= {"set" ["a" "b"]}
-         (json/decode (json/encode {"set" #{}})))))
-
-(deftest test-generate-empty-set
   (is (= {"set" []}
          (json/decode (json/encode {"set" #{}})))))
 
@@ -96,7 +92,7 @@
 
 (deftest test-accepts-empty-java-set
   (is (= {"set" []}
-         (json/decode (json/encode {"set" (doto (java.util.HashSet. 3))})))))
+         (json/decode (json/encode {"set" (java.util.HashSet. 3)})))))
 
 (deftest test-nil
   (is (nil? (json/decode nil true))))
