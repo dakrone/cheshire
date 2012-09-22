@@ -9,6 +9,9 @@
            (java.sql Timestamp)
            (java.util Date UUID)))
 
+;; Generally, all tests in here should use json/encode*, unless you
+;; know what you're doing and what you're trying to test.
+
 (def test-obj {"int" 3 "long" (long -2147483647) "boolean" true
                "LongObj" (Long/parseLong "2147483647") "double" 1.23
                "nil" nil "string" "string" "vec" [1 2 3] "map" {"a" "b"}
@@ -70,6 +73,32 @@
 (deftest test-symbols
   (is (= {"foo" "clojure.core/map"}
          (json/decode (json/encode* {"foo" 'clojure.core/map})))))
+
+(deftest test-accepts-java-map
+  (is (= {"foo" 1}
+         (json/decode
+          (json/encode (doto (java.util.HashMap.) (.put "foo" 1)))))))
+
+(deftest test-accepts-java-list
+  (is (= [1 2 3]
+         (json/decode (json/encode (doto (java.util.ArrayList. 3)
+                                     (.add 1)
+                                     (.add 2)
+                                     (.add 3)))))))
+
+(deftest test-accepts-java-set
+  (is (= {"set" [1 2 3]}
+         (json/decode (json/encode {"set" (doto (java.util.HashSet. 3)
+                                            (.add 1)
+                                            (.add 2)
+                                            (.add 3))})))))
+
+(deftest test-accepts-empty-java-set
+  (is (= {"set" []}
+         (json/decode (json/encode {"set" (java.util.HashSet. 3)})))))
+
+(deftest test-nil
+  (is (nil? (json/decode nil true))))
 
 (deftest test-parsed-seq
   (let [br (BufferedReader. (StringReader. "1\n2\n3\n"))]
@@ -133,27 +162,6 @@
         re-decoded-json (json/decode encoded-json)]
     (is (= decoded-json re-decoded-json))))
 
-(deftest test-add-remove-encoder
-  (json/remove-encoder java.net.URL)
-  (json/add-encoder java.net.URL json/encode-str)
-  (is (= "\"http://foo.com\""
-         (json/encode (java.net.URL. "http://foo.com"))))
-  (json/remove-encoder java.net.URL)
-  (is (thrown? IllegalArgumentException
-               (json/encode (java.net.URL. "http://foo.com")))))
-
-;; Test that default encoders can be bypassed if so desired.
-(deftest test-shadowing-default-encoder
-  (json/remove-encoder java.util.Date)
-  (json/add-encoder java.util.Date
-                    (fn [d jg] (json/encode-str "foo" jg)))
-  (is (= "\"foo\"" (json/encode* (java.util.Date.))))
-  (is (= "\"foo\"" (json/encode* :foo)))
-  (json/remove-encoder java.util.Date)
-  (json/add-encoder java.util.Date json/encode-date)
-  (is (json/encode (java.util.Date.))
-      "shouldn't throw an exception after adding back the default."))
-
 (deftest test-namespaced-keywords
   (is (= "{\"foo\":\"user/bar\"}"
          (json/encode* {:foo :user/bar})))
@@ -180,7 +188,6 @@
 
 (deftest t-persistent-queue
   (let [q (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)]
-    (is (= q (json/decode (json/encode q))))
     (is (= q (json/decode (json/encode* q))))))
 
 (deftest t-pretty-print
@@ -199,3 +206,27 @@
   (is (= {"foo" "bar"} (json/decode "{\"foo\": \"bar\"}" nil)))
   (is (= {"foo" "bar"} (json/decode "{\"foo\": \"bar\"}" false)))
   (is (= {:foo "bar"} (json/decode "{\"foo\": \"bar\"}" true))))
+
+;; Begin custom-only tests
+
+(deftest test-add-remove-encoder
+  (json/remove-encoder java.net.URL)
+  (json/add-encoder java.net.URL json/encode-str)
+  (is (= "\"http://foo.com\""
+         (json/encode (java.net.URL. "http://foo.com"))))
+  (json/remove-encoder java.net.URL)
+  (is (thrown? IllegalArgumentException
+               (json/encode (java.net.URL. "http://foo.com")))))
+
+;; Test that default encoders can be bypassed if so desired.
+(deftest test-shadowing-default-encoder
+  (json/remove-encoder java.util.Date)
+  (json/add-encoder java.util.Date
+                    (fn [d jg] (json/encode-str "foo" jg)))
+  (is (= "\"foo\"" (json/encode* (java.util.Date.))))
+  (is (= "\"foo\"" (json/encode* :foo)))
+  (json/remove-encoder java.util.Date)
+  (json/add-encoder java.util.Date json/encode-date)
+  (is (json/encode (java.util.Date.))
+      "shouldn't throw an exception after adding back the default."))
+

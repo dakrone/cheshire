@@ -162,7 +162,9 @@
 
 (deftest test-namespaced-keywords
   (is (= "{\"foo\":\"user/bar\"}"
-         (json/encode {:foo :user/bar}))))
+         (json/encode {:foo :user/bar})))
+  (is (= {:foo/bar "baz/eggplant"}
+         (json/decode (json/encode {:foo/bar :baz/eggplant}) true))))
 
 (deftest test-array-coerce-fn
   (is (= {"set" #{"a" "b"} "array" ["a" "b"] "map" {"a" 1}}
@@ -185,10 +187,6 @@
 (deftest t-persistent-queue
   (let [q (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)]
     (is (= q (json/decode (json/encode q))))))
-
-(deftest t-namespaced-keywords
-  (is (= {:foo/bar "baz/eggplant"}
-         (json/decode (json/encode {:foo/bar :baz/eggplant}) true))))
 
 (deftest t-pretty-print
   (is (= (str "{\n  \"foo\" : 1,\n  \"bar\" : [ {\n    \"baz\" : 2\n  }, "
