@@ -180,7 +180,9 @@
   (.writeStartObject jg)
   (doseq [[k v] m]
     (.writeFieldName jg (if (instance? clojure.lang.Keyword k)
-                          (name k)
+                          (if-let [ns (namespace k)]
+                            (str ns "/" (name k))
+                            (name k))
                           (str k)))
     (to-json v jg))
   (.writeEndObject jg))
