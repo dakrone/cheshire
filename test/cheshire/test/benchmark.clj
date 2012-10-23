@@ -31,7 +31,7 @@
 (deftest ^{:benchmark true} t-bench-clojure-json
   (println "-------- Data.json Benchmarks -------")
   (bench/with-progress-reporting
-    (bench/quick-bench (cj/read-json (cj/json-str test-obj)) :verbose))
+    (bench/quick-bench (cj/read-str (cj/write-str test-obj)) :verbose))
   (println "-------------------------------------"))
 
 (deftest ^{:benchmark true} t-bench-core

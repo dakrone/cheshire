@@ -7,7 +7,7 @@
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.4.0"]
                                   [criterium "0.2.1"]
                                   [org.clojure/test.generative "0.1.4"]
-                                  [org.clojure/data.json "0.1.2"]
+                                  [org.clojure/data.json "0.2.0"]
                                   [clj-json "0.5.0"]]}
              :1.2 {:dependencies [[org.clojure/clojure "1.2.1"]]}
              :1.3 {:dependencies [[org.clojure/clojure "1.3.0"]]}
