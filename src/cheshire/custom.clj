@@ -71,7 +71,7 @@
      (try
        (core/encode-stream obj w (merge opt-map {:ex core-failure}))
        (catch JsonGenerationException _
-         (encode-stream* obj opt-map)))))
+         (encode-stream* obj w opt-map)))))
 
 (defn encode-smile*
   ([obj]
