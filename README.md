@@ -140,7 +140,7 @@ namespace change)
 ;; things to be encoded:
 (ns myns
   (:require [cheshire.core :refer :all]
-            [cheshire.generate :refer [add-encoder remove-encoder]]))
+            [cheshire.generate :refer [add-encoder encode-str remove-encoder]]))
 
 ;; First, add a custom encoder for a class:
 (add-encoder java.awt.Color
