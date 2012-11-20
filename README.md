@@ -171,6 +171,8 @@ namespace change)
 ;; Decoding remains the same, you are responsible for doing custom decoding.
 ```
 
+<h3>NOTE: `cheshire.custom` has been deprecated in version 5.0.0</h3>
+
 <del>
 In version 3.0.0 and above, custom encoding first attempts to encode
 the object using the core encoding (because it would be faster). If
