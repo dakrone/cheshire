@@ -1,5 +1,7 @@
 (ns cheshire.custom
-  "Methods used for extending JSON generation to different Java classes.
+  "DEPRECATED
+
+  Methods used for extending JSON generation to different Java classes.
   Has the same public API as core.clj so they can be swapped in and out."
   (:use [cheshire.factory])
   (:require [cheshire.core :as core])
@@ -40,14 +42,7 @@
          (.flush generator)
          (.toString sw)))))
 
-(defn ^String encode
-  ([obj]
-     (encode obj nil))
-  ([obj opt-map]
-     (try
-       (core/encode obj (merge opt-map {:ex core-failure}))
-       (catch JsonGenerationException _
-         (encode* obj opt-map)))))
+(def ^String encode encode*)
 
 (defn ^String encode-stream*
   ([obj ^BufferedWriter w]
@@ -64,14 +59,7 @@
          (.flush generator)
          w))))
 
-(defn ^String encode-stream
-  ([obj ^BufferedWriter w]
-     (encode-stream obj w nil))
-  ([obj ^BufferedWriter w opt-map]
-     (try
-       (core/encode-stream obj w (merge opt-map {:ex core-failure}))
-       (catch JsonGenerationException _
-         (encode-stream* obj w opt-map)))))
+(def ^String encode-stream encode-stream*)
 
 (defn encode-smile*
   ([obj]
@@ -86,14 +74,7 @@
          (.flush generator)
          (.toByteArray baos)))))
 
-(defn encode-smile
-  ([obj]
-     (encode-smile* obj nil))
-  ([obj opt-map]
-     (try
-       (core/encode-smile obj (merge opt-map {:ex core-failure}))
-       (catch JsonGenerationException _
-         (encode-smile* obj opt-map)))))
+(def encode-smile encode-smile*)
 
 ;; there are no differences in parsing, but these are here to make
 ;; this a self-contained namespace if desired
@@ -107,12 +88,13 @@
 (def decode-smile parse-smile)
 
 ;; aliases for encoding
-(def generate-string encode)
+(def generate-string encode*)
 (def generate-string* encode*)
-(def generate-stream encode-stream)
+(def generate-stream encode-stream*)
 (def generate-stream* encode-stream*)
-(def generate-smile encode-smile)
+(def generate-smile encode-smile*)
 (def generate-smile* encode-smile*)
+
 
 ;; Generic encoders, these can be used by someone writing a custom
 ;; encoder if so desired, after transforming an arbitrary data
@@ -278,6 +260,18 @@
 (extend clojure.lang.Associative
   JSONable
   {:to-json encode-map})
+
+(extend java.util.Map
+  JSONable
+  {:to-json encode-map})
+
+(extend java.util.Set
+  JSONable
+  {:to-json encode-seq})
+
+(extend java.util.List
+  JSONable
+  {:to-json encode-seq})
 ;; Utility methods to add and remove encoders
 (defn add-encoder
   "Provide an encoder for a type not handled by Cheshire.
