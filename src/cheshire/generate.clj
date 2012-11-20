@@ -1,4 +1,5 @@
 (ns cheshire.generate
+  "Namespace used to generate JSON from Clojure data structures."
   (:import (com.fasterxml.jackson.core JsonGenerator JsonGenerationException)
            (java.util Date Map List Set SimpleTimeZone UUID)
            (java.sql Timestamp)
@@ -277,6 +278,7 @@
 (extend clojure.lang.Associative
   JSONable
   {:to-json encode-map})
+
 ;; Utility methods to add and remove encoders
 (defn add-encoder
   "Provide an encoder for a type not handled by Cheshire.

@@ -14,6 +14,11 @@
                                        JsonGenerator$Feature
                                        JsonGenerationException JsonParser)))
 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;  DEPRECATED, DO NOT USE  ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 ;; date format rebound for custom encoding
 (def ^{:dynamic true :private true} *date-format*)
 
