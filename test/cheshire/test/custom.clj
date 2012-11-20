@@ -1,4 +1,5 @@
 (ns cheshire.test.custom
+  "DEPRECATED, kept here to ensure backward compatibility."
   (:use [clojure.test]
         [clojure.java.io :only [reader]])
   (:require [cheshire.custom :as json] :reload
@@ -8,6 +9,11 @@
                     BufferedReader BufferedWriter)
            (java.sql Timestamp)
            (java.util Date UUID)))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;  DEPRECATED, DO NOT USE  ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 
 ;; Generally, all tests in here should use json/encode*, unless you
 ;; know what you're doing and what you're trying to test.

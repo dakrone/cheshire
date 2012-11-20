@@ -1,7 +1,8 @@
 (ns cheshire.core
-  (:use [cheshire.factory]
-        [cheshire.generate :only [generate]]
-        [cheshire.parse :only [parse]])
+  "Main encoding and decoding namespace."
+  (:require [cheshire.factory :as factory]
+            [cheshire.generate :as gen]
+            [cheshire.parse :as parse])
   (:import (com.fasterxml.jackson.core JsonParser JsonFactory
                                        JsonGenerator$Feature)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
@@ -19,14 +20,15 @@
   ([obj opt-map]
      (let [sw (StringWriter.)
            generator (.createJsonGenerator
-                      ^JsonFactory (or *json-factory* json-factory) sw)]
+                      ^JsonFactory (or factory/*json-factory*
+                                       factory/json-factory) sw)]
        (when (:pretty opt-map)
          (.useDefaultPrettyPrinter generator))
        (when (:escape-non-ascii opt-map)
          (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
-       (generate generator obj
-                 (or (:date-format opt-map) default-date-format)
-                 (:ex opt-map))
+       (gen/generate generator obj
+                     (or (:date-format opt-map) factory/default-date-format)
+                     (:ex opt-map))
        (.flush generator)
        (.toString sw))))
 
@@ -40,12 +42,14 @@
      (generate-stream obj writer nil))
   ([obj ^BufferedWriter writer opt-map]
      (let [generator (.createJsonGenerator
-                      ^JsonFactory (or *json-factory* json-factory) writer)]
+                      ^JsonFactory (or factory/*json-factory*
+                                       factory/json-factory) writer)]
        (when (:pretty opt-map)
          (.useDefaultPrettyPrinter generator))
        (when (:escape-non-ascii opt-map)
          (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
-       (generate generator obj (or (:date-format opt-map) default-date-format)
+       (gen/generate generator obj (or (:date-format opt-map)
+                                       factory/default-date-format)
                  (:ex opt-map))
        (.flush generator)
        writer)))
@@ -60,9 +64,11 @@
   ([obj opt-map]
      (let [baos (ByteArrayOutputStream.)
            generator (.createJsonGenerator ^SmileFactory
-                                           (or *smile-factory* smile-factory)
+                                           (or factory/*smile-factory*
+                                               factory/smile-factory)
                                            baos)]
-       (generate generator obj (or (:date-format opt-map) default-date-format)
+       (gen/generate generator obj (or (:date-format opt-map)
+                                       factory/default-date-format)
                  (:ex opt-map))
        (.flush generator)
        (.toByteArray baos))))
@@ -77,8 +83,9 @@
   and returning the collection to be used for array values."
   [^String string & [key-fn array-coerce-fn]]
   (when string
-    (parse
-     (.createJsonParser ^JsonFactory (or *json-factory* json-factory)
+    (parse/parse
+     (.createJsonParser ^JsonFactory (or factory/*json-factory*
+                                         factory/json-factory)
                         (StringReader. string))
      key-fn nil array-coerce-fn)))
 
@@ -93,8 +100,9 @@
   If laziness is needed, see parsed-seq."
   [^BufferedReader rdr & [key-fn array-coerce-fn]]
   (when rdr
-    (parse
-     (.createJsonParser ^JsonFactory (or *json-factory* json-factory) rdr)
+    (parse/parse
+     (.createJsonParser ^JsonFactory (or factory/*json-factory*
+                                         factory/json-factory) rdr)
      key-fn nil array-coerce-fn)))
 
 (defn parse-smile
@@ -106,8 +114,9 @@
   and returning the collection to be used for array values."
   [^bytes bytes & [key-fn array-coerce-fn]]
   (when bytes
-    (parse
-     (.createJsonParser ^SmileFactory (or *smile-factory* smile-factory) bytes)
+    (parse/parse
+     (.createJsonParser ^SmileFactory (or factory/*smile-factory*
+                                          factory/smile-factory) bytes)
      key-fn nil array-coerce-fn)))
 
 (def ^{:doc "Object used to determine end of lazy parsing attempt."}
@@ -118,7 +127,7 @@
   "Internal lazy-seq parser"
   [^JsonParser parser key-fn array-coerce-fn]
   (lazy-seq
-   (let [elem (parse parser key-fn eof array-coerce-fn)]
+   (let [elem (parse/parse parser key-fn eof array-coerce-fn)]
      (when-not (identical? elem eof)
        (cons elem (parsed-seq* parser key-fn array-coerce-fn))))))
 
@@ -132,7 +141,8 @@
   [^BufferedReader reader & [key-fn array-coerce-fn]]
   (when reader
     (parsed-seq* (.createJsonParser ^JsonFactory
-                                    (or *json-factory* json-factory) reader)
+                                    (or factory/*json-factory*
+                                        factory/json-factory) reader)
                  key-fn array-coerce-fn)))
 
 (defn parsed-smile-seq
@@ -144,7 +154,8 @@
   [^BufferedReader reader & [key-fn array-coerce-fn]]
   (when reader
     (parsed-seq* (.createJsonParser ^SmileFactory
-                                    (or *smile-factory* smile-factory) reader)
+                                    (or factory/*smile-factory*
+                                        factory/smile-factory) reader)
                  key-fn array-coerce-fn)))
 
 ;; aliases for clojure-json users

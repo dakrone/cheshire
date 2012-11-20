@@ -2,9 +2,11 @@
   (:use [clojure.test]
         [clojure.java.io :only [file reader]])
   (:require [cheshire.core :as json]
+            [cheshire.generate :as gen]
             [cheshire.factory :as fact]
             [cheshire.parse :as parse])
-  (:import (java.io FileInputStream StringReader StringWriter
+  (:import (com.fasterxml.jackson.core JsonGenerationException)
+           (java.io FileInputStream StringReader StringWriter
                     BufferedReader BufferedWriter)
            (java.sql Timestamp)
            (java.util Date UUID)))
@@ -204,3 +206,13 @@
   (is (= {"foo" "bar"} (json/decode "{\"foo\": \"bar\"}" nil)))
   (is (= {"foo" "bar"} (json/decode "{\"foo\": \"bar\"}" false)))
   (is (= {:foo "bar"} (json/decode "{\"foo\": \"bar\"}" true))))
+
+(deftest test-add-remove-encoder
+  (gen/remove-encoder java.net.URL)
+  (gen/add-encoder java.net.URL gen/encode-str)
+  (is (= "\"http://foo.com\""
+         (json/encode (java.net.URL. "http://foo.com"))))
+  (gen/remove-encoder java.net.URL)
+  (is (thrown? JsonGenerationException
+               (json/encode (java.net.URL. "http://foo.com")))))
+
