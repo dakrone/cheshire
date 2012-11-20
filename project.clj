@@ -2,8 +2,8 @@
   :description "JSON and JSON SMILE encoding, fast."
   :url "https://github.com/dakrone/cheshire"
   :warn-on-reflection false
-  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.1.0"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.1.0"]]
+  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.1.1"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.1.1"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.4.0"]
                                   [criterium "0.3.0"]
                                   [org.clojure/test.generative "0.1.4"]

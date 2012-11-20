@@ -38,9 +38,9 @@ encoders.
 ## Usage
 
 ```clojure
-[cheshire "4.0.4"]
+[cheshire "5.0.0"]
 
-;; Cheshire v4.0.4 uses Jackson 2.1.0
+;; Cheshire v5.0.0 uses Jackson 2.1.1
 
 ;; In your ns statement:
 (ns myns
@@ -130,14 +130,17 @@ The type must be "transient-able", so use either #{} or []
 ### Custom Encoders
 
 Custom encoding is supported from 2.0.0 and up, if you encounter a
-bug, please open a github issue.
+bug, please open a github issue. From 5.0.0 onwards, custom encoding
+has been moved to be part of the core namespace (not requiring a
+namespace change)
 
 ```clojure
 ;; Custom encoders allow you to swap out the api for the fast
 ;; encoder with one that is slightly slower, but allows custom
 ;; things to be encoded:
 (ns myns
-  (:use [cheshire.custom]))
+  (:require [cheshire.core :refer :all]
+            [cheshire.generate :refer [add-encoder remove-encoder]]))
 
 ;; First, add a custom encoder for a class:
 (add-encoder java.awt.Color
@@ -147,7 +150,7 @@ bug, please open a github issue.
 ;; There are also helpers for common encoding actions:
 (add-encoder java.net.URL encode-str)
 
-;; List of common encoders that can be used: (see custom.clj)
+;; List of common encoders that can be used: (see generate.clj)
 ;; encode-nil
 ;; encode-number
 ;; encode-seq
@@ -168,6 +171,7 @@ bug, please open a github issue.
 ;; Decoding remains the same, you are responsible for doing custom decoding.
 ```
 
+<del>
 In version 3.0.0 and above, custom encoding first attempts to encode
 the object using the core encoding (because it would be faster). If
 the encoding fails, it uses the custom encoding mechanics to encode
@@ -180,6 +184,11 @@ to encode custom classes. The API methods for cheshire.core and
 cheshire.custom are exactly the same (except for add-encoder,
 remove-encoder and the methods ending with '*' in the custom
 namespace).
+</del>
+
+Custom and Core encoding have been combined in Cheshire 5.0.0, so
+there is no longer any need to require a different namespace depending
+on what you would like to use.
 
 ### Aliases
 
@@ -215,6 +224,9 @@ Cheshire encoding supports:
 - Date
 - UUID
 - java.sql.Timestamp
+- any java.util.Set
+- any java.util.Map
+- any java.util.List
 
 ### Custom class encoding while still being fast
 
@@ -287,9 +299,9 @@ know.
 
 ## Advanced customization for factories
 See
-[this](http://fasterxml.github.com/jackson-core/javadoc/2.0.0/com/fasterxml/jackson/core/JsonFactory.Feature.html)
+[this](http://fasterxml.github.com/jackson-core/javadoc/2.1.1/com/fasterxml/jackson/core/JsonFactory.Feature.html)
 and
-[this](http://fasterxml.github.com/jackson-core/javadoc/2.0.0/com/fasterxml/jackson/core/JsonParser.Feature.html)
+[this](http://fasterxml.github.com/jackson-core/javadoc/2.1.1/com/fasterxml/jackson/core/JsonParser.Feature.html)
 for a list of features that can be customized if desired. A custom
 factory can be used like so:
 
