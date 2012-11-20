@@ -1,6 +1,9 @@
-(defproject cheshire "4.0.5-SNAPSHOT"
+(defproject cheshire "5.0.0"
   :description "JSON and JSON SMILE encoding, fast."
   :url "https://github.com/dakrone/cheshire"
+  :license {:name "The Apache License"
+            :url "https://www.apache.org/licenses/LICENSE-2.0"
+            :distribution :repo}
   :warn-on-reflection false
   :dependencies [[com.fasterxml.jackson.core/jackson-core "2.1.1"]
                  [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.1.1"]]
