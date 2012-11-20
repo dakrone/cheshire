@@ -43,8 +43,8 @@ encoders.
 ;; Cheshire v5.0.0 uses Jackson 2.1.1
 
 ;; In your ns statement:
-(ns myns
-  (:use [cheshire.core]))
+(ns my.ns
+  (:require [cheshire.core :refer :all]))
 ```
 
 ### Encoding
