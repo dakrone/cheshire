@@ -1,4 +1,4 @@
-## Changes between Cheshire 5.0.1 and 5.0.0
+## Changes between Cheshire 5.0.0 and 5.0.1
 
 No changes yet.
 
