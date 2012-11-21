@@ -265,7 +265,7 @@ to true:
 
 ## Change Log
 
-[Change log](https://github.com/michaelklishin/cheshire/blob/master/ChangeLog.md) is available on GitHub.
+[Change log](https://github.com/dakrone/cheshire/blob/master/ChangeLog.md) is available on GitHub.
 
 ## Speed
 
