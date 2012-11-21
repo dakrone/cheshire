@@ -263,6 +263,10 @@ to true:
 - Replacing default encoders for builtin types
 - [SMILE encoding/decoding](http://wiki.fasterxml.com/SmileFormatSpec)
 
+## Change Log
+
+[Change log](https://github.com/michaelklishin/cheshire/blob/master/ChangeLog.md) is available on GitHub.
+
 ## Speed
 
     Clojure version:  1.2.1
