@@ -298,10 +298,9 @@ to true:
 
 
 <del>Benchmarks for custom encoding coming soon.</del> - check out the
-benchmarks in `cheshire.test.benchmark`; or run `lein test
-:benchmark`. If you have scenarios where Cheshire is not performing as
-well as expected (compared to a different library), please let me
-know.
+benchmarks in `cheshire.test.benchmark`; or run `lein benchmark`. If
+you have scenarios where Cheshire is not performing as well as
+expected (compared to a different library), please let me know.
 
 ## Advanced customization for factories
 See

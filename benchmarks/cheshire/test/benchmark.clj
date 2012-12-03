@@ -21,26 +21,26 @@
                "set" #{"a" "b"}
                "keyword" :foo})
 
-(deftest ^{:benchmark true} t-bench-clj-json
+(deftest t-bench-clj-json
   (println "-------- clj-json Benchmarks --------")
   (bench/with-progress-reporting
-    (bench/bench (clj-json/parse-string
-                  (clj-json/generate-string test-obj)) :verbose))
+    (bench/quick-bench (clj-json/parse-string
+                        (clj-json/generate-string test-obj)) :verbose))
   (println "-------------------------------------"))
 
-(deftest ^{:benchmark true} t-bench-clojure-json
+(deftest t-bench-clojure-json
   (println "-------- Data.json Benchmarks -------")
   (bench/with-progress-reporting
-    (bench/bench (cj/read-str (cj/write-str test-obj)) :verbose))
+    (bench/quick-bench (cj/read-str (cj/write-str test-obj)) :verbose))
   (println "-------------------------------------"))
 
-(deftest ^{:benchmark true} t-bench-core
+(deftest t-bench-core
   (println "---------- Core Benchmarks ----------")
   (bench/with-progress-reporting
-    (bench/bench (core/decode (core/encode test-obj)) :verbose))
+    (bench/quick-bench (core/decode (core/encode test-obj)) :verbose))
   (println "-------------------------------------"))
 
-(deftest ^{:benchmark true} t-bench-custom
+(deftest t-bench-custom
   (println "--------- Custom Benchmarks ---------")
   (custom/add-encoder java.net.URL custom/encode-str)
   (is (= "\"http://foo.com\"" (core/encode (java.net.URL. "http://foo.com"))))
@@ -50,7 +50,7 @@
       (bench/quick-bench (core/decode (core/encode custom-obj)) :verbose)))
   (println "-------------------------------------"))
 
-(deftest ^{:benchmark true} t-bench-custom-kw-coercion
+(deftest t-bench-custom-kw-coercion
   (println "---- Custom keyword-fn Benchmarks ---")
   (let [t (core/encode test-obj)]
     (println "[+] (fn [k] (keyword k))")

@@ -1,7 +1,9 @@
 ## Changes between Cheshire 5.0.0 and 5.0.1
 
-No changes yet.
+* Protocol custom encoders now take precedence over regular map
+  encoders.
 
+* Benchmarking is now a separate lein command, not a test selector.
 
 ## Changes between Cheshire 5.0.0 and 4.0.x
 
