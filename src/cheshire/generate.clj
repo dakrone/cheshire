@@ -73,46 +73,51 @@
        (generate ~jg item# ~date-format ~e))
      (.writeEndArray ~jg)))
 
+(defmacro i?
+  "Just to shorten 'instance?' and for debugging."
+  [k obj]
+  ;;(println :inst? k obj)
+  `(instance? ~k ~obj))
+
 (defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex]
-  (condp instance? obj
-    IPersistentCollection (condp instance? obj
-                            clojure.lang.IPersistentMap
-                            (generate-map jg obj date-format ex)
-                            clojure.lang.IPersistentVector
-                            (generate-array jg obj date-format ex)
-                            clojure.lang.IPersistentSet
-                            (generate-array jg obj date-format ex)
-                            clojure.lang.IPersistentList
-                            (generate-array jg obj date-format ex)
-                            clojure.lang.ISeq
-                            (generate-array jg obj date-format ex)
-                            clojure.lang.Associative
-                            (generate-map jg obj date-format ex))
-    Map (generate-map jg obj date-format ex)
-    List (generate-array jg obj date-format ex)
-    Set (generate-array jg obj date-format ex)
-    Number (number-dispatch ^JsonGenerator jg obj ex)
-    String (write-string ^JsonGenerator jg ^String obj )
-    Keyword (write-string ^JsonGenerator jg
-                          (if-let [ns (namespace obj)]
-                            (str ns "/" (name obj))
-                            (name obj)))
-    UUID (write-string ^JsonGenerator jg (.toString ^UUID obj))
-    Symbol (write-string ^JsonGenerator jg (.toString ^Symbol obj))
-    Boolean (.writeBoolean ^JsonGenerator jg ^Boolean obj)
-    Date (let [sdf (doto (SimpleDateFormat. date-format)
-                     (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
-           (write-string ^JsonGenerator jg (.format sdf obj)))
-    Timestamp (let [date (Date. (.getTime ^Timestamp obj))
-                    sdf (doto (SimpleDateFormat. date-format)
-                          (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
-                (write-string ^JsonGenerator jg (.format sdf obj)))
-    (if (nil? obj)
-      (.writeNull ^JsonGenerator jg)
-      ;; it must be a primative then
-      (try
-        (.writeNumber ^JsonGenerator jg obj)
-        (catch Exception e (fail obj jg ex))))))
+  (cond
+   (nil? obj) (.writeNull ^JsonGenerator jg)
+   (:to-json (find-protocol-impl JSONable obj)) (#'to-json obj jg)
+   (i? IPersistentCollection obj) (condp instance? obj
+                                    clojure.lang.IPersistentMap
+                                    (generate-map jg obj date-format ex)
+                                    clojure.lang.IPersistentVector
+                                    (generate-array jg obj date-format ex)
+                                    clojure.lang.IPersistentSet
+                                    (generate-array jg obj date-format ex)
+                                    clojure.lang.IPersistentList
+                                    (generate-array jg obj date-format ex)
+                                    clojure.lang.ISeq
+                                    (generate-array jg obj date-format ex)
+                                    clojure.lang.Associative
+                                    (generate-map jg obj date-format ex))
+   (i? Number obj) (number-dispatch ^JsonGenerator jg obj ex)
+   (i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
+   (i? String obj) (write-string ^JsonGenerator jg ^String obj )
+   (i? Keyword obj) (write-string ^JsonGenerator jg
+                                  (if-let [ns (namespace obj)]
+                                    (str ns "/" (name obj))
+                                    (name obj)))
+   (i? Map obj) (generate-map jg obj date-format ex)
+   (i? List obj) (generate-array jg obj date-format ex)
+   (i? Set obj) (generate-array jg obj date-format ex)
+   (i? UUID obj) (write-string ^JsonGenerator jg (.toString ^UUID obj))
+   (i? Symbol obj) (write-string ^JsonGenerator jg (.toString ^Symbol obj))
+   (i? Date obj) (let [sdf (doto (SimpleDateFormat. date-format)
+                             (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
+                   (write-string ^JsonGenerator jg (.format sdf obj)))
+   (i? Timestamp obj) (let [date (Date. (.getTime ^Timestamp obj))
+                            sdf (doto (SimpleDateFormat. date-format)
+                                  (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
+                        (write-string ^JsonGenerator jg (.format sdf obj)))
+   :else (try
+           (.writeNumber ^JsonGenerator jg obj)
+           (catch Exception e (fail obj jg ex)))))
 
 ;; Generic encoders, these can be used by someone writing a custom
 ;; encoder if so desired, after transforming an arbitrary data
@@ -152,7 +157,7 @@
   [s ^JsonGenerator jg]
   (.writeStartArray jg)
   (doseq [i s]
-    (to-json i jg))
+    (generate jg i *date-format* nil))
   (.writeEndArray jg))
 
 (defn encode-date
@@ -184,100 +189,13 @@
                             (str ns "/" (name k))
                             (name k))
                           (str k)))
-    (to-json v jg))
+    (generate jg v *date-format* nil))
   (.writeEndObject jg))
 
 (defn encode-symbol
   "Encode a clojure symbol to the json generator."
   [^clojure.lang.Symbol s ^JsonGenerator jg]
   (.writeString jg (str s)))
-
-;; extended implementations for clojure datastructures
-(extend nil
-  JSONable
-  {:to-json encode-nil})
-
-(extend java.lang.String
-  JSONable
-  {:to-json encode-str})
-
-;; This is lame, thanks for changing all the BigIntegers to BigInts
-;; in 1.3 clojure/core :-/
-(when (not= {:major 1 :minor 2} (select-keys *clojure-version* [:major :minor]))
-  ;; Use Class/forName so it only resolves if it's running on clojure 1.3
-  (extend (Class/forName "clojure.lang.BigInt")
-    JSONable
-    {:to-json (fn encode-bigint
-                [^java.lang.Number n ^JsonGenerator jg]
-                (.writeNumber jg ^java.math.BigInteger (.toBigInteger n)))}))
-
-(extend clojure.lang.Ratio
-  JSONable
-  {:to-json encode-ratio})
-
-(extend Long
-  JSONable
-  {:to-json encode-long})
-
-(extend Short
-  JSONable
-  {:to-json encode-int})
-
-(extend Byte
-  JSONable
-  {:to-json encode-int})
-
-(extend java.lang.Number
-  JSONable
-  {:to-json encode-number})
-
-(extend clojure.lang.ISeq
-  JSONable
-  {:to-json encode-seq})
-
-(extend clojure.lang.IPersistentVector
-  JSONable
-  {:to-json encode-seq})
-
-(extend clojure.lang.IPersistentSet
-  JSONable
-  {:to-json encode-seq})
-
-(extend clojure.lang.IPersistentList
-  JSONable
-  {:to-json encode-seq})
-
-(extend java.util.Date
-  JSONable
-  {:to-json encode-date})
-
-(extend java.sql.Timestamp
-  JSONable
-  {:to-json #(encode-date (Date. (.getTime ^java.sql.Timestamp %1)) %2)})
-
-(extend java.util.UUID
-  JSONable
-  {:to-json encode-str})
-
-(extend java.lang.Boolean
-  JSONable
-  {:to-json encode-bool})
-
-(extend clojure.lang.Keyword
-  JSONable
-  {:to-json encode-named})
-
-(extend clojure.lang.IPersistentMap
-  JSONable
-  {:to-json encode-map})
-
-(extend clojure.lang.Symbol
-  JSONable
-  {:to-json encode-symbol})
-
-(extend clojure.lang.Associative
-  JSONable
-  {:to-json encode-map})
 
 ;; Utility methods to add and remove encoders
 (defn add-encoder

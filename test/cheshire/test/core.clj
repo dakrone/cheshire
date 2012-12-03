@@ -216,3 +216,21 @@
   (is (thrown? JsonGenerationException
                (json/encode (java.net.URL. "http://foo.com")))))
 
+(defprotocol TestP
+  (foo [this] "foo method"))
+
+(defrecord TestR [state])
+
+(extend TestR
+  TestP
+  {:foo (constantly "bar")})
+
+(deftest t-custom-protocol-encoder
+  (let [rec (TestR. :quux)]
+    (is (= {:state "quux"} (json/decode (json/encode rec) true)))
+    (gen/add-encoder cheshire.test.core.TestR
+                     (fn [obj jg]
+                       (.writeString jg (foo obj))))
+    (is (= "bar" (json/decode (json/encode rec))))
+    (gen/remove-encoder cheshire.test.core.TestR)
+    (is (= {:state "quux"} (json/decode (json/encode rec) true)))))
