@@ -82,7 +82,7 @@
 (defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex]
   (cond
    (nil? obj) (.writeNull ^JsonGenerator jg)
-   (:to-json (find-protocol-impl JSONable obj)) (#'to-json obj jg)
+   (get (:impls JSONable) (class obj)) (#'to-json obj jg)
    (i? IPersistentCollection obj) (condp instance? obj
                                     clojure.lang.IPersistentMap
                                     (generate-map jg obj date-format ex)
