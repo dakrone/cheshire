@@ -1,4 +1,4 @@
-(defproject cheshire "5.0.1-SNAPSHOT"
+(defproject cheshire "5.0.1"
   :description "JSON and JSON SMILE encoding, fast."
   :url "https://github.com/dakrone/cheshire"
   :license {:name "The Apache License"

@@ -1,3 +1,6 @@
+## Changes between Cheshire 5.0.2 and 5.0.1
+
+
 ## Changes between Cheshire 5.0.0 and 5.0.1
 
 * Protocol custom encoders now take precedence over regular map
