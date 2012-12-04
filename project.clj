@@ -22,4 +22,5 @@
                                    (not (:generative %)))
                    :generative :generative
                    :all (constantly true)}
+  :plugins [[codox "0.6.3"]]
   :jvm-opts ["-Xmx512M"])
