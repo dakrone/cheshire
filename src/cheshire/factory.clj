@@ -72,10 +72,10 @@
                   (boolean (:canonicalize-field-names opts))))))
 
 (defonce ^JsonFactory json-factory (make-json-factory default-factory-options))
-(defonce ^SmileFactory smile-factory (make-smile-factory default-factory-options))
+(defonce ^SmileFactory smile-factory
+  (make-smile-factory default-factory-options))
 
 ;; dynamically rebindable json factory, if desired
 (def ^{:dynamic true :tag JsonFactory} *json-factory* nil)
 ;; dynamically rebindable smile factory, if desired
 (def ^{:dynamic true :tag SmileFactory} *smile-factory* nil)
-

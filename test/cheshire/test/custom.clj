@@ -177,7 +177,9 @@
 (deftest test-array-coerce-fn
   (is (= {"set" #{"a" "b"} "array" ["a" "b"] "map" {"a" 1}}
          (json/decode
-          (json/encode* {"set" #{"a" "b"} "array" ["a" "b"] "map" {"a" 1}}) false
+          (json/encode* {"set" #{"a" "b"}
+                         "array" ["a" "b"]
+                         "map" {"a" 1}}) false
           (fn [field-name] (if (= "set" field-name) #{} []))))))
 
 (deftest t-symbol-encoding-for-non-resolvable-symbols
@@ -235,4 +237,3 @@
   (json/add-encoder java.util.Date json/encode-date)
   (is (json/encode (java.util.Date.))
       "shouldn't throw an exception after adding back the default."))
-
