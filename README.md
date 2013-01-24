@@ -79,6 +79,10 @@ encoders.
 ;; generate JSON escaping UTF-8
 (generate-string {:foo "It costs £100"} {:escape-non-ascii true})
 ;; => "{\"foo\":\"It costs \\u00A3100\"}"
+
+;; generate JSON and munge keys with a custom function
+(generate-string {:foo "bar"} {:key-fn (fn [k] (.toUpperCase k))})
+;; => "{\"FOO\":\"bar\"}"
 ```
 
 In the event encoding fails, Cheshire will throw a JsonGenerationException.
