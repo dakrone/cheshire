@@ -5,8 +5,8 @@
             :url "http://opensource.org/licenses/MIT"
             :distribution :repo}
   :warn-on-reflection false
-  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.1.1"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.1.1"]]
+  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.1.3"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.1.2"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.4.0"]
                                   [org.clojure/test.generative "0.1.4"]]}
              :1.2 {:dependencies [[org.clojure/clojure "1.2.1"]]}
