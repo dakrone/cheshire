@@ -11,7 +11,7 @@
                                   [org.clojure/test.generative "0.1.4"]]}
              :1.2 {:dependencies [[org.clojure/clojure "1.2.1"]]}
              :1.3 {:dependencies [[org.clojure/clojure "1.3.0"]]}
-             :1.5 {:dependencies [[org.clojure/clojure "1.5.0-RC15"]]}
+             :1.5 {:dependencies [[org.clojure/clojure "1.5.0-RC16"]]}
              :benchmark {:test-paths ["benchmarks"]
                          :dependencies [[criterium "0.3.1"]
                                         [org.clojure/data.json "0.2.1"]
