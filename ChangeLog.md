@@ -1,6 +1,6 @@
 ## Changes between Cheshire 5.0.2 and 5.0.1
 
-* Bump Jackson dependency from 5.1.1 to 5.1.3
+* Bump Jackson dependency from 2.1.1 to 2.1.3
 
 * Add more type hinting (thanks to ztellman)
 
