@@ -5,5 +5,6 @@ classes/*
 .lein-failures
 .lein-deps-sum
 target/*
-pom.xml
+pom.xml*
 doc
+.lein*
