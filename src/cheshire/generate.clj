@@ -54,15 +54,16 @@
 
 (declare generate)
 
-(definline generate-map [^JsonGenerator jg obj ^String date-format ^Exception e]
+(definline generate-map [^JsonGenerator jg obj ^String date-format ^Exception e
+                         key-fn]
   `(do
      (.writeStartObject ~jg)
      (doseq [m# ~obj]
        (let [k# (key m#)
              v# (val m#)]
-         (.writeFieldName ~jg (if (keyword? k#)
-                                (.substring (str k#) 1)
-                                (str k#)))
+         (.writeFieldName ~jg (~key-fn (if (keyword? k#)
+                                         (.substring (str k#) 1)
+                                         (str k#))))
          (generate ~jg v# ~date-format ~e)))
      (.writeEndObject ~jg)))
 
@@ -80,13 +81,14 @@
   ;;(println :inst? k obj)
   `(instance? ~k ~obj))
 
-(defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex]
+(defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex
+                & {:keys [key-fn] :or {key-fn identity}}]
   (cond
    (nil? obj) (.writeNull ^JsonGenerator jg)
    (get (:impls JSONable) (class obj)) (#'to-json obj jg)
    (i? IPersistentCollection obj) (condp instance? obj
                                     clojure.lang.IPersistentMap
-                                    (generate-map jg obj date-format ex)
+                                    (generate-map jg obj date-format ex key-fn)
                                     clojure.lang.IPersistentVector
                                     (generate-array jg obj date-format ex)
                                     clojure.lang.IPersistentSet
@@ -96,7 +98,7 @@
                                     clojure.lang.ISeq
                                     (generate-array jg obj date-format ex)
                                     clojure.lang.Associative
-                                    (generate-map jg obj date-format ex))
+                                    (generate-map jg obj date-format ex key-fn))
    (i? Number obj) (number-dispatch ^JsonGenerator jg obj ex)
    (i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
    (i? String obj) (write-string ^JsonGenerator jg ^String obj )
@@ -104,7 +106,7 @@
                                   (if-let [ns (namespace obj)]
                                     (str ns "/" (name obj))
                                     (name obj)))
-   (i? Map obj) (generate-map jg obj date-format ex)
+   (i? Map obj) (generate-map jg obj date-format ex key-fn)
    (i? List obj) (generate-array jg obj date-format ex)
    (i? Set obj) (generate-array jg obj date-format ex)
    (i? UUID obj) (write-string ^JsonGenerator jg (.toString ^UUID obj))
