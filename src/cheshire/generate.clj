@@ -61,7 +61,7 @@
        (let [k# (key m#)
              v# (val m#)]
          (.writeFieldName ~jg (if (keyword? k#)
-                                (.substring (str k#) 1)
+                                (~key-fn k#)
                                 (str k#)))
          (generate ~jg v# ~date-format ~e ~key-fn)))
      (.writeEndObject ~jg)))
