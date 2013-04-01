@@ -29,7 +29,7 @@
        (gen/generate generator obj
                      (or (:date-format opt-map) factory/default-date-format)
                      (:ex opt-map)
-                     (or (:key-fn opt-map) name))
+                     (or (:key-fn opt-map) (fn [k] (.substring (str k) 1))))
        (.flush generator)
        (.toString sw))))
 

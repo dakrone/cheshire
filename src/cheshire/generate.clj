@@ -100,10 +100,7 @@
    (i? Number obj) (number-dispatch ^JsonGenerator jg obj ex)
    (i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
    (i? String obj) (write-string ^JsonGenerator jg ^String obj )
-   (i? Keyword obj) (write-string ^JsonGenerator jg
-                                  (if-let [ns (namespace obj)]
-                                    (str ns "/" (key-fn obj))
-                                    (key-fn obj)))
+   (i? Keyword obj) (write-string ^JsonGenerator jg (key-fn obj))
    (i? Map obj) (generate-map jg obj date-format ex key-fn)
    (i? List obj) (generate-array jg obj date-format ex key-fn)
    (i? Set obj) (generate-array jg obj date-format ex key-fn)

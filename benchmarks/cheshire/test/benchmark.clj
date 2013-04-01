@@ -53,13 +53,19 @@
 (deftest t-bench-custom-kw-coercion
   (println "---- Custom keyword-fn Benchmarks ---")
   (let [t (core/encode test-obj)]
-    (println "[+] (fn [k] (keyword k))")
+    (println "[+] (fn [k] (keyword k)) decode")
     (bench/with-progress-reporting
       (bench/quick-bench (core/decode t (fn [k] (keyword k)))))
-    (println "[+] basic 'true' keyword-fn")
+    (println "[+] basic 'true' keyword-fn decode")
     (bench/with-progress-reporting
       (bench/quick-bench (core/decode t true)))
-    (println "[+] no keyword-fn")
+    (println "[+] no keyword-fn decode")
     (bench/with-progress-reporting
-      (bench/quick-bench (core/decode t))))
+      (bench/quick-bench (core/decode t)))
+    (println "[+] (fn [k] (keyword k)) encode")
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/encode test-obj {:key-fn (fn [k] (name k))})))
+    (println "[+] no keyword-fn encode")
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/encode test-obj))))
   (println "-------------------------------------"))

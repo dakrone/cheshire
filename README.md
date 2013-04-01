@@ -79,6 +79,10 @@ encoders.
 ;; generate JSON escaping UTF-8
 (generate-string {:foo "It costs £100"} {:escape-non-ascii true})
 ;; => "{\"foo\":\"It costs \\u00A3100\"}"
+
+;; generate JSON and munge keys with a custom function
+(generate-string {:foo "bar"} {:key-fn (fn [k] (.toUpperCase (name k)))})
+;; => "{\"FOO\":\"bar\"}"
 ```
 
 In the event encoding fails, Cheshire will throw a JsonGenerationException.
@@ -116,7 +120,7 @@ In 2.0.4 and up, Cheshire allows passing in a
 function to specify what kind of types to return, like so:
 
 ```clojure
-;; In this example a function that checks for a certain key 
+;; In this example a function that checks for a certain key
 (decode "{\"myarray\":[2,3,3,2],\"myset\":[1,2,2,1]}" true
         (fn [field-name]
           (if (= field-name "myset")
@@ -283,7 +287,7 @@ to true:
     clojure printer/reader w/ print-dup    12.29
     clojure-json                           20.55
     clojure.data.json (0.1.2)              3.89
-    
+
     Trial:  2
     clj-json                               1.19
     clj-json w/ keywords                   2.04
