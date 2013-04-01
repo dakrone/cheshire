@@ -54,7 +54,19 @@
 
 (declare generate)
 
-(definline generate-map [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
+(definline generate-basic-map [^JsonGenerator jg obj ^String date-format ^Exception e]
+  `(do
+     (.writeStartObject ~jg)
+     (doseq [m# ~obj]
+       (let [k# (key m#)
+             v# (val m#)]
+         (.writeFieldName ~jg (if (keyword? k#)
+                                (.substring (str k#) 1)
+                                (str k#)))
+         (generate ~jg v# ~date-format ~e nil)))
+     (.writeEndObject ~jg)))
+
+(definline generate-key-fn-map [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
   `(do
      (.writeStartObject ~jg)
      (doseq [m# ~obj]
@@ -65,6 +77,11 @@
                                 (str k#)))
          (generate ~jg v# ~date-format ~e ~key-fn)))
      (.writeEndObject ~jg)))
+
+(definline generate-map [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
+  `(if (nil? ~key-fn)
+     (generate-basic-map ~jg ~obj ~date-format ~e)
+     (generate-key-fn-map ~jg ~obj ~date-format ~e ~key-fn)))
 
 (definline generate-array [^JsonGenerator jg obj ^String date-format
                            ^Exception e key-fn]
@@ -100,7 +117,7 @@
    (i? Number obj) (number-dispatch ^JsonGenerator jg obj ex)
    (i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
    (i? String obj) (write-string ^JsonGenerator jg ^String obj )
-   (i? Keyword obj) (write-string ^JsonGenerator jg (key-fn obj))
+   (i? Keyword obj) (write-string ^JsonGenerator jg (if (fn? key-fn) (key-fn obj) (.substring (str obj) 1)))
    (i? Map obj) (generate-map jg obj date-format ex key-fn)
    (i? List obj) (generate-array jg obj date-format ex key-fn)
    (i? Set obj) (generate-array jg obj date-format ex key-fn)

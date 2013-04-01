@@ -62,7 +62,7 @@
     (println "[+] no keyword-fn decode")
     (bench/with-progress-reporting
       (bench/quick-bench (core/decode t)))
-    (println "[+] (fn [k] (keyword k)) encode")
+    (println "[+] (fn [k] (name k)) encode")
     (bench/with-progress-reporting
       (bench/quick-bench (core/encode test-obj {:key-fn (fn [k] (name k))})))
     (println "[+] no keyword-fn encode")

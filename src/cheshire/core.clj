@@ -29,7 +29,7 @@
        (gen/generate generator obj
                      (or (:date-format opt-map) factory/default-date-format)
                      (:ex opt-map)
-                     (or (:key-fn opt-map) (fn [k] (.substring (str k) 1))))
+                     (:key-fn opt-map))
        (.flush generator)
        (.toString sw))))
 
@@ -52,7 +52,7 @@
        (gen/generate generator obj (or (:date-format opt-map)
                                        factory/default-date-format)
                      (:ex opt-map)
-                     (or (:key-fn opt-map) name))
+                     (:key-fn opt-map))
        (.flush generator)
        writer)))
 
@@ -72,7 +72,7 @@
        (gen/generate generator obj (or (:date-format opt-map)
                                        factory/default-date-format)
                      (:ex opt-map)
-                     (or (:key-fn opt-map) name))
+                     (:key-fn opt-map))
        (.flush generator)
        (.toByteArray baos))))
 
