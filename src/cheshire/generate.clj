@@ -117,7 +117,7 @@
    (i? Number obj) (number-dispatch ^JsonGenerator jg obj ex)
    (i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
    (i? String obj) (write-string ^JsonGenerator jg ^String obj )
-   (i? Keyword obj) (write-string ^JsonGenerator jg (if (fn? key-fn) (key-fn obj) (.substring (str obj) 1)))
+   (i? Keyword obj) (write-string ^JsonGenerator jg (.substring (str obj) 1))
    (i? Map obj) (generate-map jg obj date-format ex key-fn)
    (i? List obj) (generate-array jg obj date-format ex key-fn)
    (i? Set obj) (generate-array jg obj date-format ex key-fn)
