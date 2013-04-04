@@ -37,7 +37,7 @@
 (deftest t-bench-core
   (println "---------- Core Benchmarks ----------")
   (bench/with-progress-reporting
-    (bench/quick-bench (core/decode (core/encode test-obj)) :verbose))
+    (bench/bench (core/decode (core/encode test-obj)) :verbose))
   (println "-------------------------------------"))
 
 (deftest t-bench-custom
