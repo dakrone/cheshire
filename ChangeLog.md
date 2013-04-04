@@ -1,3 +1,7 @@
+## Changes between Cheshire 5.1.0 and 5.0.2
+
+* Allow custom keyword function for encoding (thanks goodwink)
+
 ## Changes between Cheshire 5.0.2 and 5.0.1
 
 * Bump Jackson dependency from 2.1.1 to 2.1.3
