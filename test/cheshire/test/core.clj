@@ -209,7 +209,8 @@
 
 (deftest t-custom-encode-key-fn
   (is (= "{\"FOO\":\"bar\"}"
-         (json/encode {:foo "bar"} {:key-fn (fn [k] (.toUpperCase (name k)))}))))
+         (json/encode {:foo :bar}
+                      {:key-fn (fn [k] (.toUpperCase (name k)))}))))
 
 (deftest test-add-remove-encoder
   (gen/remove-encoder java.net.URL)

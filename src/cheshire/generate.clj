@@ -36,8 +36,9 @@
        Ratio (.writeNumber ~jg (double ~obj))
        Short (.writeNumber ~jg (int ~obj))
        Byte (.writeNumber ~jg (int ~obj))
-       clojure.lang.BigInt (.writeNumber ~jg ^BigInteger
-                             (.toBigInteger ^clojure.lang.BigInt (bigint ~obj)))
+       clojure.lang.BigInt (.writeNumber
+                            ~jg ^BigInteger
+                            (.toBigInteger ^clojure.lang.BigInt (bigint ~obj)))
        (fail ~obj ~jg ~e))
     `(let [^JsonGenerator jg# ~jg]
        (condp instance? ~obj
@@ -54,7 +55,8 @@
 
 (declare generate)
 
-(definline generate-basic-map [^JsonGenerator jg obj ^String date-format ^Exception e]
+(definline generate-basic-map
+  [^JsonGenerator jg obj ^String date-format ^Exception e]
   `(do
      (.writeStartObject ~jg)
      (doseq [m# ~obj]
@@ -66,7 +68,8 @@
          (generate ~jg v# ~date-format ~e nil)))
      (.writeEndObject ~jg)))
 
-(definline generate-key-fn-map [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
+(definline generate-key-fn-map
+  [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
   `(do
      (.writeStartObject ~jg)
      (doseq [m# ~obj]
@@ -78,7 +81,8 @@
          (generate ~jg v# ~date-format ~e ~key-fn)))
      (.writeEndObject ~jg)))
 
-(definline generate-map [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
+(definline generate-map
+  [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
   `(if (nil? ~key-fn)
      (generate-basic-map ~jg ~obj ~date-format ~e)
      (generate-key-fn-map ~jg ~obj ~date-format ~e ~key-fn)))
@@ -101,19 +105,22 @@
   (cond
    (nil? obj) (.writeNull ^JsonGenerator jg)
    (get (:impls JSONable) (class obj)) (#'to-json obj jg)
-   (i? IPersistentCollection obj) (condp instance? obj
-                                    clojure.lang.IPersistentMap
-                                    (generate-map jg obj date-format ex key-fn)
-                                    clojure.lang.IPersistentVector
-                                    (generate-array jg obj date-format ex key-fn)
-                                    clojure.lang.IPersistentSet
-                                    (generate-array jg obj date-format ex key-fn)
-                                    clojure.lang.IPersistentList
-                                    (generate-array jg obj date-format ex key-fn)
-                                    clojure.lang.ISeq
-                                    (generate-array jg obj date-format ex key-fn)
-                                    clojure.lang.Associative
-                                    (generate-map jg obj date-format ex key-fn))
+
+   (i? IPersistentCollection obj)
+   (condp instance? obj
+     clojure.lang.IPersistentMap
+     (generate-map jg obj date-format ex key-fn)
+     clojure.lang.IPersistentVector
+     (generate-array jg obj date-format ex key-fn)
+     clojure.lang.IPersistentSet
+     (generate-array jg obj date-format ex key-fn)
+     clojure.lang.IPersistentList
+     (generate-array jg obj date-format ex key-fn)
+     clojure.lang.ISeq
+     (generate-array jg obj date-format ex key-fn)
+     clojure.lang.Associative
+     (generate-map jg obj date-format ex key-fn))
+
    (i? Number obj) (number-dispatch ^JsonGenerator jg obj ex)
    (i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
    (i? String obj) (write-string ^JsonGenerator jg ^String obj )
