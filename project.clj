@@ -1,4 +1,4 @@
-(defproject cheshire "5.0.2"
+(defproject cheshire "5.1.0-SNAPSHOT"
   :description "JSON and JSON SMILE encoding, fast."
   :url "https://github.com/dakrone/cheshire"
   :license {:name "The MIT License"
@@ -17,7 +17,9 @@
                                         [org.clojure/data.json "0.2.1"]
                                         [clj-json "0.5.0"]]}}
   :aliases {"all" ["with-profile" "dev,1.3:dev,1.4:dev"]
-            "benchmark" ["with-profile" "dev,benchmark" "test"]}
+            "benchmark" ["with-profile" "dev,benchmark" "test"]
+            "core-bench" ["with-profile" "dev,benchmark" "test" ":only"
+                          "cheshire.test.benchmark/t-bench-core"]}
   :test-selectors {:default  #(and (not (:benchmark %))
                                    (not (:generative %)))
                    :generative :generative
