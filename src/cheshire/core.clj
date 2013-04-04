@@ -28,7 +28,8 @@
          (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
        (gen/generate generator obj
                      (or (:date-format opt-map) factory/default-date-format)
-                     (:ex opt-map))
+                     (:ex opt-map)
+                     (:key-fn opt-map))
        (.flush generator)
        (.toString sw))))
 
@@ -50,7 +51,8 @@
          (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
        (gen/generate generator obj (or (:date-format opt-map)
                                        factory/default-date-format)
-                     (:ex opt-map))
+                     (:ex opt-map)
+                     (:key-fn opt-map))
        (.flush generator)
        writer)))
 
@@ -69,7 +71,8 @@
                                            baos)]
        (gen/generate generator obj (or (:date-format opt-map)
                                        factory/default-date-format)
-                     (:ex opt-map))
+                     (:ex opt-map)
+                     (:key-fn opt-map))
        (.flush generator)
        (.toByteArray baos))))
 
