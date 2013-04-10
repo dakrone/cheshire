@@ -147,10 +147,7 @@
                             sdf (doto (SimpleDateFormat. date-format)
                                   (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
                         (write-string ^JsonGenerator jg (.format sdf obj)))
-   :else (try
-           (.writeNumber ^JsonGenerator jg obj)
-           (catch Exception e
-             (fail obj jg ex)))))
+   :else (fail obj jg ex)))
 
 ;; Generic encoders, these can be used by someone writing a custom
 ;; encoder if so desired, after transforming an arbitrary data
