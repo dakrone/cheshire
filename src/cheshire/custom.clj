@@ -4,7 +4,8 @@
   Methods used for extending JSON generation to different Java classes.
   Has the same public API as core.clj so they can be swapped in and out."
   (:use [cheshire.factory])
-  (:require [cheshire.core :as core])
+  (:require [cheshire.core :as core]
+            [cheshire.generate :as generate])
   (:import (java.io BufferedWriter ByteArrayOutputStream StringWriter)
            (java.util Date SimpleTimeZone)
            (java.text SimpleDateFormat)
@@ -117,7 +118,7 @@
 (defn encode-number
   "Encode anything implementing java.lang.Number to the json generator."
   [^java.lang.Number n ^JsonGenerator jg]
-  (.writeNumber jg n))
+  (generate/encode-number n jg))
 
 (defn encode-long
   "Encode anything implementing java.lang.Number to the json generator."
@@ -190,13 +191,14 @@
 
 ;; This is lame, thanks for changing all the BigIntegers to BigInts
 ;; in 1.3 clojure/core :-/
-(when (not= {:major 1 :minor 2} (select-keys *clojure-version* [:major :minor]))
-  ;; Use Class/forName so it only resolves if it's running on clojure 1.3
-  (extend (Class/forName "clojure.lang.BigInt")
-    JSONable
-    {:to-json (fn encode-bigint
-                [^java.lang.Number n ^JsonGenerator jg]
-                (.writeNumber jg ^java.math.BigInteger (.toBigInteger n)))}))
+(defmacro handle-bigint []
+  (when (not= {:major 1 :minor 2} (select-keys *clojure-version* [:major :minor]))
+    `(extend clojure.lang.BigInt
+       JSONable
+       {:to-json ~'(fn encode-bigint
+                     [^clojure.lang.BigInt n ^JsonGenerator jg]
+                     (.writeNumber jg (.toBigInteger n)))})))
+(handle-bigint)
 
 (extend clojure.lang.Ratio
   JSONable
