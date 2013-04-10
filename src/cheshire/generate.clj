@@ -10,11 +10,15 @@
 ;; date format rebound for custom encoding
 (def ^{:dynamic true :private true} *date-format*)
 
+(defmacro ^:private tag
+  ([obj]
+     `(vary-meta ~obj assoc :tag `JsonGenerator)))
+
 (defprotocol JSONable
   (to-json [t jg]))
 
 (definline write-string [^JsonGenerator jg ^String str]
-  `(.writeString ~jg ~str))
+  `(.writeString ~(tag jg) ~str))
 
 (defmacro fail [obj jg ^Exception e]
   `(try
@@ -57,29 +61,34 @@
 
 (definline generate-basic-map
   [^JsonGenerator jg obj ^String date-format ^Exception e]
-  `(do
-     (.writeStartObject ~jg)
-     (doseq [m# ~obj]
-       (let [k# (key m#)
-             v# (val m#)]
-         (.writeFieldName ~jg (if (keyword? k#)
-                                (.substring (str k#) 1)
-                                (str k#)))
-         (generate ~jg v# ~date-format ~e nil)))
-     (.writeEndObject ~jg)))
+  (let [jg (tag jg)]
+    `(do
+       (.writeStartObject ~jg)
+       (doseq [m# ~obj]
+         (let [k# (key m#)
+               v# (val m#)]
+           (.writeFieldName ~jg (if (keyword? k#)
+                                  (.substring (str k#) 1)
+                                  (str k#)))
+           (generate ~jg v# ~date-format ~e nil)))
+       (.writeEndObject ~jg))))
 
 (definline generate-key-fn-map
   [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
-  `(do
-     (.writeStartObject ~jg)
-     (doseq [m# ~obj]
-       (let [k# (key m#)
-             v# (val m#)]
-         (.writeFieldName ~jg (if (keyword? k#)
-                                (~key-fn k#)
-                                (str k#)))
-         (generate ~jg v# ~date-format ~e ~key-fn)))
-     (.writeEndObject ~jg)))
+  (let [k (gensym 'k)
+        name (gensym 'name)
+        jg (tag jg)]
+    `(do
+       (.writeStartObject ~jg)
+       (doseq [m# ~obj]
+         (let [~k (key m#)
+               v# (val m#)
+               ^String name# (if (keyword? ~k)
+                               (~key-fn ~k)
+                               (str ~k))]
+           (.writeFieldName ~jg name#)
+           (generate ~jg v# ~date-format ~e ~key-fn)))
+       (.writeEndObject ~jg))))
 
 (definline generate-map
   [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
@@ -89,11 +98,12 @@
 
 (definline generate-array [^JsonGenerator jg obj ^String date-format
                            ^Exception e key-fn]
-  `(do
-     (.writeStartArray ~jg)
-     (doseq [item# ~obj]
-       (generate ~jg item# ~date-format ~e ~key-fn))
-     (.writeEndArray ~jg)))
+  (let [jg (tag jg)]
+    `(do
+       (.writeStartArray ~jg)
+       (doseq [item# ~obj]
+         (generate ~jg item# ~date-format ~e ~key-fn))
+       (.writeEndArray ~jg))))
 
 (defmacro i?
   "Just to shorten 'instance?' and for debugging."
@@ -158,7 +168,7 @@
 (defn encode-number
   "Encode anything implementing java.lang.Number to the json generator."
   [^java.lang.Number n ^JsonGenerator jg]
-  (.writeNumber jg n))
+  (number-dispatch jg n nil))
 
 (defn encode-long
   "Encode anything implementing java.lang.Number to the json generator."

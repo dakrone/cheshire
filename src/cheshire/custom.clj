@@ -4,7 +4,8 @@
   Methods used for extending JSON generation to different Java classes.
   Has the same public API as core.clj so they can be swapped in and out."
   (:use [cheshire.factory])
-  (:require [cheshire.core :as core])
+  (:require [cheshire.core :as core]
+            [cheshire.generate :as generate])
   (:import (java.io BufferedWriter ByteArrayOutputStream StringWriter)
            (java.util Date SimpleTimeZone)
            (java.text SimpleDateFormat)
@@ -117,7 +118,7 @@
 (defn encode-number
   "Encode anything implementing java.lang.Number to the json generator."
   [^java.lang.Number n ^JsonGenerator jg]
-  (.writeNumber jg n))
+  (generate/encode-number n jg))
 
 (defn encode-long
   "Encode anything implementing java.lang.Number to the json generator."
