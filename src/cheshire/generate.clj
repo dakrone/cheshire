@@ -28,34 +28,27 @@
                       (str "Cannot JSON encode object of class: "
                            (class ~obj) ": " ~obj)))))))
 
-(defmacro number-dispatch [^JsonGenerator jg obj ^Exception e]
-  (if (< 2 (:minor *clojure-version*))
-    `(condp instance? ~obj
-       Integer (.writeNumber ~jg (int ~obj))
-       Long (.writeNumber ~jg (long ~obj))
-       Double (.writeNumber ~jg (double ~obj))
-       Float (.writeNumber ~jg (double ~obj))
-       BigInteger (.writeNumber ~jg ~(with-meta obj {:tag `BigInteger}))
-       BigDecimal (.writeNumber ~jg ~(with-meta obj {:tag `BigDecimal}))
-       Ratio (.writeNumber ~jg (double ~obj))
-       Short (.writeNumber ~jg (int ~obj))
-       Byte (.writeNumber ~jg (int ~obj))
-       clojure.lang.BigInt (.writeNumber
-                            ~jg ^BigInteger
-                            (.toBigInteger ^clojure.lang.BigInt (bigint ~obj)))
-       (fail ~obj ~jg ~e))
-    `(let [^JsonGenerator jg# ~jg]
-       (condp instance? ~obj
-         Integer (.writeNumber jg# (int ~obj))
-         Long (.writeNumber jg# (long ~obj))
-         Double (.writeNumber jg# (double ~obj))
-         Float (.writeNumber jg# (float ~obj))
-         BigInteger (.writeNumber jg# ^BigInteger ~obj)
-         BigDecimal (.writeNumber jg# ^BigDecimal ~obj)
-         Ratio (.writeNumber jg# (double ~obj))
-         Short (.writeNumber jg# (int ~obj))
-         Byte (.writeNumber jg# (int ~obj))
-         (fail ~obj jg# ~e)))))
+(defmacro number-dispatch [jg obj e]
+  (let [g (tag (gensym 'jg))
+        o (gensym 'obj)
+        common-clauses `[Integer (.writeNumber ~g (int ~o))
+                         Long (.writeNumber ~g (long ~o))
+                         Double (.writeNumber ~g (double ~o))
+                         Float (.writeNumber ~g (double ~o))
+                         BigInteger (.writeNumber ~g ~(with-meta o {:tag `BigInteger}))
+                         BigDecimal (.writeNumber ~g ~(with-meta o {:tag `BigDecimal}))
+                         Ratio (.writeNumber ~g (double ~o))
+                         Short (.writeNumber ~g (int ~o))
+                         Byte (.writeNumber ~g (int ~o))]]
+    `(let [~g ~jg
+           ~o ~obj]
+       (condp instance? ~o
+         ~@(if (< 2 (:minor *clojure-version*))
+             `[~@common-clauses
+               clojure.lang.BigInt (.writeNumber ~g (.toBigInteger ~(vary-meta obj assoc :tag
+                                                                               `clojure.lang.BigInt)))]
+             common-clauses)
+         (fail ~o ~g ~e)))))
 
 (declare generate)
 
