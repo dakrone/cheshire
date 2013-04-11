@@ -1,3 +1,7 @@
+## Changes between Cheshire 5.1.1 and 5.1.0
+
+* Remove all type hints (thanks amalloy)
+
 ## Changes between Cheshire 5.1.0 and 5.0.2
 
 * Allow custom keyword function for encoding (thanks goodwink)
