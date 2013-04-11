@@ -8,34 +8,40 @@
        :dynamic true}
   *use-bigdecimals?* false)
 
+(defmacro ^:private tag
+  ([obj]
+     `(vary-meta ~obj assoc :tag `JsonParser)))
+
 (definline parse-object [^JsonParser jp key-fn bd? array-coerce-fn]
-  `(do
-     (.nextToken ~jp)
-     (loop [mmap# (transient {})]
-       (if-not (= (.getCurrentToken ~jp)
-                  JsonToken/END_OBJECT)
-         (let [key-str# (.getText ~jp)
-               _# (.nextToken ~jp)
-               key# (~key-fn key-str#)
-               mmap# (assoc! mmap# key#
-                             (parse* ~jp ~key-fn ~bd? ~array-coerce-fn))]
-           (.nextToken ~jp)
-           (recur mmap#))
-         (persistent! mmap#)))))
+  (let [jp (tag jp)]
+    `(do
+       (.nextToken ~jp)
+       (loop [mmap# (transient {})]
+         (if-not (= (.getCurrentToken ~jp)
+                    JsonToken/END_OBJECT)
+           (let [key-str# (.getText ~jp)
+                 _# (.nextToken ~jp)
+                 key# (~key-fn key-str#)
+                 mmap# (assoc! mmap# key#
+                               (parse* ~jp ~key-fn ~bd? ~array-coerce-fn))]
+             (.nextToken ~jp)
+             (recur mmap#))
+           (persistent! mmap#))))))
 
 (definline parse-array [^JsonParser jp key-fn bd? array-coerce-fn]
-  `(let [array-field-name# (.getCurrentName ~jp)]
-     (.nextToken ~jp)
-     (loop [coll# (transient (if ~array-coerce-fn
-                               (~array-coerce-fn array-field-name#)
-                               []))]
-       (if-not (= (.getCurrentToken ~jp)
-                  JsonToken/END_ARRAY)
-         (let [coll# (conj! coll#
-                            (parse* ~jp ~key-fn ~bd? ~array-coerce-fn))]
-           (.nextToken ~jp)
-           (recur coll#))
-         (persistent! coll#)))))
+  (let [jp (tag jp)]
+    `(let [array-field-name# (.getCurrentName ~jp)]
+       (.nextToken ~jp)
+       (loop [coll# (transient (if ~array-coerce-fn
+                                 (~array-coerce-fn array-field-name#)
+                                 []))]
+         (if-not (= (.getCurrentToken ~jp)
+                    JsonToken/END_ARRAY)
+           (let [coll# (conj! coll#
+                              (parse* ~jp ~key-fn ~bd? ~array-coerce-fn))]
+             (.nextToken ~jp)
+             (recur coll#))
+           (persistent! coll#))))))
 
 (defn parse* [^JsonParser jp key-fn bd? array-coerce-fn]
   (condp = (.getCurrentToken jp)
