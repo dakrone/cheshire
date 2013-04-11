@@ -192,7 +192,8 @@
 ;; This is lame, thanks for changing all the BigIntegers to BigInts
 ;; in 1.3 clojure/core :-/
 (defmacro handle-bigint []
-  (when (not= {:major 1 :minor 2} (select-keys *clojure-version* [:major :minor]))
+  (when (not= {:major 1 :minor 2} (select-keys *clojure-version*
+                                               [:major :minor]))
     `(extend clojure.lang.BigInt
        JSONable
        {:to-json ~'(fn encode-bigint

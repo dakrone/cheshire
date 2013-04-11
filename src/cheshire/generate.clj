@@ -35,8 +35,10 @@
                          Long (.writeNumber ~g (long ~o))
                          Double (.writeNumber ~g (double ~o))
                          Float (.writeNumber ~g (double ~o))
-                         BigInteger (.writeNumber ~g ~(with-meta o {:tag `BigInteger}))
-                         BigDecimal (.writeNumber ~g ~(with-meta o {:tag `BigDecimal}))
+                         BigInteger (.writeNumber
+                                     ~g ~(with-meta o {:tag `BigInteger}))
+                         BigDecimal (.writeNumber
+                                     ~g ~(with-meta o {:tag `BigDecimal}))
                          Ratio (.writeNumber ~g (double ~o))
                          Short (.writeNumber ~g (int ~o))
                          Byte (.writeNumber ~g (int ~o))]]
@@ -45,8 +47,10 @@
        (condp instance? ~o
          ~@(if (< 2 (:minor *clojure-version*))
              `[~@common-clauses
-               clojure.lang.BigInt (.writeNumber ~g (.toBigInteger ~(vary-meta obj assoc :tag
-                                                                               `clojure.lang.BigInt)))]
+               clojure.lang.BigInt (.writeNumber
+                                    ~g (.toBigInteger
+                                        ~(vary-meta obj assoc :tag
+                                                    `clojure.lang.BigInt)))]
              common-clauses)
          (fail ~o ~g ~e)))))
 
