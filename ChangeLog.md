@@ -1,6 +1,6 @@
 ## Changes between Cheshire 5.1.1 and 5.1.0
 
-* Remove all type hints (thanks amalloy)
+* Remove all reflection (thanks amalloy)
 
 ## Changes between Cheshire 5.1.0 and 5.0.2
 
