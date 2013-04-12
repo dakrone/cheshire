@@ -184,7 +184,7 @@
   [s ^JsonGenerator jg]
   (.writeStartArray jg)
   (doseq [i s]
-    (generate jg i *date-format* nil))
+    (generate jg i *date-format* nil nil))
   (.writeEndArray jg))
 
 (defn encode-date
@@ -216,7 +216,7 @@
                             (str ns "/" (name k))
                             (name k))
                           (str k)))
-    (generate jg v *date-format* nil))
+    (generate jg v *date-format* nil nil))
   (.writeEndObject jg))
 
 (defn encode-symbol
