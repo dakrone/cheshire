@@ -271,9 +271,9 @@
     (gen/add-encoder CTestR (fn [obj jg] (gen/encode-seq [:foo :bar] jg)))
     (is (= ["foo" "bar"] (json/decode (json/encode thing) true)))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-date (Date. 0) jg)))
-    (binding [gen/*date-format* "YYYY"]
-      (is (= "1970" (json/decode (json/encode thing) true))))
+    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-date (Date. (long 0)) jg)))
+    (binding [gen/*date-format* "yyyy-MM-dd'T'HH:mm:ss'Z'"]
+      (is (= "1970-01-01T00:00:00Z" (json/decode (json/encode thing) true))))
     (remove)
     (gen/add-encoder CTestR (fn [obj jg] (gen/encode-bool true jg)))
     (is (= true (json/decode (json/encode thing) true)))
