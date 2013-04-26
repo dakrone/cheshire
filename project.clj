@@ -13,7 +13,7 @@
              :1.3 {:dependencies [[org.clojure/clojure "1.3.0"]]}
              :1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
              :benchmark {:test-paths ["benchmarks"]
-                         :dependencies [[criterium "0.3.1"]
+                         :dependencies [[criterium "0.4.0"]
                                         [org.clojure/data.json "0.2.2"]
                                         [clj-json "0.5.0"]]}}
   :aliases {"all" ["with-profile" "dev,1.3:dev,1.4:dev"]
