@@ -288,20 +288,6 @@ In the `cheshire.experimental` namespace:
 $ echo "Hi. \"THIS\" is a string.\\yep." > /tmp/foo
 
 $ lein repl
-nREPL server started on port 58908
-REPL-y 0.1.10
-Clojure 1.5.1
-    Exit: Control+D or (exit) or (quit)
-Commands: (user/help)
-    Docs: (doc function-name-here)
-          (find-doc "part-of-name-here")
-  Source: (source function-name-here)
-          (user/sourcery function-name-here)
- Javadoc: (javadoc java-object-or-class-here)
-Examples from clojuredocs.org: [clojuredocs or cdoc]
-          (user/clojuredocs name-here)
-          (user/clojuredocs "ns-here" "name-here")
-
 user> (use 'cheshire.experimental)
 nil
 user> (use 'clojure.java.io)
@@ -315,9 +301,9 @@ user> (println (slurp (encode-large-field-in-map {:id "10"
 nil
 ```
 
-`encode-large-field-in-map` Is used for streamy JSON encoding where
+`encode-large-field-in-map` is used for streamy JSON encoding where
 you want to JSON encode a map, but don't want the map in memory all at
-once (it returns a stream).
+once (it returns a stream). Check out the docstring for full usage.
 
 It's experimental, like the name says. Based on [Tigris](http://github.com/dakrone/tigris).
 
