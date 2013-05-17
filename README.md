@@ -177,21 +177,6 @@ namespace change)
 
 <h3>NOTE: `cheshire.custom` has been deprecated in version 5.0.0</h3>
 
-<del>
-In version 3.0.0 and above, custom encoding first attempts to encode
-the object using the core encoding (because it would be faster). If
-the encoding fails, it uses the custom encoding mechanics to encode
-the JSON. If this is undesirable, use the `generate-string*`,
-`generate-stream*` and `generate-smile*` methods to overwrite this.
-
-Custom (slower) and Core (faster) encoding can be mixed and matched by
-requiring both namespaces and using the custom one only when you need
-to encode custom classes. The API methods for cheshire.core and
-cheshire.custom are exactly the same (except for add-encoder,
-remove-encoder and the methods ending with '*' in the custom
-namespace).
-</del>
-
 Custom and Core encoding have been combined in Cheshire 5.0.0, so
 there is no longer any need to require a different namespace depending
 on what you would like to use.
