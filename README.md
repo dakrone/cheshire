@@ -273,38 +273,53 @@ to true:
 
 ## Speed
 
-    Clojure version:  1.2.1
-    Num roundtrips:   100000
+Cheshire is about twice as fast as data.json.
 
-    Trial:  1
-    clj-json                               2.01
-    clj-json w/ keywords                   2.10
-    clj-serializer                         2.13
-    cheshire                               1.34
-    cheshire-smile                         1.36
-    cheshire w/ keywords                   1.77
-    clojure printer/reader                 7.16
-    clojure printer/reader w/ print-dup    12.29
-    clojure-json                           20.55
-    clojure.data.json (0.1.2)              3.89
+Check out the benchmarks in `cheshire.test.benchmark`; or run `lein
+benchmark`. If you have scenarios where Cheshire is not performing as
+well as expected (compared to a different library), please let me
+know.
 
-    Trial:  2
-    clj-json                               1.19
-    clj-json w/ keywords                   2.04
-    clj-serializer                         1.58
-    cheshire                               1.33
-    cheshire-smile                         1.37
-    cheshire w/ keywords                   1.87
-    clojure printer/reader                 5.97
-    clojure printer/reader w/ print-dup    11.17
-    clojure-json                           20.42
-    clojure.data.json (0.1.2)              3.93
+## Experimental things
 
+In the `cheshire.experimental` namespace:
 
-<del>Benchmarks for custom encoding coming soon.</del> - check out the
-benchmarks in `cheshire.test.benchmark`; or run `lein benchmark`. If
-you have scenarios where Cheshire is not performing as well as
-expected (compared to a different library), please let me know.
+```
+$ echo "Hi. \"THIS\" is a string.\\yep." > /tmp/foo
+
+$ lein repl
+nREPL server started on port 58908
+REPL-y 0.1.10
+Clojure 1.5.1
+    Exit: Control+D or (exit) or (quit)
+Commands: (user/help)
+    Docs: (doc function-name-here)
+          (find-doc "part-of-name-here")
+  Source: (source function-name-here)
+          (user/sourcery function-name-here)
+ Javadoc: (javadoc java-object-or-class-here)
+Examples from clojuredocs.org: [clojuredocs or cdoc]
+          (user/clojuredocs name-here)
+          (user/clojuredocs "ns-here" "name-here")
+
+user> (use 'cheshire.experimental)
+nil
+user> (use 'clojure.java.io)
+nil
+user> (println (slurp (encode-large-field-in-map {:id "10"
+                                                  :things [1 2 3]
+                                                  :body "I'll be removed"}
+                                                 :body
+                                                 (input-stream (file "/tmp/foo")))))
+{"things":[1,2,3],"id":"10","body":"Hi. \"THIS\" is a string.\\yep.\n"}
+nil
+```
+
+`encode-large-field-in-map` Is used for streamy JSON encoding where
+you want to JSON encode a map, but don't want the map in memory all at
+once (it returns a stream).
+
+It's experimental, like the name says. Based on [Tigris](http://github.com/dakrone/tigris).
 
 ## Advanced customization for factories
 See

@@ -1,3 +1,8 @@
+## Changes between Cheshire 5.1.2 and 5.1.1
+
+* Add experimental namespace
+* Bump Jackson deps to 2.2.1
+
 ## Changes between Cheshire 5.1.1 and 5.1.0
 
 * Remove all reflection (thanks amalloy)

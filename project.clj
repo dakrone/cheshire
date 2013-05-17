@@ -6,7 +6,8 @@
             :distribution :repo}
   :warn-on-reflection false
   :dependencies [[com.fasterxml.jackson.core/jackson-core "2.2.1"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.2.1"]]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.2.1"]
+                 [tigris "0.1.0"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.5.1"]
                                   [org.clojure/test.generative "0.1.4"]]}
              :1.2 {:dependencies [[org.clojure/clojure "1.2.1"]]}
