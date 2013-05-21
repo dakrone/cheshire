@@ -44,7 +44,7 @@
            (persistent! coll#))))))
 
 (defn parse* [^JsonParser jp key-fn bd? array-coerce-fn]
-  (condp = (.getCurrentToken jp)
+  (condp identical? (.getCurrentToken jp)
     JsonToken/START_OBJECT (parse-object jp key-fn bd? array-coerce-fn)
     JsonToken/START_ARRAY (parse-array jp key-fn bd? array-coerce-fn)
     JsonToken/VALUE_STRING (.getText jp)
