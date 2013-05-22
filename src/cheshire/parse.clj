@@ -28,7 +28,6 @@
              (recur mmap#))
            (persistent! mmap#))))))
 
-
 (definline parse-array [^JsonParser jp key-fn bd? array-coerce-fn]
   (let [jp (tag jp)]
     `(let [array-field-name# (.getCurrentName ~jp)]
@@ -39,26 +38,25 @@
          (if-not (identical? (.getCurrentToken ~jp)
                              JsonToken/END_ARRAY)
            (let [coll# (conj! coll#
-                         (parse* ~jp ~key-fn ~bd? ~array-coerce-fn))]
+                              (parse* ~jp ~key-fn ~bd? ~array-coerce-fn))]
              (.nextToken ~jp)
              (recur coll#))
            (persistent! coll#))))))
 
 (defn lazily-parse-array [^JsonParser jp key-fn bd? array-coerce-fn]
   (lazy-seq
-    (loop [chunk-idx 0, buf (chunk-buffer 32)]
-      (if (identical? (.getCurrentToken jp) JsonToken/END_ARRAY)
-
-        (chunk-cons (chunk buf) nil)
-
-        (let [coll# (chunk-append buf (parse* jp key-fn bd? array-coerce-fn))]
-          (.nextToken jp)
-          (let [chunk-idx* (unchecked-inc chunk-idx)]
-            (if (< chunk-idx* 32)
-              (recur chunk-idx* buf)
-              (chunk-cons
-                (chunk buf)
-                (lazily-parse-array jp key-fn bd? array-coerce-fn)))))))))
+   (loop [chunk-idx 0, buf (chunk-buffer 32)]
+     (if (identical? (.getCurrentToken jp) JsonToken/END_ARRAY)
+       (chunk-cons (chunk buf) nil)
+       (do
+         (chunk-append buf (parse* jp key-fn bd? array-coerce-fn))
+         (.nextToken jp)
+         (let [chunk-idx* (unchecked-inc chunk-idx)]
+           (if (< chunk-idx* 32)
+             (recur chunk-idx* buf)
+             (chunk-cons
+              (chunk buf)
+              (lazily-parse-array jp key-fn bd? array-coerce-fn)))))))))
 
 (defn parse* [^JsonParser jp key-fn bd? array-coerce-fn]
   (condp identical? (.getCurrentToken jp)
