@@ -69,3 +69,10 @@
     (bench/with-progress-reporting
       (bench/quick-bench (core/encode test-obj))))
   (println "-------------------------------------"))
+
+(deftest t-large-array
+  (println "-------- Large array parsing --------")
+  (let [test-array-json (core/encode (range 1024))]
+    (bench/with-progress-reporting
+      (bench/bench (pr-str (core/decode test-array-json)))))
+  (println "-------------------------------------"))
