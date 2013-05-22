@@ -17,8 +17,8 @@
     `(do
        (.nextToken ~jp)
        (loop [mmap# (transient {})]
-         (if-not (= (.getCurrentToken ~jp)
-                    JsonToken/END_OBJECT)
+         (if-not (identical? (.getCurrentToken ~jp)
+                             JsonToken/END_OBJECT)
            (let [key-str# (.getText ~jp)
                  _# (.nextToken ~jp)
                  key# (~key-fn key-str#)
@@ -36,8 +36,8 @@
        (loop [coll# (transient (if ~array-coerce-fn
                                  (~array-coerce-fn array-field-name#)
                                  []))]
-         (if-not (= (.getCurrentToken ~jp)
-                   JsonToken/END_ARRAY)
+         (if-not (identical? (.getCurrentToken ~jp)
+                             JsonToken/END_ARRAY)
            (let [coll# (conj! coll#
                          (parse* ~jp ~key-fn ~bd? ~array-coerce-fn))]
              (.nextToken ~jp)
@@ -77,7 +77,7 @@
       (str "Cannot parse " (pr-str (.getCurrentToken jp)))))))
 
 (defn parse [^JsonParser jp key-fn eof array-coerce-fn]
-  (let [key-fn (or (if (= key-fn true) keyword key-fn) identity)]
+  (let [key-fn (or (if (identical? key-fn true) keyword key-fn) identity)]
     (.nextToken jp)
     (condp identical? (.getCurrentToken jp)
       nil
