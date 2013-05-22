@@ -1,3 +1,8 @@
+## Changes between Cheshire 5.2.0 and 5.1.2
+
+* Bump tigris to 0.1.1 to use PushbackReader
+* Lazily decode top-level arrays (thanks ztellman)
+
 ## Changes between Cheshire 5.1.2 and 5.1.1
 
 * Add experimental namespace
