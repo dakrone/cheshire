@@ -210,13 +210,17 @@
   "Encode a clojure map to the json generator."
   [^clojure.lang.IPersistentMap m ^JsonGenerator jg]
   (.writeStartObject jg)
-  (doseq [[k v] m]
-    (.writeFieldName jg (if (instance? clojure.lang.Keyword k)
-                          (if-let [ns (namespace k)]
-                            (str ns "/" (name k))
-                            (name k))
-                          (str k)))
-    (generate jg v *date-format* nil nil))
+  (loop [im (seq m)]
+    (let [[k v] (first im)
+          rm (rest im)]
+      (.writeFieldName jg (if (instance? clojure.lang.Keyword k)
+                            (if-let [ns (namespace k)]
+                              (str ns "/" (name k))
+                              (name k))
+                            (str k)))
+      (generate jg v *date-format* nil nil)
+      (when (seq rm)
+        (recur rm))))
   (.writeEndObject jg))
 
 (defn encode-symbol
