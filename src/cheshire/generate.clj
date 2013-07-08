@@ -108,6 +108,13 @@
   ;;(println :inst? k obj)
   `(instance? ~k ~obj))
 
+(def sdf
+  "Memoized SimpleDateFormat creator."
+  (memoize
+   (fn [date-format]
+     (doto (SimpleDateFormat. date-format)
+       (.setTimeZone (SimpleTimeZone. 0 "UTC"))))))
+
 (defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex key-fn]
   (cond
    (nil? obj) (.writeNull ^JsonGenerator jg)
@@ -137,13 +144,9 @@
    (i? Set obj) (generate-array jg obj date-format ex key-fn)
    (i? UUID obj) (write-string ^JsonGenerator jg (.toString ^UUID obj))
    (i? Symbol obj) (write-string ^JsonGenerator jg (.toString ^Symbol obj))
-   (i? Date obj) (let [sdf (doto (SimpleDateFormat. date-format)
-                             (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
-                   (write-string ^JsonGenerator jg (.format sdf obj)))
-   (i? Timestamp obj) (let [date (Date. (.getTime ^Timestamp obj))
-                            sdf (doto (SimpleDateFormat. date-format)
-                                  (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
-                        (write-string ^JsonGenerator jg (.format sdf obj)))
+   (i? Date obj)  (write-string ^JsonGenerator jg (.format (sdf date-format) obj))
+   (i? Timestamp obj) (let [date (Date. (.getTime ^Timestamp obj))]
+                        (write-string ^JsonGenerator jg (.format (sdf date-format) obj)))
    :else (fail obj jg ex)))
 
 ;; Generic encoders, these can be used by someone writing a custom
@@ -190,9 +193,7 @@
 (defn encode-date
   "Encode a date object to the json generator."
   [^Date d ^JsonGenerator jg]
-  (let [sdf (SimpleDateFormat. *date-format*)]
-    (.setTimeZone sdf (SimpleTimeZone. 0 "UTC"))
-    (.writeString jg (.format sdf d))))
+    (.writeString jg (.format (sdf *date-format*) d)))
 
 (defn encode-bool
   "Encode a Boolean object to the json generator."
