@@ -1,10 +1,13 @@
 (ns cheshire.test.benchmark
   (:use [clojure.test])
   (:require [cheshire.core :as core]
+            [cheshire.custom :as old]
             [cheshire.generate :as custom]
             [clojure.data.json :as cj]
+            [clojure.java.io :refer [file input-stream resource]]
             [clj-json.core :as clj-json]
-            [criterium.core :as bench]))
+            [criterium.core :as bench])
+  (:import (java.util.zip GZIPInputStream)))
 
 ;; These tests just print out results, nothing else, they also
 ;; currently don't work with clojure 1.2 (but the regular tests do)
@@ -20,6 +23,14 @@
                "list" '("a" "b")
                "set" #{"a" "b"}
                "keyword" :foo})
+
+(def big-test-obj
+  (-> "test/all_month.geojson.gz"
+      file
+      input-stream
+      (GZIPInputStream. )
+      slurp
+      core/decode))
 
 (deftest t-bench-clj-json
   (println "-------- clj-json Benchmarks --------")
@@ -75,4 +86,18 @@
   (let [test-array-json (core/encode (range 1024))]
     (bench/with-progress-reporting
       (bench/bench (pr-str (core/decode test-array-json)))))
+  (println "-------------------------------------"))
+
+(deftest t-large-geojson-object
+  (println "------- Large GeoJSON parsing -------")
+  (println "[+] large geojson custom encode")
+  (bench/with-progress-reporting
+    (bench/quick-bench (old/encode big-test-obj)))
+  (println "[+] large geojson encode")
+  (bench/with-progress-reporting
+    (bench/quick-bench (core/encode big-test-obj)))
+  (println "[+] large geojson decode")
+  (let [s (core/encode big-test-obj)]
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/decode s))))
   (println "-------------------------------------"))
