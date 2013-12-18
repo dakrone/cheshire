@@ -74,6 +74,14 @@
      (Exception.
       (str "Cannot parse " (pr-str (.getCurrentToken jp)))))))
 
+(defn parse-strict [^JsonParser jp key-fn eof array-coerce-fn]
+  (let [key-fn (or (if (identical? key-fn true) keyword key-fn) identity)]
+    (.nextToken jp)
+    (condp identical? (.getCurrentToken jp)
+      nil
+      eof
+      (parse* jp key-fn *use-bigdecimals?* array-coerce-fn))))
+
 (defn parse [^JsonParser jp key-fn eof array-coerce-fn]
   (let [key-fn (or (if (identical? key-fn true) keyword key-fn) identity)]
     (.nextToken jp)

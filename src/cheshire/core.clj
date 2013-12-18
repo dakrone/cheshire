@@ -94,6 +94,26 @@
                            (StringReader. string))
         key-fn nil array-coerce-fn))))
 
+;; Parsing strictly
+(defn parse-string-strict
+  "Returns the Clojure object corresponding to the given JSON-encoded string.
+  An optional key-fn argument can be either true (to coerce keys to keywords),
+  false to leave them as strings, or a function to provide custom coercion.
+
+  The array-coerce-fn is an optional function taking the name of an array field,
+  and returning the collection to be used for array values.
+
+  Does not lazily parse top-level arrays."
+  ([string] (parse-string string nil nil))
+  ([string key-fn] (parse-string string key-fn nil))
+  ([^String string key-fn array-coerce-fn]
+     (when string
+       (parse/parse-strict
+        (.createJsonParser ^JsonFactory (or factory/*json-factory*
+                                            factory/json-factory)
+                           (StringReader. string))
+        key-fn nil array-coerce-fn))))
+
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
   implement BufferedReader. An optional key-fn argument can be either true (to
@@ -136,7 +156,7 @@
   "Internal lazy-seq parser"
   [^JsonParser parser key-fn array-coerce-fn]
   (lazy-seq
-   (let [elem (parse/parse parser key-fn eof array-coerce-fn)]
+   (let [elem (parse/parse-strict parser key-fn eof array-coerce-fn)]
      (when-not (identical? elem eof)
        (cons elem (parsed-seq* parser key-fn array-coerce-fn))))))
 
@@ -176,5 +196,6 @@
 (def encode-stream generate-stream)
 (def encode-smile generate-smile)
 (def decode parse-string)
+(def decode-strict parse-string-strict)
 (def decode-stream parse-stream)
 (def decode-smile parse-smile)
