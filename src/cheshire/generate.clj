@@ -237,9 +237,10 @@
     JSONable
     {:to-json encoder}))
 
-(defn remove-encoder [cls]
+(defn remove-encoder
   "Remove encoder for a given type.
 
    ex. (remove-encoder java.net.URL)"
+  [cls]
   (alter-var-root #'JSONable #(assoc % :impls (dissoc (:impls %) cls)))
   (clojure.core/-reset-methods JSONable))
