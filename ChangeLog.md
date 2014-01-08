@@ -1,3 +1,8 @@
+## Changes between Cheshire 5.3.0 and 5.2.0
+
+* Dependencies have been bumped
+* Parse streams strictly by default to avoid scoping issues
+
 ## Changes between Cheshire 5.2.0 and 5.1.2
 
 * Bump tigris to 0.1.1 to use PushbackReader
