@@ -104,8 +104,8 @@
   and returning the collection to be used for array values.
 
   Does not lazily parse top-level arrays."
-  ([string] (parse-string string nil nil))
-  ([string key-fn] (parse-string string key-fn nil))
+  ([string] (parse-string-strict string nil nil))
+  ([string key-fn] (parse-string-strict string key-fn nil))
   ([^String string key-fn array-coerce-fn]
      (when string
        (parse/parse-strict
