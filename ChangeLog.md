@@ -1,3 +1,8 @@
+## Changes between Cheshire 5.3.1 and 5.3.0
+
+* Fix string parsing for 1 and 2 arity methods
+* Bump Jackson to 2.3.1
+
 ## Changes between Cheshire 5.3.0 and 5.2.0
 
 * Dependencies have been bumped
