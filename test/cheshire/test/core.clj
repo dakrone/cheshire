@@ -133,6 +133,9 @@
         id-str (str id)]
     (is (= {"foo" id-str} (json/decode (json/encode {:foo id}))))))
 
+(deftest test-char-literal
+  (is (= "{\"foo\":\"a\"}" (json/encode {:foo \a}))))
+
 (deftest test-streams
   (is (= {"foo" "bar"}
          (json/parse-stream

@@ -1,3 +1,7 @@
+## Changes between Cheshire 5.3.2 and 5.3.1
+
+* Add default encoder for java.lang.Character
+
 ## Changes between Cheshire 5.3.1 and 5.3.0
 
 * Fix string parsing for 1 and 2 arity methods
