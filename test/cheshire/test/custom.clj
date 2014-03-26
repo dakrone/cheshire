@@ -180,13 +180,13 @@
           (json/encode* {"set" #{"a" "b"}
                          "array" ["a" "b"]
                          "map" {"a" 1}}) false
-          (fn [field-name] (if (= "set" field-name) #{} []))))))
+                         (fn [field-name] (if (= "set" field-name) #{} []))))))
 
 (deftest t-symbol-encoding-for-non-resolvable-symbols
-  (is (= "{\"foo\":\"clojure.core/map\",\"bar\":\"clojure.core/pam\"}"
-         (json/encode* {:foo 'clojure.core/map :bar 'clojure.core/pam})))
-  (is (= "{\"foo\":\"foo.bar/baz\",\"bar\":\"clojure.core/pam\"}"
-         (json/encode* {:foo 'foo.bar/baz :bar 'clojure.core/pam}))))
+  (is (= "{\"bar\":\"clojure.core/pam\",\"foo\":\"clojure.core/map\"}"
+         (json/encode* (sorted-map :foo 'clojure.core/map :bar 'clojure.core/pam))))
+  (is (= "{\"bar\":\"clojure.core/pam\",\"foo\":\"foo.bar/baz\"}"
+         (json/encode* (sorted-map :foo 'foo.bar/baz :bar 'clojure.core/pam)))))
 
 (deftest t-bindable-factories
   (binding [fact/*json-factory* (fact/make-json-factory
@@ -199,9 +199,9 @@
     (is (= q (json/decode (json/encode* q))))))
 
 (deftest t-pretty-print
-  (is (= (str "{\n  \"foo\" : 1,\n  \"bar\" : [ {\n    \"baz\" : 2\n  }, "
-              "\"quux\", [ 1, 2, 3 ] ]\n}")
-         (json/encode* {:foo 1 :bar [{:baz 2} :quux [1 2 3]]}
+  (is (= (str "{\n  \"bar\" : [ {\n    \"baz\" : 2\n  }, "
+              "\"quux\", [ 1, 2, 3 ] ],\n  \"foo\" : 1\n}")
+         (json/encode* (sorted-map :foo 1 :bar [{:baz 2} :quux [1 2 3]])
                        {:pretty true}))))
 
 (deftest t-unicode-escaping
