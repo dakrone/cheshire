@@ -62,10 +62,10 @@ encoders.
 ;; generate some JSON with Dates
 ;; the Date will be encoded as a string using
 ;; the default date format: yyyy-MM-dd'T'HH:mm:ss'Z'
-(generate-string {:foo "bar" :baz (Date. 0)})
+(generate-string {:foo "bar" :baz (java.util.Date. 0)})
 
 ;; generate some JSON with Dates with custom Date encoding
-(generate-string {:baz (Date. 0)} {:date-format "yyyy-MM-dd"})
+(generate-string {:baz (java.util.Date. 0)} {:date-format "yyyy-MM-dd"})
 
 ;; generate some JSON with pretty formatting
 (generate-string {:foo "bar" :baz {:eggplant [1 2 3]}} {:pretty true})
