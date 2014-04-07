@@ -111,7 +111,7 @@
 (defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex key-fn]
   (cond
    (nil? obj) (.writeNull ^JsonGenerator jg)
-   (get (:impls JSONable) (class obj)) (#'to-json obj jg)
+   (satisfies? JSONable obj) (to-json obj jg)
 
    (i? IPersistentCollection obj)
    (condp instance? obj
