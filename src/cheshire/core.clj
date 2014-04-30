@@ -86,13 +86,14 @@
   and returning the collection to be used for array values."
   ([string] (parse-string string nil nil))
   ([string key-fn] (parse-string string key-fn nil))
-  ([^String string key-fn array-coerce-fn]
+  ([string key-fn array-coerce-fn] (parse-string string key-fn array-coerce-fn nil))
+  ([^String string key-fn array-coerce-fn field-predicate]
      (when string
        (parse/parse
         (.createJsonParser ^JsonFactory (or factory/*json-factory*
                                             factory/json-factory)
                            (StringReader. string))
-        key-fn nil array-coerce-fn))))
+        key-fn nil array-coerce-fn field-predicate))))
 
 ;; Parsing strictly
 (defn parse-string-strict
@@ -106,13 +107,14 @@
   Does not lazily parse top-level arrays."
   ([string] (parse-string-strict string nil nil))
   ([string key-fn] (parse-string-strict string key-fn nil))
-  ([^String string key-fn array-coerce-fn]
+  ([string key-fn array-coerce-fn] (parse-string-strict string key-fn array-coerce-fn nil))
+  ([^String string key-fn array-coerce-fn field-predicate]
      (when string
        (parse/parse-strict
         (.createJsonParser ^JsonFactory (or factory/*json-factory*
                                             factory/json-factory)
                            (StringReader. string))
-        key-fn nil array-coerce-fn))))
+        key-fn array-coerce-fn field-predicate))))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
@@ -123,14 +125,15 @@
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
   If laziness is needed, see parsed-seq."
-  ([rdr] (parse-stream rdr nil nil))
-  ([rdr key-fn] (parse-stream rdr key-fn nil))
-  ([^BufferedReader rdr key-fn array-coerce-fn]
+  ([rdr] (parse-stream rdr nil nil nil))
+  ([rdr key-fn] (parse-stream rdr key-fn nil nil))
+  ([rdr key-fn array-coerce-fn] (parse-stream rdr key-fn array-coerce-fn nil))
+  ([^BufferedReader rdr key-fn array-coerce-fn field-predicate]
      (when rdr
        (parse/parse
         (.createJsonParser ^JsonFactory (or factory/*json-factory*
                                             factory/json-factory) rdr)
-        key-fn nil array-coerce-fn))))
+        key-fn nil array-coerce-fn field-predicate))))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
@@ -139,14 +142,15 @@
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  ([bytes] (parse-smile bytes nil nil))
-  ([bytes key-fn] (parse-smile bytes key-fn nil))
-  ([^bytes bytes key-fn array-coerce-fn]
+  ([bytes] (parse-smile bytes nil nil nil))
+  ([bytes key-fn] (parse-smile bytes key-fn nil nil))
+  ([^bytes bytes key-fn array-coerce-fn] (parse-smile bytes key-fn array-coerce-fn nil))
+  ([^bytes bytes key-fn array-coerce-fn field-predicate]
      (when bytes
        (parse/parse
-        (.createJsonParser ^SmileFactory (or factory/*smile-factory*
-                                             factory/smile-factory) bytes)
-        key-fn nil array-coerce-fn))))
+         (.createJsonParser ^SmileFactory (or factory/*smile-factory*
+                                            factory/smile-factory) bytes)
+         key-fn nil array-coerce-fn field-predicate))))
 
 (def ^{:doc "Object used to determine end of lazy parsing attempt."}
   eof (Object.))
@@ -154,11 +158,11 @@
 ;; Lazy parsers
 (defn- parsed-seq*
   "Internal lazy-seq parser"
-  [^JsonParser parser key-fn array-coerce-fn]
+  [^JsonParser parser key-fn array-coerce-fn field-predicate]
   (lazy-seq
-   (let [elem (parse/parse-strict parser key-fn eof array-coerce-fn)]
+   (let [elem (parse/parse-strict parser key-fn eof array-coerce-fn field-predicate)]
      (when-not (identical? elem eof)
-       (cons elem (parsed-seq* parser key-fn array-coerce-fn))))))
+       (cons elem (parsed-seq* parser key-fn array-coerce-fn field-predicate))))))
 
 (defn parsed-seq
   "Returns a lazy seq of Clojure objects corresponding to the JSON read from
@@ -167,14 +171,15 @@
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
   If non-laziness is needed, see parse-stream."
-  ([reader] (parsed-seq reader nil nil))
-  ([reader key-fn] (parsed-seq reader key-fn nil))
-  ([^BufferedReader reader key-fn array-coerce-fn]
+  ([reader] (parsed-seq reader nil nil nil))
+  ([reader key-fn] (parsed-seq reader key-fn nil nil))
+  ([reader key-fn array-coerce-fn] (parsed-seq reader key-fn array-coerce-fn nil))
+  ([^BufferedReader reader key-fn array-coerce-fn field-predicate]
      (when reader
        (parsed-seq* (.createJsonParser ^JsonFactory
                                        (or factory/*json-factory*
                                            factory/json-factory) reader)
-                    key-fn array-coerce-fn))))
+                    key-fn array-coerce-fn field-predicate))))
 
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
@@ -184,12 +189,13 @@
   and returning the collection to be used for array values."
   ([reader] (parsed-smile-seq reader nil nil))
   ([reader key-fn] (parsed-smile-seq reader key-fn nil))
-  ([^BufferedReader reader key-fn array-coerce-fn]
+  ([reader key-fn array-coerce-fn] (parsed-smile-seq reader key-fn array-coerce-fn nil))
+  ([^BufferedReader reader key-fn array-coerce-fn field-predicate]
      (when reader
        (parsed-seq* (.createJsonParser ^SmileFactory
                                        (or factory/*smile-factory*
                                            factory/smile-factory) reader)
-                    key-fn array-coerce-fn))))
+                    key-fn array-coerce-fn field-predicate))))
 
 ;; aliases for clojure-json users
 (def encode generate-string)

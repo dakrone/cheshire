@@ -177,6 +177,16 @@
           (json/encode {"set" #{"a" "b"} "array" ["a" "b"] "map" {"a" 1}}) false
           (fn [field-name] (if (= "set" field-name) #{} []))))))
 
+(deftest test-field-predicate
+  (is (= {"map" {"a" 1}}
+         (json/decode
+           (json/encode {"set" #{"a" "b"}, "map" {"a" 1, "b" 2}})
+           false
+           nil
+           (fn [a b]
+             (or (= "map" b)
+               (and (= "map" a) (= "a" b))))))))
+
 (deftest t-symbol-encoding-for-non-resolvable-symbols
   (is (= "{\"bar\":\"clojure.core/pam\",\"foo\":\"clojure.core/map\"}"
          (json/encode (sorted-map :foo 'clojure.core/map :bar 'clojure.core/pam))))
