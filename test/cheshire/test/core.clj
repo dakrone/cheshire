@@ -149,10 +149,42 @@
            (json/parse-stream rdr true)))))
 
 (deftest serial-writing
+  (is (= "[\"foo\",\"bar\"]"
+         (.toString
+          (json/with-writer [(StringWriter.) nil]
+            (json/write [] :start)
+            (json/write "foo")
+            (json/write "bar")
+            (json/write [] :end)))))
+  (is (= "[1,[2,3],4]"
+         (.toString
+          (json/with-writer [(StringWriter.) nil]
+            (json/write [1 [2]] :start-inner)
+            (json/write 3)
+            (json/write [] :end)
+            (json/write 4)
+            (json/write [] :end)))))
+  (is (= "{\"a\":1,\"b\":2:{\"c\":3},\"d\":4}"
+         (.toString
+          (json/with-writer [(StringWriter.) nil]
+            (json/write {:a 1} :start)
+            (json/write {:b 2} :bare)
+            (json/write {:c 3} :all)
+            (json/write {:d 4} :end)))))
+  (is (= (str "[\"start\",\"continue\",[\"implicitly-nested\"],"
+              "[\"explicitly-nested\"],\"flatten\",\"end\"]")
+         (.toString
+          (json/with-writer [(StringWriter.) nil]
+            (json/write ["start"] :start)
+            (json/write "continue")
+            (json/write ["implicitly-nested"])
+            (json/write ["explicitly-nested"] :all)
+            (json/write ["flatten"] :bare)
+            (json/write ["end"] :end)))))
   (is (= "{\"head\":\"head info\",\"data\":[1,2,3],\"tail\":\"tail info\"}"
          (.toString
           (json/with-writer [(StringWriter.) nil]
-            (json/write {:head "head info" :data []} :start2)
+            (json/write {:head "head info" :data []} :start-inner)
             (json/write 1)
             (json/write 2)
             (json/write 3)

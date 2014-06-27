@@ -84,7 +84,7 @@
    - no value - the same as :all
    - :all - write object in a regular way with start and end borders
    - :start - write object with start border only
-   - :start2 - write object and it's inner object with start border only
+   - :start-inner - write object and it's inner object with start border only
    - :end - write object with end border only."
   (gen/generate *generator* obj (or (:date-format *opt-map*)
                                     factory/default-date-format)

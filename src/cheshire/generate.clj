@@ -55,7 +55,7 @@
          (fail ~o ~g ~e)))))
 
 (definline write-start-object [^JsonGenerator jg wholeness]
-  `(if (contains? #{:all :start :start2} ~wholeness)
+  `(if (contains? #{:all :start :start-inner} ~wholeness)
      (.writeStartObject ~jg)))
 
 (definline write-end-object [^JsonGenerator jg wholeness]
@@ -63,7 +63,7 @@
      (.writeEndObject ~jg)))
 
 (definline write-start-array [^JsonGenerator jg wholeness]
-  `(if (contains? #{:all :start :start2} ~wholeness)
+  `(if (contains? #{:all :start :start-inner} ~wholeness)
      (.writeStartArray ~jg)))
 
 (definline write-end-array [^JsonGenerator jg wholeness]
@@ -85,7 +85,7 @@
                                   (.substring (str k#) 1)
                                   (str k#)))
            (generate ~jg v# ~date-format ~e nil
-                     :wholeness (if (= ~wholeness :start2)
+                     :wholeness (if (= ~wholeness :start-inner)
                                   :start
                                   :all))))
        (write-end-object ~jg ~wholeness))))
@@ -106,7 +106,7 @@
                                (str ~k))]
            (.writeFieldName ~jg name#)
            (generate ~jg v# ~date-format ~e ~key-fn
-                     :wholeness (if (= ~wholeness :start2)
+                     :wholeness (if (= ~wholeness :start-inner)
                                   :start
                                   :all))))
        (write-end-object ~jg ~wholeness))))
@@ -124,7 +124,10 @@
     `(do
        (write-start-array ~jg ~wholeness)
        (doseq [item# ~obj]
-         (generate ~jg item# ~date-format ~e ~key-fn))
+         (generate ~jg item# ~date-format ~e ~key-fn
+                   :wholeness (if (= ~wholeness :start-inner)
+                                :start
+                                :all)))
        (write-end-array ~jg ~wholeness))))
 
 (defmacro i?
