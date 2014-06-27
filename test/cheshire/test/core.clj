@@ -164,13 +164,12 @@
             (json/write [] :end)
             (json/write 4)
             (json/write [] :end)))))
-  (is (= "{\"a\":1,\"b\":2:{\"c\":3},\"d\":4}"
+  (is (= "{\"a\":1,\"b\":2,\"c\":3}"
          (.toString
           (json/with-writer [(StringWriter.) nil]
             (json/write {:a 1} :start)
             (json/write {:b 2} :bare)
-            (json/write {:c 3} :all)
-            (json/write {:d 4} :end)))))
+            (json/write {:c 3} :end)))))
   (is (= (str "[\"start\",\"continue\",[\"implicitly-nested\"],"
               "[\"explicitly-nested\"],\"flatten\",\"end\"]")
          (.toString
