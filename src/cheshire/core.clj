@@ -76,6 +76,26 @@
        (.flush generator)
        (.toByteArray baos))))
 
+(defn generate-cbor
+  "Returns a CBOR-encoded byte-array for the given Clojure object.
+  Takes an optional date format string that Date objects will be encoded with.
+
+  The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
+  ([obj]
+     (generate-cbor obj nil))
+  ([obj opt-map]
+     (let [baos (ByteArrayOutputStream.)
+           generator (.createJsonGenerator ^CBORFactory
+                                           (or factory/*cbor-factory*
+                                               factory/cbor-factory)
+                                           baos)]
+       (gen/generate generator obj (or (:date-format opt-map)
+                                       factory/default-date-format)
+                     (:ex opt-map)
+                     (:key-fn opt-map))
+       (.flush generator)
+       (.toByteArray baos))))
+
 ;; Parsers
 (defn parse-string
   "Returns the Clojure object corresponding to the given JSON-encoded string.
@@ -146,6 +166,22 @@
        (parse/parse
         (.createJsonParser ^SmileFactory (or factory/*smile-factory*
                                              factory/smile-factory) bytes)
+        key-fn nil array-coerce-fn))))
+
+(defn parse-cbor
+  "Returns the Clojure object corresponding to the given CBOR-encoded bytes.
+  An optional key-fn argument can be either true (to coerce keys to keywords),
+  false to leave them as strings, or a function to provide custom coercion.
+
+  The array-coerce-fn is an optional function taking the name of an array field,
+  and returning the collection to be used for array values."
+  ([bytes] (parse-cbor bytes nil nil))
+  ([bytes key-fn] (parse-cbor bytes key-fn nil))
+  ([^bytes bytes key-fn array-coerce-fn]
+     (when bytes
+       (parse/parse
+        (.createJsonParser ^CBORFactory (or factory/*cbor-factory*
+                                            factory/cbor-factory) bytes)
         key-fn nil array-coerce-fn))))
 
 (def ^{:doc "Object used to determine end of lazy parsing attempt."}
