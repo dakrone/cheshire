@@ -1,9 +1,9 @@
 (ns cheshire.generate-seq
   "Namespace used to generate JSON from Clojure data structures in a
   sequential way."
-  (:require [cheshire.generate :refer [tag JSONable to-json i?
-                                       number-dispatch write-string
-                                       fail]])
+  (:use [cheshire.generate :only [tag JSONable to-json i?
+                                  number-dispatch write-string
+                                  fail]])
   (:import (com.fasterxml.jackson.core JsonGenerator JsonGenerationException)
            (java.util Date Map List Set SimpleTimeZone UUID)
            (java.sql Timestamp)
