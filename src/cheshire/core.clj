@@ -2,6 +2,7 @@
   "Main encoding and decoding namespace."
   (:require [cheshire.factory :as factory]
             [cheshire.generate :as gen]
+            [cheshire.generate-seq :as gen-seq]
             [cheshire.parse :as parse])
   (:import (com.fasterxml.jackson.core JsonParser JsonFactory
                                        JsonGenerator
@@ -86,11 +87,11 @@
    - :start - write object with start border only
    - :start-inner - write object and it's inner object with start border only
    - :end - write object with end border only."
-  (gen/generate *generator* obj (or (:date-format *opt-map*)
-                                    factory/default-date-format)
-                (:ex *opt-map*)
-                (:key-fn *opt-map*)
-                :wholeness wholeness))
+  (gen-seq/generate *generator* obj (or (:date-format *opt-map*)
+                                        factory/default-date-format)
+                    (:ex *opt-map*)
+                    (:key-fn *opt-map*)
+                    :wholeness wholeness))
 
 (defn generate-smile
   "Returns a SMILE-encoded byte-array for the given Clojure object.
