@@ -1,5 +1,6 @@
 (ns cheshire.generate-seq
-  "Namespace used to generate JSON from Clojure data structures."
+  "Namespace used to generate JSON from Clojure data structures in a
+  sequential way."
   (:require [cheshire.generate :refer [tag JSONable to-json i?
                                        number-dispatch write-string
                                        fail]])
