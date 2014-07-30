@@ -10,7 +10,7 @@
 ;; date format rebound for custom encoding
 (def ^{:dynamic true :private true} *date-format*)
 
-(defmacro ^:private tag
+(defmacro tag
   ([obj]
      `(vary-meta ~obj assoc :tag `JsonGenerator)))
 

@@ -2,8 +2,10 @@
   "Main encoding and decoding namespace."
   (:require [cheshire.factory :as factory]
             [cheshire.generate :as gen]
+            [cheshire.generate-seq :as gen-seq]
             [cheshire.parse :as parse])
   (:import (com.fasterxml.jackson.core JsonParser JsonFactory
+                                       JsonGenerator
                                        JsonGenerator$Feature)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (java.io StringWriter StringReader BufferedReader BufferedWriter
@@ -55,6 +57,41 @@
                      (:key-fn opt-map))
        (.flush generator)
        writer)))
+
+(defn create-generator [writer]
+  "Returns JsonGenerator for given writer."
+  (.createJsonGenerator
+   ^JsonFactory (or factory/*json-factory*
+                    factory/json-factory) writer))
+
+(def ^:dynamic ^JsonGenerator *generator*)
+(def ^:dynamic *opt-map*)
+
+(defmacro with-writer [[writer opt-map] & body]
+  "Start writing for series objects using the same json generator.
+   Takes writer and options map as arguments.
+   Expects it's body as sequence of write calls.
+   Returns a given writer."
+  `(let [c-wr# ~writer]
+     (binding [*generator* (create-generator c-wr#)
+               *opt-map* ~opt-map]
+       ~@body
+       (.flush *generator*)
+       c-wr#)))
+
+(defn write [obj & [wholeness]]
+  "Write given Clojure object as a piece of data within with-writer.
+   List of wholeness acceptable values:
+   - no value - the same as :all
+   - :all - write object in a regular way with start and end borders
+   - :start - write object with start border only
+   - :start-inner - write object and it's inner object with start border only
+   - :end - write object with end border only."
+  (gen-seq/generate *generator* obj (or (:date-format *opt-map*)
+                                        factory/default-date-format)
+                    (:ex *opt-map*)
+                    (:key-fn *opt-map*)
+                    :wholeness wholeness))
 
 (defn generate-smile
   "Returns a SMILE-encoded byte-array for the given Clojure object.
