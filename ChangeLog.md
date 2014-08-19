@@ -1,6 +1,7 @@
 ## Changes between Cheshire 5.3.2 and 5.3.1
 
 * Add default encoder for java.lang.Character
+* Add sequention write support
 
 ## Changes between Cheshire 5.3.1 and 5.3.0
 

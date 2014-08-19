@@ -79,19 +79,21 @@
        (.flush *generator*)
        c-wr#)))
 
-(defn write [obj & [wholeness]]
+(defn write
   "Write given Clojure object as a piece of data within with-writer.
-   List of wholeness acceptable values:
-   - no value - the same as :all
-   - :all - write object in a regular way with start and end borders
-   - :start - write object with start border only
-   - :start-inner - write object and it's inner object with start border only
-   - :end - write object with end border only."
-  (gen-seq/generate *generator* obj (or (:date-format *opt-map*)
-                                        factory/default-date-format)
-                    (:ex *opt-map*)
-                    (:key-fn *opt-map*)
-                    :wholeness wholeness))
+  List of wholeness acceptable values:
+  - no value - the same as :all
+  - :all - write object in a regular way with start and end borders
+  - :start - write object with start border only
+  - :start-inner - write object and it's inner object with start border only
+  - :end - write object with end border only."
+  ([obj] (write obj nil))
+  ([obj wholeness]
+     (gen-seq/generate *generator* obj (or (:date-format *opt-map*)
+                                           factory/default-date-format)
+                       (:ex *opt-map*)
+                       (:key-fn *opt-map*)
+                       :wholeness wholeness)))
 
 (defn generate-smile
   "Returns a SMILE-encoded byte-array for the given Clojure object.

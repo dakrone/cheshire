@@ -88,7 +88,7 @@
        (write-end-array ~jg ~wholeness))))
 
 (defn generate [^JsonGenerator jg obj ^String date-format
-                    ^Exception ex key-fn & {:keys [wholeness]}]
+                ^Exception ex key-fn & {:keys [wholeness]}]
   (let [wholeness (or wholeness :all)]
     (cond
      (nil? obj) (.writeNull ^JsonGenerator jg)
@@ -127,4 +127,3 @@
                                     (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
                           (write-string ^JsonGenerator jg (.format sdf obj)))
      :else (fail obj jg ex))))
-
