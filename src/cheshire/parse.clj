@@ -1,5 +1,7 @@
 (ns cheshire.parse
-  (:import (com.fasterxml.jackson.core JsonParser JsonToken)))
+  (:import
+    (com.fasterxml.jackson.core JsonParser JsonToken)
+    (clojure.lang PersistentUnrolledVector PersistentUnrolledMap)))
 
 (declare parse*)
 
@@ -16,7 +18,7 @@
   (let [jp (tag jp)]
     `(do
        (.nextToken ~jp)
-       (loop [mmap# (transient {})]
+       (loop [mmap# (transient (PersistentUnrolledMap/create))]
          (if-not (identical? (.getCurrentToken ~jp)
                              JsonToken/END_OBJECT)
            (let [key-str# (.getText ~jp)
@@ -34,7 +36,7 @@
        (.nextToken ~jp)
        (loop [coll# (transient (if ~array-coerce-fn
                                  (~array-coerce-fn array-field-name#)
-                                 []))]
+                                 (PersistentUnrolledVector/create)))]
          (if-not (identical? (.getCurrentToken ~jp)
                              JsonToken/END_ARRAY)
            (let [coll# (conj! coll#

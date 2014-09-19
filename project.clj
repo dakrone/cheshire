@@ -27,7 +27,9 @@
                    :generative :generative
                    :all (constantly true)}
   :plugins [[codox "0.6.3"]]
-  :jvm-opts ["-Xmx512M"
+  :java-source-paths ["java"]
+  :jvm-opts ["-server"
+             "-Xmx512M"
 ;;             "-XX:+PrintCompilation"
 ;;             "-XX:+UnlockDiagnosticVMOptions"
 ;;             "-XX:+PrintInlining"
