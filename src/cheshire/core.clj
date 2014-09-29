@@ -267,10 +267,10 @@
                     key-fn array-coerce-fn))))
 
 ;; aliases for clojure-json users
-(def encode generate-string)
-(def encode-stream generate-stream)
-(def encode-smile generate-smile)
-(def decode parse-string)
-(def decode-strict parse-string-strict)
-(def decode-stream parse-stream)
-(def decode-smile parse-smile)
+(def encode "Alias to generate-string for clojure-json users" generate-string)
+(def encode-stream "Alias to generate-stream for clojure-json users" generate-stream)
+(def encode-smile "Alias to generate-smile for clojure-json users" generate-smile)
+(def decode "Alias to parse-string for clojure-json users" parse-string)
+(def decode-strict "Alias to parse-string-strict for clojure-json users" parse-string-strict)
+(def decode-stream "Alias to parse-stream for clojure-json users" parse-stream)
+(def decode-smile "Alias to parse-smile for clojure-json users" parse-smile)
