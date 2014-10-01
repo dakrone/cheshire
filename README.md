@@ -37,9 +37,13 @@ encoders.
 
 ## Usage
 
-```clojure
-[cheshire "5.3.1"]
+Leiningen dependency information:
 
+```
+[cheshire "5.3.1"]
+```
+
+```clojure
 ;; Cheshire v5.3.1 uses Jackson 2.3.1
 
 ;; In your ns statement:
@@ -78,11 +82,11 @@ encoders.
 
 ;; generate JSON escaping UTF-8
 (generate-string {:foo "It costs £100"} {:escape-non-ascii true})
-;; => "{\"foo\":\"It costs \\u00A3100\"}"
+=> "{\"foo\":\"It costs \\u00A3100\"}"
 
 ;; generate JSON and munge keys with a custom function
 (generate-string {:foo "bar"} {:key-fn (fn [k] (.toUpperCase (name k)))})
-;; => "{\"FOO\":\"bar\"}"
+=> "{\"FOO\":\"bar\"}"
 ```
 
 In the event encoding fails, Cheshire will throw a JsonGenerationException.
@@ -92,18 +96,18 @@ In the event encoding fails, Cheshire will throw a JsonGenerationException.
 ```clojure
 ;; parse some json
 (parse-string "{\"foo\":\"bar\"}")
-;; => {"foo" "bar"}
+=> {"foo" "bar"}
 
 ;; parse some json and get keywords back
 (parse-string "{\"foo\":\"bar\"}" true)
-;; => {:foo "bar"}
+=> {:foo "bar"}
 
 ;; parse some json and munge keywords with a custom function
 (parse-string "{\"foo\":\"bar\"}" (fn [k] (keyword (.toUpperCase k))))
-;; => {:FOO "bar"}
-
+=> {:FOO "bar"}
 
 ;; parse some SMILE (keywords option also supported)
+(def <your-byte-array> (byte-array 0))
 (parse-smile <your-byte-array>)
 
 ;; parse a stream (keywords option also supported)
@@ -113,7 +117,7 @@ In the event encoding fails, Cheshire will throw a JsonGenerationException.
 (parsed-seq (clojure.java.io/reader "/tmp/foo"))
 
 ;; parse a SMILE stream lazily (keywords option also supported)
-(parsed-smile-seq (clojure.java.io/reader "/tmp/foo"))
+;(parsed-smile-seq (clojure.java.io/reader "/tmp/foo"))
 ```
 
 In 2.0.4 and up, Cheshire allows passing in a
@@ -126,7 +130,7 @@ function to specify what kind of types to return, like so:
           (if (= field-name "myset")
             #{}
             [])))
-;; => {:myarray [2 3 3 2], :myset #{1 2}}
+=> {:myarray [2 3 3 2], :myset #{1 2}}
 ```
 The type must be "transient-able", so use either #{} or []
 
@@ -142,9 +146,6 @@ namespace change)
 ;; Custom encoders allow you to swap out the api for the fast
 ;; encoder with one that is slightly slower, but allows custom
 ;; things to be encoded:
-(ns myns
-  (:require [cheshire.core :refer :all]
-            [cheshire.generate :refer [add-encoder encode-str remove-encoder]]))
 
 ;; First, add a custom encoder for a class:
 (add-encoder java.awt.Color
@@ -167,7 +168,7 @@ namespace change)
 
 ;; Then you can use encode from the custom namespace as normal
 (encode (java.awt.Color. 1 2 3))
-;; => "java.awt.Color[r=1,g=2,b=3]"
+=> "\"java.awt.Color[r=1,g=2,b=3]\""
 
 ;; Custom encoders can also be removed:
 (remove-encoder java.awt.Color)
@@ -237,16 +238,13 @@ Doubles will be used unless the `*use-bigdecimals?*` symbol is bound
 to true:
 
 ```clojure
-(ns foo.bar
-  (require [cheshire.core :as json]
-           [cheshire.parse :as parse]))
 
-(json/decode "111111111111111111111111111111111.111111111111111111111111111111111111")
-;; => 1.1111111111111112E32 (a Double)
+(decode "111111111111111111111111111111111.111111111111111111111111111111111111")
+=> 1.1111111111111112E32 ; (a Double)
 
-(binding [parse/*use-bigdecimals?* true]
-  (json/decode "111111111111111111111111111111111.111111111111111111111111111111111111"))
-;; => 111111111111111111111111111111111.111111111111111111111111111111111111M (a BigDecimal)
+(binding [cheshire.parse/*use-bigdecimals?* true]
+  (decode "111111111111111111111111111111111.111111111111111111111111111111111111"))
+=> 111111111111111111111111111111111.111111111111111111111111111111111111M ; (a BigDecimal)
 ```
 
 - Replacing default encoders for builtin types
@@ -301,13 +299,10 @@ for a list of features that can be customized if desired. A custom
 factory can be used like so:
 
 ```clojure
-(ns myns
-  (:require [cheshire.core :as core]
-            [cheshire.factory :as factory]))
 
-(binding [factory/*json-factory* (factory/make-json-factory
-                                  {:allow-non-numeric-numbers true})]
-  (json/decode "{\"foo\":NaN}" true))))))
+(binding [cheshire.factory/*json-factory* (cheshire.factory/make-json-factory
+                                          {:allow-non-numeric-numbers true})]
+  (decode "{\"foo\":NaN}" true))
 ```
 
 See the `default-factory-options` map in

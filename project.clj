@@ -10,7 +10,11 @@
                  [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.4.1"]
                  [tigris "0.1.1"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.6.0"]
-                                  [org.clojure/test.generative "0.1.4"]]}
+                                  [org.clojure/test.generative "0.1.4"]
+                                  [org.clojure/tools.namespace "0.2.5"]
+                                  [midje "1.6.3"]]
+                   :plugins [[lein-midje "3.1.3"]
+                             [midje-readme "1.0.2"]]}
              :1.2 {:dependencies [[org.clojure/clojure "1.2.1"]]}
              :1.3 {:dependencies [[org.clojure/clojure "1.3.0"]]}
              :1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
@@ -19,6 +23,7 @@
                          :dependencies [[criterium "0.4.3"]
                                         [org.clojure/data.json "0.2.5"]
                                         [clj-json "0.5.3"]]}}
+  :midje-readme {:require "[cheshire.core :refer :all] [cheshire.generate :refer [add-encoder encode-str remove-encoder]]"}
   :aliases {"all" ["with-profile" "dev,1.3:dev,1.4:dev,1.5:dev"]
             "benchmark" ["with-profile" "dev,benchmark" "test"]
             "core-bench" ["with-profile" "dev,benchmark" "test" ":only"

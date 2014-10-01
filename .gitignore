@@ -9,3 +9,4 @@ pom.xml*
 doc*
 .lein*
 .nrepl*
+test/readme.clj
