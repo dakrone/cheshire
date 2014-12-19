@@ -9,7 +9,7 @@
                                        JsonGenerator$Feature)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (java.io StringWriter StringReader BufferedReader BufferedWriter
-                    ByteArrayOutputStream)))
+                    ByteArrayOutputStream OutputStream Reader Writer)))
 
 ;; Generators
 (defn ^String generate-string
@@ -18,22 +18,23 @@
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   ([obj]
-     (generate-string obj nil))
+   (generate-string obj nil))
   ([obj opt-map]
-     (let [sw (StringWriter.)
-           generator (.createJsonGenerator
-                      ^JsonFactory (or factory/*json-factory*
-                                       factory/json-factory) sw)]
-       (when (:pretty opt-map)
-         (.useDefaultPrettyPrinter generator))
-       (when (:escape-non-ascii opt-map)
-         (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
-       (gen/generate generator obj
-                     (or (:date-format opt-map) factory/default-date-format)
-                     (:ex opt-map)
-                     (:key-fn opt-map))
-       (.flush generator)
-       (.toString sw))))
+   (let [sw (StringWriter.)
+         generator (.createGenerator
+                    ^JsonFactory (or factory/*json-factory*
+                                     factory/json-factory)
+                    ^Writer sw)]
+     (when (:pretty opt-map)
+       (.useDefaultPrettyPrinter generator))
+     (when (:escape-non-ascii opt-map)
+       (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
+     (gen/generate generator obj
+                   (or (:date-format opt-map) factory/default-date-format)
+                   (:ex opt-map)
+                   (:key-fn opt-map))
+     (.flush generator)
+     (.toString sw))))
 
 (defn ^String generate-stream
   "Returns a BufferedWriter for the given Clojure object with the.
@@ -42,27 +43,29 @@
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   ([obj ^BufferedWriter writer]
-     (generate-stream obj writer nil))
+   (generate-stream obj writer nil))
   ([obj ^BufferedWriter writer opt-map]
-     (let [generator (.createJsonGenerator
-                      ^JsonFactory (or factory/*json-factory*
-                                       factory/json-factory) writer)]
-       (when (:pretty opt-map)
-         (.useDefaultPrettyPrinter generator))
-       (when (:escape-non-ascii opt-map)
-         (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
-       (gen/generate generator obj (or (:date-format opt-map)
-                                       factory/default-date-format)
-                     (:ex opt-map)
-                     (:key-fn opt-map))
-       (.flush generator)
-       writer)))
+   (let [generator (.createGenerator
+                    ^JsonFactory (or factory/*json-factory*
+                                     factory/json-factory)
+                    ^Writer writer)]
+     (when (:pretty opt-map)
+       (.useDefaultPrettyPrinter generator))
+     (when (:escape-non-ascii opt-map)
+       (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
+     (gen/generate generator obj (or (:date-format opt-map)
+                                     factory/default-date-format)
+                   (:ex opt-map)
+                   (:key-fn opt-map))
+     (.flush generator)
+     writer)))
 
 (defn create-generator [writer]
   "Returns JsonGenerator for given writer."
-  (.createJsonGenerator
+  (.createGenerator
    ^JsonFactory (or factory/*json-factory*
-                    factory/json-factory) writer))
+                    factory/json-factory)
+   ^Writer writer))
 
 (def ^:dynamic ^JsonGenerator *generator*)
 (def ^:dynamic *opt-map*)
@@ -89,11 +92,11 @@
   - :end - write object with end border only."
   ([obj] (write obj nil))
   ([obj wholeness]
-     (gen-seq/generate *generator* obj (or (:date-format *opt-map*)
-                                           factory/default-date-format)
-                       (:ex *opt-map*)
-                       (:key-fn *opt-map*)
-                       :wholeness wholeness)))
+   (gen-seq/generate *generator* obj (or (:date-format *opt-map*)
+                                         factory/default-date-format)
+                     (:ex *opt-map*)
+                     (:key-fn *opt-map*)
+                     :wholeness wholeness)))
 
 (defn generate-smile
   "Returns a SMILE-encoded byte-array for the given Clojure object.
@@ -101,19 +104,19 @@
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   ([obj]
-     (generate-smile obj nil))
+   (generate-smile obj nil))
   ([obj opt-map]
-     (let [baos (ByteArrayOutputStream.)
-           generator (.createJsonGenerator ^SmileFactory
-                                           (or factory/*smile-factory*
-                                               factory/smile-factory)
-                                           baos)]
-       (gen/generate generator obj (or (:date-format opt-map)
-                                       factory/default-date-format)
-                     (:ex opt-map)
-                     (:key-fn opt-map))
-       (.flush generator)
-       (.toByteArray baos))))
+   (let [baos (ByteArrayOutputStream.)
+         generator (.createGenerator ^SmileFactory
+                                     (or factory/*smile-factory*
+                                         factory/smile-factory)
+                                     ^OutputStream baos)]
+     (gen/generate generator obj (or (:date-format opt-map)
+                                     factory/default-date-format)
+                   (:ex opt-map)
+                   (:key-fn opt-map))
+     (.flush generator)
+     (.toByteArray baos))))
 
 (defn generate-cbor
   "Returns a CBOR-encoded byte-array for the given Clojure object.
@@ -121,19 +124,19 @@
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   ([obj]
-     (generate-cbor obj nil))
+   (generate-cbor obj nil))
   ([obj opt-map]
-     (let [baos (ByteArrayOutputStream.)
-           generator (.createJsonGenerator ^CBORFactory
-                                           (or factory/*cbor-factory*
-                                               factory/cbor-factory)
-                                           baos)]
-       (gen/generate generator obj (or (:date-format opt-map)
-                                       factory/default-date-format)
-                     (:ex opt-map)
-                     (:key-fn opt-map))
-       (.flush generator)
-       (.toByteArray baos))))
+   (let [baos (ByteArrayOutputStream.)
+         generator (.createGenerator ^CBORFactory
+                                     (or factory/*cbor-factory*
+                                         factory/cbor-factory)
+                                     ^OutputStream baos)]
+     (gen/generate generator obj (or (:date-format opt-map)
+                                     factory/default-date-format)
+                   (:ex opt-map)
+                   (:key-fn opt-map))
+     (.flush generator)
+     (.toByteArray baos))))
 
 ;; Parsers
 (defn parse-string
@@ -146,12 +149,12 @@
   ([string] (parse-string string nil nil))
   ([string key-fn] (parse-string string key-fn nil))
   ([^String string key-fn array-coerce-fn]
-     (when string
-       (parse/parse
-        (.createJsonParser ^JsonFactory (or factory/*json-factory*
-                                            factory/json-factory)
-                           (StringReader. string))
-        key-fn nil array-coerce-fn))))
+   (when string
+     (parse/parse
+      (.createParser ^JsonFactory (or factory/*json-factory*
+                                      factory/json-factory)
+                     ^Reader (StringReader. string))
+      key-fn nil array-coerce-fn))))
 
 ;; Parsing strictly
 (defn parse-string-strict
@@ -166,12 +169,12 @@
   ([string] (parse-string-strict string nil nil))
   ([string key-fn] (parse-string-strict string key-fn nil))
   ([^String string key-fn array-coerce-fn]
-     (when string
-       (parse/parse-strict
-        (.createJsonParser ^JsonFactory (or factory/*json-factory*
-                                            factory/json-factory)
-                           (StringReader. string))
-        key-fn nil array-coerce-fn))))
+   (when string
+     (parse/parse-strict
+      (.createParser ^JsonFactory (or factory/*json-factory*
+                                      factory/json-factory)
+                     ^Writer (StringReader. string))
+      key-fn nil array-coerce-fn))))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
@@ -185,11 +188,12 @@
   ([rdr] (parse-stream rdr nil nil))
   ([rdr key-fn] (parse-stream rdr key-fn nil))
   ([^BufferedReader rdr key-fn array-coerce-fn]
-     (when rdr
-       (parse/parse
-        (.createJsonParser ^JsonFactory (or factory/*json-factory*
-                                            factory/json-factory) rdr)
-        key-fn nil array-coerce-fn))))
+   (when rdr
+     (parse/parse
+      (.createParser ^JsonFactory (or factory/*json-factory*
+                                      factory/json-factory)
+                     ^Reader rdr)
+      key-fn nil array-coerce-fn))))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
@@ -201,11 +205,11 @@
   ([bytes] (parse-smile bytes nil nil))
   ([bytes key-fn] (parse-smile bytes key-fn nil))
   ([^bytes bytes key-fn array-coerce-fn]
-     (when bytes
-       (parse/parse
-        (.createJsonParser ^SmileFactory (or factory/*smile-factory*
-                                             factory/smile-factory) bytes)
-        key-fn nil array-coerce-fn))))
+   (when bytes
+     (parse/parse
+      (.createParser ^SmileFactory (or factory/*smile-factory*
+                                       factory/smile-factory) bytes)
+      key-fn nil array-coerce-fn))))
 
 (defn parse-cbor
   "Returns the Clojure object corresponding to the given CBOR-encoded bytes.
@@ -217,11 +221,11 @@
   ([bytes] (parse-cbor bytes nil nil))
   ([bytes key-fn] (parse-cbor bytes key-fn nil))
   ([^bytes bytes key-fn array-coerce-fn]
-     (when bytes
-       (parse/parse
-        (.createJsonParser ^CBORFactory (or factory/*cbor-factory*
-                                            factory/cbor-factory) bytes)
-        key-fn nil array-coerce-fn))))
+   (when bytes
+     (parse/parse
+      (.createParser ^CBORFactory (or factory/*cbor-factory*
+                                      factory/cbor-factory) bytes)
+      key-fn nil array-coerce-fn))))
 
 (def ^{:doc "Object used to determine end of lazy parsing attempt."}
   eof (Object.))
@@ -245,11 +249,12 @@
   ([reader] (parsed-seq reader nil nil))
   ([reader key-fn] (parsed-seq reader key-fn nil))
   ([^BufferedReader reader key-fn array-coerce-fn]
-     (when reader
-       (parsed-seq* (.createJsonParser ^JsonFactory
-                                       (or factory/*json-factory*
-                                           factory/json-factory) reader)
-                    key-fn array-coerce-fn))))
+   (when reader
+     (parsed-seq* (.createParser ^JsonFactory
+                                 (or factory/*json-factory*
+                                     factory/json-factory)
+                                 ^Reader reader)
+                  key-fn array-coerce-fn))))
 
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
@@ -260,11 +265,12 @@
   ([reader] (parsed-smile-seq reader nil nil))
   ([reader key-fn] (parsed-smile-seq reader key-fn nil))
   ([^BufferedReader reader key-fn array-coerce-fn]
-     (when reader
-       (parsed-seq* (.createJsonParser ^SmileFactory
-                                       (or factory/*smile-factory*
-                                           factory/smile-factory) reader)
-                    key-fn array-coerce-fn))))
+   (when reader
+     (parsed-seq* (.createParser ^SmileFactory
+                                 (or factory/*smile-factory*
+                                     factory/smile-factory)
+                                 ^Reader reader)
+                  key-fn array-coerce-fn))))
 
 ;; aliases for clojure-json users
 (def encode "Alias to generate-string for clojure-json users" generate-string)
