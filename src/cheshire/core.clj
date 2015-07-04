@@ -145,7 +145,10 @@
   false to leave them as strings, or a function to provide custom coercion.
 
   The array-coerce-fn is an optional function taking the name of an array field,
-  and returning the collection to be used for array values."
+  and returning the collection to be used for array values.
+
+  If the top-level object is an array, it will be parsed lazily (use
+  `parse-strict' if strict parsing is required for top-level arrays."
   ([string] (parse-string string nil nil))
   ([string key-fn] (parse-string string key-fn nil))
   ([^String string key-fn array-coerce-fn]
@@ -184,7 +187,12 @@
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
-  If laziness is needed, see parsed-seq."
+
+  If the top-level object is an array, it will be parsed lazily (use
+  `parse-strict' if strict parsing is required for top-level arrays.
+
+  If multiple objects (enclosed in a top-level `{}' need to be parsed lazily,
+  see parsed-seq."
   ([rdr] (parse-stream rdr nil nil))
   ([rdr key-fn] (parse-stream rdr key-fn nil))
   ([^BufferedReader rdr key-fn array-coerce-fn]
