@@ -5,6 +5,7 @@
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
            (java.math BigInteger)
+           (java.time OffsetDateTime)
            (clojure.lang IPersistentCollection Keyword Ratio Symbol)))
 
 ;; date format rebound for custom encoding
@@ -141,6 +142,7 @@
    (i? Date obj) (let [sdf (doto (SimpleDateFormat. date-format)
                              (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
                    (write-string ^JsonGenerator jg (.format sdf obj)))
+   (i? OffsetDateTime obj) (write-string ^JsonGenerator jg (.toString obj))
    (i? Timestamp obj) (let [date (Date. (.getTime ^Timestamp obj))
                             sdf (doto (SimpleDateFormat. date-format)
                                   (.setTimeZone (SimpleTimeZone. 0 "UTC")))]

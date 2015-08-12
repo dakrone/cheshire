@@ -7,6 +7,7 @@
   (:import (com.fasterxml.jackson.core JsonGenerator JsonGenerationException)
            (java.util Date Map List Set SimpleTimeZone UUID)
            (java.sql Timestamp)
+           (java.time OffsetDateTime)
            (java.text SimpleDateFormat)
            (java.math BigInteger)
            (clojure.lang IPersistentCollection Keyword Ratio Symbol)))
@@ -122,6 +123,7 @@
      (i? Date obj) (let [sdf (doto (SimpleDateFormat. date-format)
                                (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
                      (write-string ^JsonGenerator jg (.format sdf obj)))
+     (i? OffsetDateTime obj) (write-string ^JsonGenerator jg (.toString obj))
      (i? Timestamp obj) (let [date (Date. (.getTime ^Timestamp obj))
                               sdf (doto (SimpleDateFormat. date-format)
                                     (.setTimeZone (SimpleTimeZone. 0 "UTC")))]

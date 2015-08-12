@@ -213,6 +213,7 @@ Cheshire encoding supports:
 
 ### Java classes
 - Date
+- java.time.OffsetDateTime
 - UUID
 - java.sql.Timestamp
 - any java.util.Set
