@@ -37,9 +37,9 @@
      (.toString sw))))
 
 (defn ^String generate-stream
-  "Returns a BufferedWriter for the given Clojure object with the.
-  JSON-encoded data written to the writer. Takes an optional date
-  format string that Date objects will be encoded with.
+  "Returns a BufferedWriter for the given Clojure object with the JSON-encoded
+  data written to the writer. Takes an optional date format string that Date
+  objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
   ([obj ^BufferedWriter writer]
