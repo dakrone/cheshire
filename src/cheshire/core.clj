@@ -11,6 +11,9 @@
            (java.io StringWriter StringReader BufferedReader BufferedWriter
                     ByteArrayOutputStream OutputStream Reader Writer)))
 
+(def default-opts
+  {:date-format factory/default-date-format})
+
 ;; Generators
 (defn ^String generate-string
   "Returns a JSON-encoding String for the given Clojure object. Takes an
@@ -29,10 +32,7 @@
        (.useDefaultPrettyPrinter generator))
      (when (:escape-non-ascii opt-map)
        (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
-     (gen/generate generator obj
-                   (or (:date-format opt-map) factory/default-date-format)
-                   (:ex opt-map)
-                   (:key-fn opt-map))
+     (gen/generate generator obj (merge default-opts opt-map))
      (.flush generator)
      (.toString sw))))
 
@@ -53,10 +53,7 @@
        (.useDefaultPrettyPrinter generator))
      (when (:escape-non-ascii opt-map)
        (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
-     (gen/generate generator obj (or (:date-format opt-map)
-                                     factory/default-date-format)
-                   (:ex opt-map)
-                   (:key-fn opt-map))
+     (gen/generate generator obj (merge default-opts opt-map))
      (.flush generator)
      writer)))
 
@@ -92,11 +89,8 @@
   - :end - write object with end border only."
   ([obj] (write obj nil))
   ([obj wholeness]
-   (gen-seq/generate *generator* obj (or (:date-format *opt-map*)
-                                         factory/default-date-format)
-                     (:ex *opt-map*)
-                     (:key-fn *opt-map*)
-                     :wholeness wholeness)))
+   (gen-seq/generate *generator* obj (assoc (merge default-opts *opt-map*)
+                                            :wholeness wholeness))))
 
 (defn generate-smile
   "Returns a SMILE-encoded byte-array for the given Clojure object.
@@ -111,10 +105,7 @@
                                      (or factory/*smile-factory*
                                          factory/smile-factory)
                                      ^OutputStream baos)]
-     (gen/generate generator obj (or (:date-format opt-map)
-                                     factory/default-date-format)
-                   (:ex opt-map)
-                   (:key-fn opt-map))
+     (gen/generate generator obj (merge default-opts opt-map))
      (.flush generator)
      (.toByteArray baos))))
 
@@ -131,10 +122,7 @@
                                      (or factory/*cbor-factory*
                                          factory/cbor-factory)
                                      ^OutputStream baos)]
-     (gen/generate generator obj (or (:date-format opt-map)
-                                     factory/default-date-format)
-                   (:ex opt-map)
-                   (:key-fn opt-map))
+     (gen/generate generator obj (merge default-opts opt-map))
      (.flush generator)
      (.toByteArray baos))))
 
