@@ -73,7 +73,7 @@
 (defmacro with-writer [[writer opt-map] & body]
   "Start writing for series objects using the same json generator.
    Takes writer and options map as arguments.
-   Expects it's body as sequence of write calls.
+   Expects its body as sequence of write calls.
    Returns a given writer."
   `(let [c-wr# ~writer]
      (binding [*generator* (create-generator c-wr#)
@@ -88,7 +88,7 @@
   - no value - the same as :all
   - :all - write object in a regular way with start and end borders
   - :start - write object with start border only
-  - :start-inner - write object and it's inner object with start border only
+  - :start-inner - write object and its inner object with start border only
   - :end - write object with end border only."
   ([obj] (write obj nil))
   ([obj wholeness]
