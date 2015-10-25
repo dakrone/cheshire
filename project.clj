@@ -16,12 +16,13 @@
              :1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
              :1.5 {:dependencies [[org.clojure/clojure "1.5.1"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
+             :1.8 {:dependencies [[org.clojure/clojure "1.8.0-beta1"]]}
              :benchmark {:test-paths ["benchmarks"]
                          :jvm-opts ^:replace ["-Xms1g" "-Xmx1g" "-server"]
                          :dependencies [[criterium "0.4.3"]
                                         [org.clojure/data.json "0.2.6"]
                                         [clj-json "0.5.3"]]}}
-  :aliases {"all" ["with-profile" "dev,1.3:dev,1.4:dev,1.5:dev,1.7:dev"]
+  :aliases {"all" ["with-profile" "dev,1.3:dev,1.4:dev,1.5:dev,1.7:dev,1.8:dev"]
             "benchmark" ["with-profile" "dev,benchmark" "test"]
             "core-bench" ["with-profile" "dev,benchmark" "test" ":only"
                           "cheshire.test.benchmark/t-bench-core"]}
