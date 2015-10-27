@@ -67,6 +67,7 @@
     JsonToken/VALUE_NUMBER_FLOAT (if bd?
                                    (.getDecimalValue jp)
                                    (.getNumberValue jp))
+    JsonToken/VALUE_EMBEDDED_OBJECT (.getBinaryValue jp)
     JsonToken/VALUE_TRUE true
     JsonToken/VALUE_FALSE false
     JsonToken/VALUE_NULL nil
