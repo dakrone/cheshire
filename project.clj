@@ -16,7 +16,7 @@
              :1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
              :1.5 {:dependencies [[org.clojure/clojure "1.5.1"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
-             :1.8 {:dependencies [[org.clojure/clojure "1.8.0-beta1"]]}
+             :1.8 {:dependencies [[org.clojure/clojure "1.8.0-RC4"]]}
              :benchmark {:test-paths ["benchmarks"]
                          :jvm-opts ^:replace ["-Xms1g" "-Xmx1g" "-server"]
                          :dependencies [[criterium "0.4.3"]
