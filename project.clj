@@ -5,9 +5,9 @@
             :url "http://opensource.org/licenses/MIT"
             :distribution :repo}
   :global-vars {*warn-on-reflection* false}
-  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.6.3"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.6.3"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.6.3"]
+  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.6.4"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.6.4"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.6.4"]
                  [tigris "0.1.1"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.6.0"]
                                   [org.clojure/test.generative "0.1.4"]]}
