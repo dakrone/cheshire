@@ -36,7 +36,7 @@
      (.flush generator)
      (.toString sw))))
 
-(defn ^String generate-stream
+(defn ^BufferedWriter generate-stream
   "Returns a BufferedWriter for the given Clojure object with the JSON-encoded
   data written to the writer. Takes an optional date format string that Date
   objects will be encoded with.
