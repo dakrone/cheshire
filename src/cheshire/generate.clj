@@ -108,6 +108,11 @@
   ;;(println :inst? k obj)
   `(instance? ~k ~obj))
 
+(defn byte-array? [o]
+  (let [c (class o)]
+    (and (.isArray c)
+         (identical? (.getComponentType c) Byte/TYPE))))
+
 (defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex key-fn]
   (cond
    (nil? obj) (.writeNull ^JsonGenerator jg)
@@ -128,6 +133,7 @@
      clojure.lang.Associative
      (generate-map jg obj date-format ex key-fn))
 
+   (byte-array? obj) (.writeBinary ^JsonGenerator jg ^bytes obj)
    (i? Number obj) (number-dispatch ^JsonGenerator jg obj ex)
    (i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
    (i? String obj) (write-string ^JsonGenerator jg ^String obj)
