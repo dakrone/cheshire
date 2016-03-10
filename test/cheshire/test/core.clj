@@ -106,6 +106,17 @@
 (deftest test-smile-round-trip
   (is (= test-obj (json/parse-smile (json/generate-smile test-obj)))))
 
+(def bin-obj {"byte-array" (byte-array (map byte [1 2 3]))})
+
+(deftest test-round-trip-binary
+  (for [[p g] {json/parse-string json/generate-string
+               json/parse-smile  json/generate-smile
+               json/parse-cbor   json/generate-cbor}]
+    (is (let [roundtripped (p (g bin-obj))]
+          ;; test value equality
+          (= (->> bin-obj (get "byte-array") seq)
+             (->> roundtripped (get "byte-array") seq))))))
+
 (deftest test-aliases
   (is (= {"foo" "bar" "1" "bat" "2" "bang" "3" "biz"}
          (json/decode

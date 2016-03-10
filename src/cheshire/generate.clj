@@ -108,6 +108,11 @@
   ;;(println :inst? k obj)
   `(instance? ~k ~obj))
 
+(defn byte-array? [o]
+  (let [c (class o)]
+    (and (.isArray c)
+         (identical? (.getComponentType c) Byte/TYPE))))
+
 (defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex key-fn]
   (cond
    (nil? obj) (.writeNull ^JsonGenerator jg)
@@ -136,6 +141,7 @@
    (i? Map obj) (generate-map jg obj date-format ex key-fn)
    (i? List obj) (generate-array jg obj date-format ex key-fn)
    (i? Set obj) (generate-array jg obj date-format ex key-fn)
+   (byte-array? obj) (.writeBinary ^JsonGenerator jg ^bytes obj)
    (i? UUID obj) (write-string ^JsonGenerator jg (.toString ^UUID obj))
    (i? Symbol obj) (write-string ^JsonGenerator jg (.toString ^Symbol obj))
    (i? Date obj) (let [sdf (doto (SimpleDateFormat. date-format)
