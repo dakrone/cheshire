@@ -6,10 +6,65 @@
             [cheshire.parse :as parse])
   (:import (com.fasterxml.jackson.core JsonParser JsonFactory
                                        JsonGenerator
+                                       PrettyPrinter
                                        JsonGenerator$Feature)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (java.io StringWriter StringReader BufferedReader BufferedWriter
                     ByteArrayOutputStream OutputStream Reader Writer)))
+
+(defn- indent
+  [level indentation]
+  (let [tab (apply str (repeat indentation " "))
+        tabs (apply str (repeat level tab))]
+    (str "\n" tabs)))
+
+(defn ^PrettyPrinter generate-pretty-printer
+  "Generates a pretty printer instance from
+  a map with flags"
+  [options]
+  (let [defaults {:indentation 2
+                  :indent-arrays? true
+                  :array-value-separator ", " ; used when not indent-arrays?
+                  :object-key-value-separator " : "}
+        level (atom 0)
+        {:keys [indentation
+                indent-arrays?
+                array-value-separator
+                object-key-value-separator]} (merge defaults options)]
+    (reify PrettyPrinter
+      (writeStartArray [_ gen]
+        (.writeRaw gen "[")
+        (swap! level inc))
+      (beforeArrayValues [_ gen]
+        (if indent-arrays?
+          (.writeRaw gen (indent @level indentation))
+          (.writeRaw gen "")))
+      (writeArrayValueSeparator [_ gen]
+        (if indent-arrays?
+          (.writeRaw gen (str "," (indent @level indentation)))
+          (.writeRaw gen array-value-separator)))
+      (writeEndArray [_ gen _]
+        (swap! level dec)
+        (if indent-arrays?
+          (.writeRaw gen (str (indent @level indentation) "]"))
+          (.writeRaw gen "]")))
+
+      (writeStartObject [_ gen]
+        (.writeRaw gen "{")
+        (swap! level inc)
+        (.writeRaw gen (indent @level indentation)))
+      (beforeObjectEntries [_ gen]
+        (.writeRaw gen ""))
+      (writeObjectFieldValueSeparator [_ gen]
+        (.writeRaw gen object-key-value-separator))
+      (writeObjectEntrySeparator [_ gen]
+        (.writeRaw gen (str "," (indent @level indentation))))
+      (writeEndObject [_ gen _]
+        (swap! level dec)
+        (.writeRaw gen (str (indent @level indentation) "}")))
+
+      (writeRootValueSeparator [_ jg]
+        (.writeRaw jg "")))))
 
 ;; Generators
 (defn ^String generate-string
@@ -21,12 +76,20 @@
    (generate-string obj nil))
   ([obj opt-map]
    (let [sw (StringWriter.)
+         print-pretty (:pretty opt-map)
          generator (.createGenerator
                     ^JsonFactory (or factory/*json-factory*
                                      factory/json-factory)
                     ^Writer sw)]
-     (when (:pretty opt-map)
-       (.useDefaultPrettyPrinter generator))
+     (when print-pretty
+        (if (= print-pretty true)
+          ; pretty = true uses default pretty printer
+          (.useDefaultPrettyPrinter generator)
+          ; else we construct a custom pretty printer
+          (.setPrettyPrinter generator
+                             (generate-pretty-printer (if (map? print-pretty)
+                                                          print-pretty
+                                                          {})))))
      (when (:escape-non-ascii opt-map)
        (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
      (gen/generate generator obj
