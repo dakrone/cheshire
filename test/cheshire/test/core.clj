@@ -252,31 +252,42 @@
          (json/encode (sorted-map :foo 1 :bar [{:baz 2} :quux [1 2 3]])
                       {:pretty true}))))
 
-(deftest t-custom-pretty-print
+(deftest t-custom-pretty-print-with-defaults
   (let [test-obj {:foo 1 :bar {:baz [{:ulu "mulu"} {:moot "foo"} 3]} :quux "blub"}
-        test-opts {:pretty {:indentation 4 :object-key-value-separator ": "}}
+        pretty-str-default (json/encode test-obj {:pretty true})
+        pretty-str-custom (json/encode test-obj {:pretty {}})]
+    ; print for easy comparison
+    (println "; default pretty print")
+    (println pretty-str-default)
+    (println "; custom pretty print with default options")
+    (println pretty-str-custom)
+    (is (= pretty-str-default pretty-str-custom))))
+
+(deftest t-custom-pretty-print-with-non-defaults
+  (let [test-obj {:foo 1 :bar {:baz [{:ulu "mulu"} {:moot "foo"} 3]} :quux "blub"}
+        test-opts {:pretty {:indentation 4
+                            :indent-arrays? false
+                            :before-array-values ""
+                            :after-array-values ""
+                            :object-field-value-separator ": "}}
         pretty-str (json/encode test-obj test-opts)]
     ; just to be easy on the eyes in case of error
     (println "; pretty print with options")
     (println (json/encode test-obj
                           test-opts))
     ; actual test
-  (is (= (str "{\n"
-              "    \"bar\": {\n"
-              "        \"baz\": [\n"
-              "            {\n"
-              "                \"ulu\": \"mulu\"\n"
-              "            },\n"
-              "            {\n"
-              "                \"moot\": \"foo\"\n"
-              "            },\n"
-              "            3\n"
-              "        ]\n"
-              "    },\n"
-              "    \"foo\": 1,\n"
-              "    \"quux\": \"blub\"\n"
-              "}")
-          pretty-str))))
+    (is (= (str "{\n"
+                "    \"bar\": {\n"
+                "        \"baz\": [{\n"
+                "            \"ulu\": \"mulu\"\n"
+                "        }, {\n"
+                "            \"moot\": \"foo\"\n"
+                "        }, 3]\n"
+                "    },\n"
+                "    \"foo\": 1,\n"
+                "    \"quux\": \"blub\"\n"
+                "}")
+            pretty-str))))
 
 (deftest t-unicode-escaping
   (is (= "{\"foo\":\"It costs \\u00A3100\"}"
