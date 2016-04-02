@@ -9,67 +9,34 @@
 																			 JsonGenerator
 																			 PrettyPrinter
 																			 JsonGenerator$Feature)
+           (cheshire.prettyprint CustomPrettyPrinter)
 					 (com.fasterxml.jackson.dataformat.smile SmileFactory)
 					 (java.io StringWriter StringReader BufferedReader BufferedWriter
 										ByteArrayOutputStream OutputStream Reader Writer)))
 
-(defn- indent-with-spaces
-	[indentation level]
-	(let [space (apply str (repeat indentation " "))
-				spaces (apply str (repeat level space))]
-		(str "\n" spaces)))
+(def ^:private default-pretty-print-options
+	{:indentation 2
+	 :indent-arrays? false
+	 :indent-objects? true
+	 :before-array-values nil
+	 :after-array-values nil
+	 :object-field-value-separator nil})
 
-(defn- indent-fn
-	[indentation]
-	(partial indent-with-spaces indentation))
-
-(defn- ^PrettyPrinter generate-pretty-printer
-	"Generates a pretty printer instance from
-	a map with flags"
-	[options]
-	(let [defaults {:indentation 2
-									:indent-arrays? true
-									:array-value-separator ", " ; used when not indent-arrays?
-									:object-key-value-separator " : "}
-				level (atom 0)
-				{:keys [indentation
-								indent-arrays?
-								array-value-separator
-								object-key-value-separator]} (merge defaults options)
-				indent (memoize (indent-fn indentation))]
-		(reify PrettyPrinter
-			(writeStartArray [_ gen]
-				(.writeRaw gen "[")
-				(swap! level inc))
-			(beforeArrayValues [_ gen]
-				(if indent-arrays?
-					(.writeRaw gen (indent @level))))
-			(writeArrayValueSeparator [_ gen]
-				(if indent-arrays?
-					(.writeRaw gen (str "," (indent @level)))
-					(.writeRaw gen array-value-separator)))
-			(writeEndArray [_ gen _]
-				(swap! level dec)
-				(if indent-arrays?
-					(.writeRaw gen (str (indent @level) "]"))
-					(.writeRaw gen "]")))
-
-			(writeStartObject [_ gen]
-				(.writeRaw gen "{")
-				(swap! level inc)
-				(.writeRaw gen (indent @level)))
-			(beforeObjectEntries [_ gen]
-				(.writeRaw gen ""))
-			(writeObjectFieldValueSeparator [_ gen]
-				(.writeRaw gen object-key-value-separator))
-			(writeObjectEntrySeparator [_ gen]
-				(.writeRaw gen (str "," (indent @level))))
-			(writeEndObject [_ gen _]
-				(swap! level dec)
-				(.writeRaw gen (str (indent @level) "}")))
-
-			(writeRootValueSeparator [_ jg]
-				(.writeRaw jg "")))))
+(defn- create-pretty-printer
+	 "Returns an instance of CustomPrettyPrinter based on the configuration
+	 provided as argument"
+	 [options]
+	 (let [{:keys [indentation
+								 indent-arrays?
+								 indent-objects?
+								 before-array-values
+								 after-array-values
+								 object-field-value-separator]} (merge default-pretty-print-options options)]
+		(-> (new CustomPrettyPrinter)
+				(.setIndentation indentation indent-objects? indent-arrays?)
+				(.setBeforeArrayValues before-array-values)
+				(.setAfterArrayValues after-array-values)
+				(.setObjectFieldValueSeparator object-field-value-separator))))
 
 ;; Generators
 (defn ^String generate-string
@@ -91,10 +58,7 @@
 					; pretty = true uses default pretty printer
 					(.useDefaultPrettyPrinter generator)
 					; else we construct a custom pretty printer
-					(.setPrettyPrinter generator
-														 (generate-pretty-printer (if (map? print-pretty)
-																													print-pretty
-																													{})))))
+					(.setPrettyPrinter generator (create-pretty-printer print-pretty))))
 		 (when (:escape-non-ascii opt-map)
 			 (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
 		 (gen/generate generator obj
@@ -116,9 +80,14 @@
 	 (let [generator (.createGenerator
 										^JsonFactory (or factory/*json-factory*
 																		 factory/json-factory)
-										^Writer writer)]
-		 (when (:pretty opt-map)
-			 (.useDefaultPrettyPrinter generator))
+										^Writer writer)
+				 print-pretty (:pretty opt-map)]
+		 (when print-pretty
+			 (if (= print-pretty true)
+				 ; pretty = true uses default pretty printer
+				 (.useDefaultPrettyPrinter generator)
+				 ; else we construct a custom pretty printer
+				 (.setPrettyPrinter generator (create-pretty-printer print-pretty))))
 		 (when (:escape-non-ascii opt-map)
 			 (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
 		 (gen/generate generator obj (or (:date-format opt-map)
