@@ -253,7 +253,7 @@
                       {:pretty true}))))
 
 (deftest t-custom-pretty-print-with-defaults
-  (let [test-obj {:foo 1 :bar {:baz [{:ulu "mulu"} {:moot "foo"} 3]} :quux "blub"}
+  (let [test-obj (sorted-map :foo 1 :bar {:baz [{:ulu "mulu"} {:moot "foo"} 3]} :quux :blub)
         pretty-str-default (json/encode test-obj {:pretty true})
         pretty-str-custom (json/encode test-obj {:pretty {}})]
     ; print for easy comparison
@@ -264,7 +264,7 @@
     (is (= pretty-str-default pretty-str-custom))))
 
 (deftest t-custom-pretty-print-with-non-defaults
-  (let [test-obj {:foo 1 :bar {:baz [{:ulu "mulu"} {:moot "foo"} 3]} :quux "blub"}
+  (let [test-obj (sorted-map :foo 1 :bar {:baz [{:ulu "mulu"} {:moot "foo"} 3]} :quux :blub)
         test-opts {:pretty {:indentation 4
                             :indent-arrays? false
                             :before-array-values ""
