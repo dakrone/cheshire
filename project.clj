@@ -33,6 +33,7 @@
                    :generative :generative
                    :all (constantly true)}
   :plugins [[codox "0.6.3"]]
+  :java-source-paths ["src/java"]
   :jvm-opts ["-Xmx512M"
 ;;             "-XX:+PrintCompilation"
 ;;             "-XX:+UnlockDiagnosticVMOptions"
