@@ -26,7 +26,8 @@
 
 (def test-pretty-opts
   {:pretty {:indentation 4
-            :object-key-value-separator ": "}})
+            :indent-arrays? true
+            :object-field-value-separator ": "}})
 
 (def big-test-obj
   (-> "test/all_month.geojson.gz"
@@ -57,8 +58,6 @@
 
 (deftest t-bench-pretty
   (println "------- PrettyPrint Benchmarks ------")
-  (println "........without pretty printer")
-  (bench/bench (core/encode test-obj))
   (println "........default pretty printer")
   (bench/bench (core/encode test-obj {:pretty true}))
   (println "........custom pretty printer")
