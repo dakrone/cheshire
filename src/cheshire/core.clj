@@ -4,97 +4,92 @@
 						[cheshire.generate :as gen]
 						[cheshire.generate-seq :as gen-seq]
 						[cheshire.parse :as parse])
-	(:import (com.fasterxml.jackson.core JsonParser
-                                       JsonFactory
+	(:import (com.fasterxml.jackson.core JsonParser JsonFactory
 																			 JsonGenerator
-																			 PrettyPrinter
 																			 JsonGenerator$Feature)
-           (cheshire.prettyprint CustomPrettyPrinter)
 					 (com.fasterxml.jackson.dataformat.smile SmileFactory)
+					 (cheshire.prettyprint CustomPrettyPrinter)
 					 (java.io StringWriter StringReader BufferedReader BufferedWriter
 										ByteArrayOutputStream OutputStream Reader Writer)))
 
 (def ^:private default-pretty-print-options
-  {:indentation 2
-   :indent-arrays? false
-   :indent-objects? true
-   :before-array-values nil
-   :after-array-values nil
-   :object-field-value-separator nil})
+	{:indentation 2
+	 :indent-arrays? false
+	 :indent-objects? true
+	 :before-array-values nil
+	 :after-array-values nil
+	 :object-field-value-separator nil})
 
 (defn- create-pretty-printer
-  "Returns an instance of CustomPrettyPrinter based on the configuration
-  provided as argument"
-  [options]
-  (let [{:keys [indentation
-                indent-arrays?
-                indent-objects?
-                before-array-values
-                after-array-values
-                object-field-value-separator]} (merge default-pretty-print-options options)]
-    (-> (new CustomPrettyPrinter)
-            (.setIndentation indentation indent-objects? indent-arrays?)
-            (.setBeforeArrayValues before-array-values)
-            (.setAfterArrayValues after-array-values)
-            (.setObjectFieldValueSeparator object-field-value-separator))))
+	"Returns an instance of CustomPrettyPrinter based on the configuration
+	provided as argument"
+	[options]
+	(let [{:keys [indentation
+								indent-arrays?
+								indent-objects?
+								before-array-values
+								after-array-values
+								object-field-value-separator]} (merge default-pretty-print-options options)]
+		(-> (new CustomPrettyPrinter)
+				(.setIndentation indentation indent-objects? indent-arrays?)
+				(.setBeforeArrayValues before-array-values)
+				(.setAfterArrayValues after-array-values)
+				(.setObjectFieldValueSeparator object-field-value-separator))))
 
 ;; Generators
 (defn ^String generate-string
-  "Returns a JSON-encoding String for the given Clojure object. Takes an
-  optional date format string that Date objects will be encoded with.
+	"Returns a JSON-encoding String for the given Clojure object. Takes an
+	optional date format string that Date objects will be encoded with.
 
-  The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  ([obj]
-   (generate-string obj nil))
-  ([obj opt-map]
-   (let [sw (StringWriter.)
-         print-pretty (:pretty opt-map)
-         generator (.createGenerator
-                    ^JsonFactory (or factory/*json-factory*
-                                     factory/json-factory)
-                    ^Writer sw)]
-    (when print-pretty
-      (if (= print-pretty true)
-        ; pretty = true uses default pretty printer
-        (.useDefaultPrettyPrinter generator)
-        ; else we construct a custom pretty printer
-        (.setPrettyPrinter generator (create-pretty-printer print-pretty))))
-    (when (:escape-non-ascii opt-map)
-      (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
-    (gen/generate generator obj
-                  (or (:date-format opt-map) factory/default-date-format)
-                  (:ex opt-map)
-                  (:key-fn opt-map))
-    (.flush generator)
-    (.toString sw))))
+	The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
+	([obj]
+	 (generate-string obj nil))
+	([obj opt-map]
+	 (let [sw (StringWriter.)
+				 generator (.createGenerator
+										^JsonFactory (or factory/*json-factory*
+																		 factory/json-factory)
+										^Writer sw)
+				 print-pretty (:pretty opt-map)]
+		 (when print-pretty
+			 (if (= true print-pretty)
+				 (.useDefaultPrettyPrinter generator)
+				 (.setPrettyPrinter generator (create-pretty-printer print-pretty))))
+		 (when (:escape-non-ascii opt-map)
+			 (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
+		 (gen/generate generator obj
+									 (or (:date-format opt-map) factory/default-date-format)
+									 (:ex opt-map)
+									 (:key-fn opt-map))
+		 (.flush generator)
+		 (.toString sw))))
 
 (defn ^BufferedWriter generate-stream
-  "Returns a BufferedWriter for the given Clojure object with the JSON-encoded
-  data written to the writer. Takes an optional date format string that Date
-  objects will be encoded with.
+	"Returns a BufferedWriter for the given Clojure object with the JSON-encoded
+	data written to the writer. Takes an optional date format string that Date
+	objects will be encoded with.
 
-  The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  ([obj ^BufferedWriter writer]
-   (generate-stream obj writer nil))
-  ([obj ^BufferedWriter writer opt-map]
-   (let [generator (.createGenerator
-                    ^JsonFactory (or factory/*json-factory*
-                                                     factory/json-factory)
-                    ^Writer writer)
-         print-pretty (:pretty opt-map)]
-     (when print-pretty
-       (if (= print-pretty true)
-           ; pretty = true uses default pretty printer
-           (.useDefaultPrettyPrinter generator)
-           ; else we construct a custom pretty printer
-           (.setPrettyPrinter generator (create-pretty-printer print-pretty))))
-     (when (:escape-non-ascii opt-map)
-       (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
-     (gen/generate generator obj (or (:date-format opt-map) factory/default-date-format)
-                                     (:ex opt-map)
-                                     (:key-fn opt-map))
-     (.flush generator)
-     writer)))
+	The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
+	([obj ^BufferedWriter writer]
+	 (generate-stream obj writer nil))
+	([obj ^BufferedWriter writer opt-map]
+	 (let [generator (.createGenerator
+										^JsonFactory (or factory/*json-factory*
+																		 factory/json-factory)
+										^Writer writer)
+				 print-pretty (:pretty opt-map)]
+		 (when print-pretty
+			 (if (= true print-pretty)
+				 (.useDefaultPrettyPrinter generator)
+				 (.setPrettyPrinter generator (create-pretty-printer print-pretty))))
+		 (when (:escape-non-ascii opt-map)
+			 (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
+		 (gen/generate generator obj (or (:date-format opt-map)
+																		 factory/default-date-format)
+									 (:ex opt-map)
+									 (:key-fn opt-map))
+		 (.flush generator)
+		 writer)))
 
 (defn create-generator [writer]
 	"Returns JsonGenerator for given writer."
