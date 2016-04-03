@@ -252,6 +252,11 @@
          (json/encode (sorted-map :foo 1 :bar [{:baz 2} :quux [1 2 3]])
                       {:pretty true}))))
 
+(deftest t-pretty-print-illegal-argument
+  ; just expecting this not to throw
+  (json/encode {:foo "bar"}
+               {:pretty []}))
+
 (deftest t-custom-pretty-print-with-defaults
   (let [test-obj (sorted-map :foo 1 :bar {:baz [{:ulu "mulu"} {:moot "foo"} 3]} :quux :blub)
         pretty-str-default (json/encode test-obj {:pretty true})

@@ -51,10 +51,10 @@
                                      factory/json-factory)
                     ^Writer sw)
          print-pretty (:pretty opt-map)]
-     (when print-pretty
-       (if (= true print-pretty)
-         (.useDefaultPrettyPrinter generator)
-         (.setPrettyPrinter generator (create-pretty-printer print-pretty))))
+     (when (= true print-pretty)
+       (.useDefaultPrettyPrinter generator))
+     (when (map? print-pretty)
+       (.setPrettyPrinter generator (create-pretty-printer print-pretty)))
      (when (:escape-non-ascii opt-map)
        (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
      (gen/generate generator obj
@@ -78,10 +78,10 @@
                                      factory/json-factory)
                     ^Writer writer)
          print-pretty (:pretty opt-map)]
-     (when print-pretty
-       (if (= true print-pretty)
-         (.useDefaultPrettyPrinter generator)
-         (.setPrettyPrinter generator (create-pretty-printer print-pretty))))
+     (when (= true print-pretty)
+       (.useDefaultPrettyPrinter generator))
+     (when (map? print-pretty)
+       (.setPrettyPrinter generator (create-pretty-printer print-pretty)))
      (when (:escape-non-ascii opt-map)
        (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
      (gen/generate generator obj (or (:date-format opt-map)
