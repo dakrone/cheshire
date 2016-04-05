@@ -261,12 +261,13 @@
   (let [test-obj (sorted-map :foo 1 :bar {:baz [{:ulu "mulu"} {:moot "foo"} 3]} :quux :blub)
         pretty-str-default (json/encode test-obj {:pretty true})
         pretty-str-custom (json/encode test-obj {:pretty {}})]
-    ; print for easy comparison
-    (println "; default pretty print")
-    (println pretty-str-default)
-    (println "; custom pretty print with default options")
-    (println pretty-str-custom)
-    (is (= pretty-str-default pretty-str-custom))))
+    (is (= pretty-str-default pretty-str-custom))
+    (when-not (= pretty-str-default pretty-str-custom)
+      ; print for easy comparison
+      (println "; default pretty print")
+      (println pretty-str-default)
+      (println "; custom pretty print with default options")
+      (println pretty-str-custom))))
 
 (deftest t-custom-pretty-print-with-non-defaults
   (let [test-obj (sorted-map :foo 1 :bar {:baz [{:ulu "mulu"} {:moot "foo"} 3]} :quux :blub)
@@ -275,24 +276,26 @@
                             :before-array-values ""
                             :after-array-values ""
                             :object-field-value-separator ": "}}
+        expected (str "{\n"
+                      "    \"bar\": {\n"
+                      "        \"baz\": [{\n"
+                      "            \"ulu\": \"mulu\"\n"
+                      "        }, {\n"
+                      "            \"moot\": \"foo\"\n"
+                      "        }, 3]\n"
+                      "    },\n"
+                      "    \"foo\": 1,\n"
+                      "    \"quux\": \"blub\"\n"
+                      "}")
         pretty-str (json/encode test-obj test-opts)]
+
     ; just to be easy on the eyes in case of error
-    (println "; pretty print with options")
-    (println (json/encode test-obj
-                          test-opts))
-    ; actual test
-    (is (= (str "{\n"
-                "    \"bar\": {\n"
-                "        \"baz\": [{\n"
-                "            \"ulu\": \"mulu\"\n"
-                "        }, {\n"
-                "            \"moot\": \"foo\"\n"
-                "        }, 3]\n"
-                "    },\n"
-                "    \"foo\": 1,\n"
-                "    \"quux\": \"blub\"\n"
-                "}")
-            pretty-str))))
+    (when-not (= expected pretty-str)
+      (println "; pretty print with options - actual")
+      (println pretty-str)
+      (println "; pretty print with options - expected")
+      (println expected))
+    (is (= expected pretty-str))))
 
 (deftest t-unicode-escaping
   (is (= "{\"foo\":\"It costs \\u00A3100\"}"
