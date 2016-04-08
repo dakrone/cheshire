@@ -255,7 +255,9 @@
 (deftest t-pretty-print-illegal-argument
   ; just expecting this not to throw
   (json/encode {:foo "bar"}
-               {:pretty []}))
+               {:pretty []})
+  (json/encode {:foo "bar"}
+               {:pretty nil}))
 
 (deftest t-custom-pretty-print-with-defaults
   (let [test-obj (sorted-map :foo 1 :bar {:baz [{:ulu "mulu"} {:moot "foo"} 3]} :quux :blub)

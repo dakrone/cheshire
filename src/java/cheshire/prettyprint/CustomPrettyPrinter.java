@@ -7,19 +7,20 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 import java.io.IOException;
 
 class DynamicIndenter extends DefaultIndenter {
-    public DynamicIndenter(int indentation) {
-        super(new String(new char[indentation]).replace("\0", " "), "\n");
+    public static String repeat(String whitespace, int times) {
+        String indentWith = "";
+        while(--times >= 0) {
+            indentWith += whitespace;
+        }
+        return indentWith;
     }
-    public DynamicIndenter(int indentation, String newline) {
-        super(new String(new char[indentation]).replace("\0", " "), newline);
+
+    public DynamicIndenter(int indentation) {
+        super(DynamicIndenter.repeat(" ", indentation), "\n");
     }
 }
 
 public class CustomPrettyPrinter extends DefaultPrettyPrinter {
-    private Indenter _indenter;
-    private int _indentation = 2;
-    private boolean _indentObjects = true;
-    private boolean _indentArrays = true;
     private String _beforeArrayValues;
     private String _afterArrayValues;
     private String _objectFieldValueSeparator;
@@ -56,15 +57,12 @@ public class CustomPrettyPrinter extends DefaultPrettyPrinter {
     }
 
     public CustomPrettyPrinter setIndentation(int indentation, boolean indentObjects, boolean indentArrays) {
-        this._indentation = indentation;
-        this._indentObjects = indentObjects;
-        this._indentArrays = indentArrays;
-        this._indenter = new DynamicIndenter(indentation);
-        if (this._indentArrays) {
-            this.indentArraysWith(this._indenter);
+        Indenter indenter = new DynamicIndenter(indentation);
+        if (indentArrays) {
+            this.indentArraysWith(indenter);
         }
-        if (this._indentObjects) {
-            this.indentObjectsWith(this._indenter);
+        if (indentObjects) {
+            this.indentObjectsWith(indenter);
         }
         return this;
     }
