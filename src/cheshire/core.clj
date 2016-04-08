@@ -82,10 +82,14 @@
                                      factory/json-factory)
                     ^Writer writer)
          print-pretty (:pretty opt-map)]
-     (when (= true print-pretty)
-       (.useDefaultPrettyPrinter generator))
-     (when (map? print-pretty)
-       (.setPrettyPrinter generator (create-pretty-printer print-pretty)))
+     (condp instance? print-pretty
+       Boolean
+         (.useDefaultPrettyPrinter generator)
+       clojure.lang.IPersistentMap
+         (.setPrettyPrinter generator (create-pretty-printer print-pretty))
+       PrettyPrinter
+         (.setPrettyPrinter generator print-pretty)
+       nil)
      (when (:escape-non-ascii opt-map)
        (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
      (gen/generate generator obj (or (:date-format opt-map)
