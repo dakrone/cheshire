@@ -25,13 +25,14 @@
   "Returns an instance of CustomPrettyPrinter based on the configuration
   provided as argument"
   [options]
-  (let [{:keys [indentation
-                line-break
-                indent-arrays?
-                indent-objects?
-                before-array-values
-                after-array-values
-                object-field-value-separator]} (merge default-pretty-print-options options)
+  (let [effective-opts (merge default-pretty-print-options options)
+        indentation (:indentation effective-opts)
+        line-break (:line-break effective-opts)
+        indent-arrays? (:indent-arrays? effective-opts)
+        indent-objects? (:indent-objects? effective-opts)
+        before-array-values (:before-array-values effective-opts)
+        after-array-values (:after-array-values effective-opts)
+        object-field-value-separator (:object-field-value-separator effective-opts)
         indent-with (condp instance? indentation
                       String indentation
                       Long (apply str (repeat indentation " "))
