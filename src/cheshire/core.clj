@@ -12,26 +12,33 @@
            (java.io StringWriter StringReader BufferedReader BufferedWriter
                     ByteArrayOutputStream OutputStream Reader Writer)))
 
-(def ^:private default-pretty-print-options
-  {:indentation 2
+(defonce default-pretty-print-options
+  {:indentation "  "
+   :line-break "\n"
    :indent-arrays? false
    :indent-objects? true
    :before-array-values nil
    :after-array-values nil
    :object-field-value-separator nil})
 
-(defn- create-pretty-printer
+(defn create-pretty-printer
   "Returns an instance of CustomPrettyPrinter based on the configuration
   provided as argument"
   [options]
   (let [{:keys [indentation
+                line-break
                 indent-arrays?
                 indent-objects?
                 before-array-values
                 after-array-values
-                object-field-value-separator]} (merge default-pretty-print-options options)]
+                object-field-value-separator]} (merge default-pretty-print-options options)
+        indent-with (condp instance? indentation
+                      String indentation
+                      Long (apply str (repeat indentation " "))
+                      Integer (apply str (repeat indentation " "))
+                      "  ")]
     (-> (new CustomPrettyPrinter)
-        (.setIndentation indentation indent-objects? indent-arrays?)
+        (.setIndentation indent-with line-break indent-objects? indent-arrays?)
         (.setBeforeArrayValues before-array-values)
         (.setAfterArrayValues after-array-values)
         (.setObjectFieldValueSeparator object-field-value-separator))))

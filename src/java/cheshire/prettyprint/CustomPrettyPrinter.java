@@ -6,20 +6,6 @@ import com.fasterxml.jackson.core.util.DefaultPrettyPrinter;
 
 import java.io.IOException;
 
-class DynamicIndenter extends DefaultIndenter {
-    public static String repeat(String whitespace, int times) {
-        String indentWith = "";
-        while(--times >= 0) {
-            indentWith += whitespace;
-        }
-        return indentWith;
-    }
-
-    public DynamicIndenter(int indentation) {
-        super(DynamicIndenter.repeat(" ", indentation), "\n");
-    }
-}
-
 public class CustomPrettyPrinter extends DefaultPrettyPrinter {
     private String _beforeArrayValues;
     private String _afterArrayValues;
@@ -56,8 +42,8 @@ public class CustomPrettyPrinter extends DefaultPrettyPrinter {
         }
     }
 
-    public CustomPrettyPrinter setIndentation(int indentation, boolean indentObjects, boolean indentArrays) {
-        Indenter indenter = new DynamicIndenter(indentation);
+    public CustomPrettyPrinter setIndentation(String indentation, String lineBreak, boolean indentObjects, boolean indentArrays) {
+        Indenter indenter = new DefaultIndenter(indentation, lineBreak);
         if (indentArrays) {
             this.indentArraysWith(indenter);
         }
