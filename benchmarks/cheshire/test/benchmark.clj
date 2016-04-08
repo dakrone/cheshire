@@ -1,12 +1,12 @@
 (ns cheshire.test.benchmark
   (:use [clojure.test])
-    (:require [cheshire.core :as core]
-      [cheshire.custom :as old]
-      [cheshire.generate :as custom]
-      [clojure.data.json :as cj]
-      [clojure.java.io :refer [file input-stream resource]]
-      [clj-json.core :as clj-json]
-      [criterium.core :as bench] [cheshire.core :as core])
+  (:require [cheshire.core :as core]
+            [cheshire.custom :as old]
+            [cheshire.generate :as custom]
+            [clojure.data.json :as cj]
+            [clojure.java.io :refer [file input-stream resource]]
+            [clj-json.core :as clj-json]
+            [criterium.core :as bench])
   (:import (java.util.zip GZIPInputStream)))
 
 ;; These tests just print out results, nothing else, they also
@@ -69,36 +69,36 @@
   (custom/add-encoder java.net.URL custom/encode-str)
   (is (= "\"http://foo.com\"" (core/encode (java.net.URL. "http://foo.com"))))
   (let [custom-obj (assoc test-obj "url" (java.net.URL. "http://foo.com"))]
-       (println "[+] Custom, all custom fields:")
-       (bench/with-progress-reporting
-         (bench/quick-bench (core/decode (core/encode custom-obj)) :verbose)))
+    (println "[+] Custom, all custom fields:")
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/decode (core/encode custom-obj)) :verbose)))
   (println "-------------------------------------"))
 
 (deftest t-bench-custom-kw-coercion
   (println "---- Custom keyword-fn Benchmarks ---")
   (let [t (core/encode test-obj)]
-       (println "[+] (fn [k] (keyword k)) decode")
-       (bench/with-progress-reporting
-         (bench/quick-bench (core/decode t (fn [k] (keyword k)))))
-       (println "[+] basic 'true' keyword-fn decode")
-       (bench/with-progress-reporting
-         (bench/quick-bench (core/decode t true)))
-       (println "[+] no keyword-fn decode")
-       (bench/with-progress-reporting
-         (bench/quick-bench (core/decode t)))
-       (println "[+] (fn [k] (name k)) encode")
-       (bench/with-progress-reporting
-         (bench/quick-bench (core/encode test-obj {:key-fn (fn [k] (name k))})))
-       (println "[+] no keyword-fn encode")
-       (bench/with-progress-reporting
-         (bench/quick-bench (core/encode test-obj))))
+    (println "[+] (fn [k] (keyword k)) decode")
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/decode t (fn [k] (keyword k)))))
+    (println "[+] basic 'true' keyword-fn decode")
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/decode t true)))
+    (println "[+] no keyword-fn decode")
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/decode t)))
+    (println "[+] (fn [k] (name k)) encode")
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/encode test-obj {:key-fn (fn [k] (name k))})))
+    (println "[+] no keyword-fn encode")
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/encode test-obj))))
   (println "-------------------------------------"))
 
 (deftest t-large-array
   (println "-------- Large array parsing --------")
   (let [test-array-json (core/encode (range 1024))]
-       (bench/with-progress-reporting
-         (bench/bench (pr-str (core/decode test-array-json)))))
+    (bench/with-progress-reporting
+      (bench/bench (pr-str (core/decode test-array-json)))))
   (println "-------------------------------------"))
 
 (deftest t-large-geojson-object
@@ -111,6 +111,6 @@
     (bench/quick-bench (core/encode big-test-obj)))
   (println "[+] large geojson decode")
   (let [s (core/encode big-test-obj)]
-       (bench/with-progress-reporting
-         (bench/quick-bench (core/decode s))))
+    (bench/with-progress-reporting
+      (bench/quick-bench (core/decode s))))
   (println "-------------------------------------"))
