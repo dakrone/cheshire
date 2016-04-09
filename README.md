@@ -87,6 +87,22 @@ encoders.
 
 In the event encoding fails, Cheshire will throw a JsonGenerationException.
 
+#### Custom Pretty Printing Options
+
+If Jackson's default pretty printing library is not what you desire, you can
+manually create your own pretty printing class and pass to the `generate-string`
+or `encode` methods:
+
+```clojure
+(let [my-pretty-printer (create-pretty-printer
+                          (assoc default-pretty-print-options
+                                 :indent-arrays? true))]
+  (generate-string {:foo [1 2 3]} {:pretty my-pretty-printer}))
+```
+
+See the `default-pretty-print-options` for a list of options that can be
+changed.
+
 ### Decoding
 
 ```clojure
