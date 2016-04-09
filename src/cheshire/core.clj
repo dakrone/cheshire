@@ -5,11 +5,44 @@
             [cheshire.generate-seq :as gen-seq]
             [cheshire.parse :as parse])
   (:import (com.fasterxml.jackson.core JsonParser JsonFactory
-                                       JsonGenerator
+                                       JsonGenerator PrettyPrinter
                                        JsonGenerator$Feature)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
+           (cheshire.prettyprint CustomPrettyPrinter)
            (java.io StringWriter StringReader BufferedReader BufferedWriter
                     ByteArrayOutputStream OutputStream Reader Writer)))
+
+(defonce default-pretty-print-options
+  {:indentation "  "
+   :line-break "\n"
+   :indent-arrays? false
+   :indent-objects? true
+   :before-array-values nil
+   :after-array-values nil
+   :object-field-value-separator nil})
+
+(defn create-pretty-printer
+  "Returns an instance of CustomPrettyPrinter based on the configuration
+  provided as argument"
+  [options]
+  (let [effective-opts (merge default-pretty-print-options options)
+        indentation (:indentation effective-opts)
+        line-break (:line-break effective-opts)
+        indent-arrays? (:indent-arrays? effective-opts)
+        indent-objects? (:indent-objects? effective-opts)
+        before-array-values (:before-array-values effective-opts)
+        after-array-values (:after-array-values effective-opts)
+        object-field-value-separator (:object-field-value-separator effective-opts)
+        indent-with (condp instance? indentation
+                      String indentation
+                      Long (apply str (repeat indentation " "))
+                      Integer (apply str (repeat indentation " "))
+                      "  ")]
+    (-> (new CustomPrettyPrinter)
+        (.setIndentation indent-with line-break indent-objects? indent-arrays?)
+        (.setBeforeArrayValues before-array-values)
+        (.setAfterArrayValues after-array-values)
+        (.setObjectFieldValueSeparator object-field-value-separator))))
 
 ;; Generators
 (defn ^String generate-string
@@ -24,9 +57,17 @@
          generator (.createGenerator
                     ^JsonFactory (or factory/*json-factory*
                                      factory/json-factory)
-                    ^Writer sw)]
-     (when (:pretty opt-map)
-       (.useDefaultPrettyPrinter generator))
+                    ^Writer sw)
+         print-pretty (:pretty opt-map)]
+     (when print-pretty
+       (condp instance? print-pretty
+         Boolean
+           (.useDefaultPrettyPrinter generator)
+         clojure.lang.IPersistentMap
+           (.setPrettyPrinter generator (create-pretty-printer print-pretty))
+         PrettyPrinter
+           (.setPrettyPrinter generator print-pretty)
+         nil))
      (when (:escape-non-ascii opt-map)
        (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
      (gen/generate generator obj
@@ -48,9 +89,17 @@
    (let [generator (.createGenerator
                     ^JsonFactory (or factory/*json-factory*
                                      factory/json-factory)
-                    ^Writer writer)]
-     (when (:pretty opt-map)
-       (.useDefaultPrettyPrinter generator))
+                    ^Writer writer)
+         print-pretty (:pretty opt-map)]
+     (when print-pretty
+       (condp instance? print-pretty
+         Boolean
+       (.useDefaultPrettyPrinter generator)
+         clojure.lang.IPersistentMap
+       (.setPrettyPrinter generator (create-pretty-printer print-pretty))
+         PrettyPrinter
+       (.setPrettyPrinter generator print-pretty)
+         nil))
      (when (:escape-non-ascii opt-map)
        (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
      (gen/generate generator obj (or (:date-format opt-map)

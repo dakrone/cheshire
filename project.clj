@@ -24,6 +24,8 @@
                                         [clj-json "0.5.3"]]}}
   :aliases {"all" ["with-profile" "dev,1.3:dev,1.4:dev,1.5:dev,1.7:dev,1.8:dev"]
             "benchmark" ["with-profile" "dev,benchmark" "test"]
+            "pretty-bench" ["with-profile" "dev,benchmark" "test" ":only"
+                          "cheshire.test.benchmark/t-bench-pretty"]
             "core-bench" ["with-profile" "dev,benchmark" "test" ":only"
                           "cheshire.test.benchmark/t-bench-core"]}
   :test-selectors {:default  #(and (not (:benchmark %))
@@ -31,6 +33,7 @@
                    :generative :generative
                    :all (constantly true)}
   :plugins [[codox "0.6.3"]]
+  :java-source-paths ["src/java"]
   :jvm-opts ["-Xmx512M"
 ;;             "-XX:+PrintCompilation"
 ;;             "-XX:+UnlockDiagnosticVMOptions"

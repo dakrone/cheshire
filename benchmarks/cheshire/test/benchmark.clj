@@ -24,6 +24,11 @@
                "set" #{"a" "b"}
                "keyword" :foo})
 
+(def test-pretty-opts
+  {:indentation 4
+   :indent-arrays? true
+   :object-field-value-separator ": "})
+
 (def big-test-obj
   (-> "test/all_month.geojson.gz"
       file
@@ -50,6 +55,14 @@
   (bench/with-progress-reporting
     (bench/bench (core/decode (core/encode test-obj)) :verbose))
   (println "-------------------------------------"))
+
+(deftest t-bench-pretty
+  (let [pretty-printer (core/create-pretty-printer test-pretty-opts)]
+    (println "------- PrettyPrint Benchmarks ------")
+    (println "........default pretty printer")
+    (bench/bench (core/encode test-obj {:pretty true}))
+    (println "........custom pretty printer")
+    (bench/bench (core/encode test-obj {:pretty pretty-printer}))))
 
 (deftest t-bench-custom
   (println "--------- Custom Benchmarks ---------")
