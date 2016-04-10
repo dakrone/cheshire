@@ -5,9 +5,9 @@
             :url "http://opensource.org/licenses/MIT"
             :distribution :repo}
   :global-vars {*warn-on-reflection* false}
-  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.6.4"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.6.4"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.6.4"]
+  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.7.3"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.7.3"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.7.3"]
                  [tigris "0.1.1"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.6.0"]
                                   [org.clojure/test.generative "0.1.4"]]}
@@ -19,7 +19,7 @@
              :1.8 {:dependencies [[org.clojure/clojure "1.8.0-RC4"]]}
              :benchmark {:test-paths ["benchmarks"]
                          :jvm-opts ^:replace ["-Xms1g" "-Xmx1g" "-server"]
-                         :dependencies [[criterium "0.4.3"]
+                         :dependencies [[criterium "0.4.4"]
                                         [org.clojure/data.json "0.2.6"]
                                         [clj-json "0.5.3"]]}}
   :aliases {"all" ["with-profile" "dev,1.3:dev,1.4:dev,1.5:dev,1.7:dev,1.8:dev"]
