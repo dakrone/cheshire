@@ -45,14 +45,14 @@
         (.setObjectFieldValueSeparator object-field-value-separator))))
 
 ;; Generators
-(defn ^String generate-string
+(defn generate-string
   "Returns a JSON-encoding String for the given Clojure object. Takes an
   optional date format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  ([obj]
+  (^String [obj]
    (generate-string obj nil))
-  ([obj opt-map]
+  (^String [obj opt-map]
    (let [sw (StringWriter.)
          generator (.createGenerator
                     ^JsonFactory (or factory/*json-factory*
@@ -77,15 +77,15 @@
      (.flush generator)
      (.toString sw))))
 
-(defn ^BufferedWriter generate-stream
+(defn generate-stream
   "Returns a BufferedWriter for the given Clojure object with the JSON-encoded
   data written to the writer. Takes an optional date format string that Date
   objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  ([obj ^BufferedWriter writer]
+  (^BufferedWriter [obj ^BufferedWriter writer]
    (generate-stream obj writer nil))
-  ([obj ^BufferedWriter writer opt-map]
+  (^BufferedWriter [obj ^BufferedWriter writer opt-map]
    (let [generator (.createGenerator
                     ^JsonFactory (or factory/*json-factory*
                                      factory/json-factory)
@@ -152,9 +152,9 @@
   Takes an optional date format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  ([obj]
+  (^bytes [obj]
    (generate-smile obj nil))
-  ([obj opt-map]
+  (^bytes [obj opt-map]
    (let [baos (ByteArrayOutputStream.)
          generator (.createGenerator ^SmileFactory
                                      (or factory/*smile-factory*
@@ -172,9 +172,9 @@
   Takes an optional date format string that Date objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  ([obj]
+  (^bytes [obj]
    (generate-cbor obj nil))
-  ([obj opt-map]
+  (^bytes [obj opt-map]
    (let [baos (ByteArrayOutputStream.)
          generator (.createGenerator ^CBORFactory
                                      (or factory/*cbor-factory*
@@ -330,10 +330,20 @@
                   key-fn array-coerce-fn))))
 
 ;; aliases for clojure-json users
+(defmacro copy-arglists
+  [dst src]
+  `(alter-meta! (var ~dst) merge (select-keys (meta (var ~src)) [:arglists])))
 (def encode "Alias to generate-string for clojure-json users" generate-string)
+(copy-arglists encode generate-string)
 (def encode-stream "Alias to generate-stream for clojure-json users" generate-stream)
+(copy-arglists encode-stream generate-stream)
 (def encode-smile "Alias to generate-smile for clojure-json users" generate-smile)
+(copy-arglists encode-smile generate-smile)
 (def decode "Alias to parse-string for clojure-json users" parse-string)
+(copy-arglists decode parse-string)
 (def decode-strict "Alias to parse-string-strict for clojure-json users" parse-string-strict)
+(copy-arglists decode-strict parse-string-strict)
 (def decode-stream "Alias to parse-stream for clojure-json users" parse-stream)
+(copy-arglists decode-stream parse-stream)
 (def decode-smile "Alias to parse-smile for clojure-json users" parse-smile)
+(copy-arglists decode-smile parse-smile)

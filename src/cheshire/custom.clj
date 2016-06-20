@@ -30,10 +30,10 @@
 (defprotocol JSONable
   (to-json [t jg]))
 
-(defn ^String encode*
-  ([obj]
+(defn encode*
+  (^String [obj]
      (encode* obj nil))
-  ([obj opt-map]
+  (^String [obj opt-map]
      (binding [*date-format* (or (:date-format opt-map) default-date-format)]
        (let [sw (StringWriter.)
              generator (.createJsonGenerator
@@ -48,12 +48,13 @@
          (.flush generator)
          (.toString sw)))))
 
-(def ^String encode encode*)
+(def encode encode*)
+(core/copy-arglists encode encode*)
 
-(defn ^String encode-stream*
-  ([obj ^BufferedWriter w]
+(defn encode-stream*
+  (^String [obj ^BufferedWriter w]
      (encode-stream* obj w nil))
-  ([obj ^BufferedWriter w opt-map]
+  (^String [obj ^BufferedWriter w opt-map]
      (binding [*date-format* (or (:date-format opt-map) default-date-format)]
        (let [generator (.createJsonGenerator
                         ^JsonFactory (or *json-factory* json-factory) w)]
@@ -65,12 +66,13 @@
          (.flush generator)
          w))))
 
-(def ^String encode-stream encode-stream*)
+(def encode-stream encode-stream*)
+(core/copy-arglists encode-stream encode-stream*)
 
 (defn encode-smile*
-  ([obj]
+  (^bytes [obj]
      (encode-smile* obj nil))
-  ([obj opt-map]
+  (^bytes [obj opt-map]
      (binding [*date-format* (or (:date-format opt-map) default-date-format)]
        (let [baos (ByteArrayOutputStream.)
              generator (.createJsonGenerator ^SmileFactory
@@ -81,26 +83,40 @@
          (.toByteArray baos)))))
 
 (def encode-smile encode-smile*)
+(core/copy-arglists encode-smile encode-smile*)
 
 ;; there are no differences in parsing, but these are here to make
 ;; this a self-contained namespace if desired
 (def parse core/decode)
+(core/copy-arglists parse core/decode)
 (def parse-string core/decode)
+(core/copy-arglists parse-string core/decode)
 (def parse-stream core/decode-stream)
+(core/copy-arglists parse-stream core/decode-stream)
 (def parse-smile core/decode-smile)
+(core/copy-arglists parse-smile core/decode-smile)
 (def parsed-seq core/parsed-seq)
+(core/copy-arglists parsed-seq core/parsed-seq)
 (def decode core/parse-string)
+(core/copy-arglists decode core/parse-string)
 (def decode-stream parse-stream)
+(core/copy-arglists decode-stream core/parse-stream)
 (def decode-smile parse-smile)
+(core/copy-arglists decode-smile core/parse-smile)
 
 ;; aliases for encoding
 (def generate-string encode*)
+(core/copy-arglists generate-string encode*)
 (def generate-string* encode*)
+(core/copy-arglists generate-string* encode*)
 (def generate-stream encode-stream*)
+(core/copy-arglists generate-stream encode-stream*)
 (def generate-stream* encode-stream*)
+(core/copy-arglists generate-stream* encode-stream*)
 (def generate-smile encode-smile*)
+(core/copy-arglists generate-smile encode-smile*)
 (def generate-smile* encode-smile*)
-
+(core/copy-arglists generate-smile* encode-smile*)
 
 ;; Generic encoders, these can be used by someone writing a custom
 ;; encoder if so desired, after transforming an arbitrary data

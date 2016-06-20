@@ -22,8 +22,8 @@
    :canonicalize-field-names false})
 
 ;; Factory objects that are needed to do the encoding and decoding
-(defn ^JsonFactory make-json-factory
-  [opts]
+(defn make-json-factory
+  ^JsonFactory [opts]
   (let [opts (merge default-factory-options opts)]
     (doto (JsonFactory.)
       (.configure JsonParser$Feature/AUTO_CLOSE_SOURCE
@@ -47,8 +47,8 @@
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
                   (boolean (:canonicalize-field-names opts))))))
 
-(defn ^SmileFactory make-smile-factory
-  [opts]
+(defn make-smile-factory
+  ^SmileFactory [opts]
   (let [opts (merge default-factory-options opts)]
     (doto (SmileFactory.)
       (.configure JsonParser$Feature/AUTO_CLOSE_SOURCE
@@ -72,8 +72,8 @@
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
                   (boolean (:canonicalize-field-names opts))))))
 
-(defn ^CBORFactory make-cbor-factory
-  [opts]
+(defn make-cbor-factory
+  ^CBORFactory [opts]
   (let [opts (merge default-factory-options opts)]
     (doto (CBORFactory.)
       (.configure JsonParser$Feature/AUTO_CLOSE_SOURCE
