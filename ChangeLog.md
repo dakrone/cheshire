@@ -1,7 +1,32 @@
-## Changes between Cheshire 5.3.2 and 5.3.1
+## Changes between Cheshire 5.6.3 and 5.6.2
 
+* Fix float coercion when encoding
+
+## Changes between Cheshire 5.6.2 and 5.6.1
+
+* Fix type hints for newer clojure version
+* Bump Jackson dependencies
+
+## Changes between Cheshire 5.6.1 and 5.6.0
+
+* Fix javac target for 1.6 compatibility
+
+## Changes between Cheshire 5.6.0 and 5.5.0
+
+* Fixes for type hinting
+* Make :pretty option configurable to use custom pretty printer
+
+## Changes between Cheshire 5.5.0 and 5.5.0
+
+* Bump Jackson dependencies
+
+## Changes between Cheshire 5.4.0 and 5.3.2
+
+* Add CBOR encoding/decoding
+* Add docstrings for clojure-json aliases
 * Add default encoder for java.lang.Character
-* Add sequention write support
+* Add sequential write support
+* Bump dependencies
 
 ## Changes between Cheshire 5.3.1 and 5.3.0
 
