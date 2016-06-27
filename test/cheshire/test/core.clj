@@ -390,3 +390,6 @@
     (gen/add-encoder CTestR (fn [obj jg] (gen/encode-symbol 'foo jg)))
     (is (= "foo" (json/decode (json/encode thing) true)))
     (remove)))
+
+(deftest t-float-encoding
+  (is (= "{\"foo\":0.01}" (json/encode {:foo (float 0.01)}))))

@@ -34,7 +34,7 @@
         common-clauses `[Integer (.writeNumber ~g (int ~o))
                          Long (.writeNumber ~g (long ~o))
                          Double (.writeNumber ~g (double ~o))
-                         Float (.writeNumber ~g (double ~o))
+                         Float (.writeNumber ~g (float ~o))
                          BigInteger (.writeNumber
                                      ~g ~(with-meta o {:tag `BigInteger}))
                          BigDecimal (.writeNumber
