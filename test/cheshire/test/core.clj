@@ -393,3 +393,6 @@
 
 (deftest t-float-encoding
   (is (= "{\"foo\":0.01}" (json/encode {:foo (float 0.01)}))))
+
+(deftest t-non-const-bools
+  (is (= {:a 1} (json/decode "{\"a\": 1}" (Boolean. true)))))

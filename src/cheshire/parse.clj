@@ -84,7 +84,7 @@
       (parse* jp key-fn *use-bigdecimals?* array-coerce-fn))))
 
 (defn parse [^JsonParser jp key-fn eof array-coerce-fn]
-  (let [key-fn (or (if (identical? key-fn true) keyword key-fn) identity)]
+  (let [key-fn (or (if (and (instance? Boolean key-fn) key-fn) keyword key-fn) identity)]
     (.nextToken jp)
     (condp identical? (.getCurrentToken jp)
       nil
