@@ -118,6 +118,9 @@ changed.
 (parse-string "{\"foo\":\"bar\"}" (fn [k] (keyword (.toUpperCase k))))
 ;; => {:FOO "bar"}
 
+;; top-level strings are valid JSON too
+(parse-string "\"foo\"")
+;; => "foo"
 
 ;; parse some SMILE (keywords option also supported)
 (parse-smile <your-byte-array>)
