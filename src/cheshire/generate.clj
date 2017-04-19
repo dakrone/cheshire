@@ -118,20 +118,18 @@
    (nil? obj) (.writeNull ^JsonGenerator jg)
    (get (:impls JSONable) (class obj)) (#'to-json obj jg)
 
-   (i? IPersistentCollection obj)
-   (condp instance? obj
-     clojure.lang.IPersistentMap
-     (generate-map jg obj date-format ex key-fn)
-     clojure.lang.IPersistentVector
-     (generate-array jg obj date-format ex key-fn)
-     clojure.lang.IPersistentSet
-     (generate-array jg obj date-format ex key-fn)
-     clojure.lang.IPersistentList
-     (generate-array jg obj date-format ex key-fn)
-     clojure.lang.ISeq
-     (generate-array jg obj date-format ex key-fn)
-     clojure.lang.Associative
-     (generate-map jg obj date-format ex key-fn))
+   (i? clojure.lang.IPersistentMap obj)
+   (generate-map jg obj date-format ex key-fn)
+   (i? clojure.lang.IPersistentVector obj)
+   (generate-array jg obj date-format ex key-fn)
+   (i? clojure.lang.IPersistentSet obj)
+   (generate-array jg obj date-format ex key-fn)
+   (i? clojure.lang.IPersistentList obj)
+   (generate-array jg obj date-format ex key-fn)
+   (i? clojure.lang.ISeq obj)
+   (generate-array jg obj date-format ex key-fn)
+   (i? clojure.lang.Associative obj)
+   (generate-map jg obj date-format ex key-fn)
 
    (i? Number obj) (number-dispatch ^JsonGenerator jg obj ex)
    (i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
