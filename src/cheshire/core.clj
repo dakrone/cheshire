@@ -7,6 +7,7 @@
   (:import (com.fasterxml.jackson.core JsonParser JsonFactory
                                        JsonGenerator PrettyPrinter
                                        JsonGenerator$Feature)
+           (com.fasterxml.jackson.dataformat.cbor CBORFactory)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (cheshire.prettyprint CustomPrettyPrinter)
            (java.io StringWriter StringReader BufferedReader BufferedWriter
