@@ -1,3 +1,7 @@
+## Changes between Cheshire 5.7.1 and 5.7.2
+
+* Update Jackson dependencies to mitigate vulnerability https://github.com/FasterXML/jackson-databind/issues/1599
+
 ## Changes between Cheshire 5.6.3 and 5.6.2
 
 * Fix float coercion when encoding
