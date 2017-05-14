@@ -9,6 +9,7 @@
            (java.io FileInputStream StringReader StringWriter
                     BufferedReader BufferedWriter)
            (java.sql Timestamp)
+           (java.time ZoneId OffsetDateTime)
            (java.util Date UUID)))
 
 (def test-obj {"int" 3 "long" (long -2147483647) "boolean" true
@@ -130,6 +131,13 @@
          (json/decode (json/encode {:foo (Date. (long 0))}
                                    {:date-format "yyyy-MM-dd"})))
       "encode with given date format"))
+
+(deftest test-datetime
+  (is (= {"foo" "1970-01-01T00:00Z"}
+         (let [start (Date. (long 0))
+               zone (ZoneId/of "GMT")
+               odt (OffsetDateTime/ofInstant (.toInstant start) zone)]
+           (json/decode (json/encode {:foo odt}))))))
 
 (deftest test-sql-timestamp
   (is (= {"foo" "1970-01-01T00:00:00Z"}
