@@ -8,7 +8,7 @@
            (clojure.lang IPersistentCollection Keyword Ratio Symbol)))
 
 ;; date format rebound for custom encoding
-(def ^{:dynamic true :private true} *date-format* "yyyy-MM-dd'T'HH:mm:ssZ")
+(def ^{:dynamic true :private true} *date-format*)
 
 (defmacro tag
   ([obj]
