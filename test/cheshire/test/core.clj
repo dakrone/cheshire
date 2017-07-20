@@ -396,3 +396,13 @@
 
 (deftest t-non-const-bools
   (is (= {:a 1} (json/decode "{\"a\": 1}" (Boolean. true)))))
+
+(deftest t-invalid-json
+  (are [x y] (= x (try
+                    (binding [cheshire.parse/*valid-json-only* true] y)
+                    (catch Exception e
+                      (.getMessage e))))
+    "Invalid json" (json/decode "{\"foo\": 1}asdf")
+    "Invalid json" (json/decode "{\"foo\": 123}null")
+    "Invalid json" (json/decode  "\"hello\" : 123}")
+    {"foo" 1} (json/decode "{\"foo\": 1}")))
