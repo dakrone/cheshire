@@ -2,6 +2,7 @@
   (:use [clojure.test]
         [clojure.java.io :only [file reader]])
   (:require [cheshire.core :as json]
+            [cheshire.exact :as json-exact]
             [cheshire.generate :as gen]
             [cheshire.factory :as fact]
             [cheshire.parse :as parse])
@@ -399,10 +400,14 @@
 
 (deftest t-invalid-json
   (are [x y] (= x (try
-                    (binding [cheshire.parse/*valid-json-only* true] y)
+                    y
                     (catch Exception e
                       (.getMessage e))))
-    "Invalid json" (json/decode "{\"foo\": 1}asdf")
-    "Invalid json" (json/decode "{\"foo\": 123}null")
-    "Invalid json" (json/decode  "\"hello\" : 123}")
-    {"foo" 1} (json/decode "{\"foo\": 1}")))
+    "Invalid json" (json-exact/decode "{\"foo\": 1}asdf")
+    "Invalid json" (json-exact/decode "{\"foo\": 123}null")
+    "Invalid json" (json-exact/decode  "\"hello\" : 123}")
+    {"foo" 1} (json/decode "{\"foo\": 1}")
+    "Invalid json" (json-exact/decode-strict "{\"foo\": 1}asdf")
+    "Invalid json" (json-exact/decode-strict "{\"foo\": 123}null")
+    "Invalid json" (json-exact/decode-strict  "\"hello\" : 123}")
+    {"foo" 1} (json/decode-strict "{\"foo\": 1}")))
