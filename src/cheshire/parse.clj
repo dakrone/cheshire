@@ -8,20 +8,9 @@
        :dynamic true}
   *use-bigdecimals?* false)
 
-(def ^{:dynamic true} *valid-json-only* false)
-
 (defmacro ^:private tag
   ([obj]
-   `(vary-meta ~obj assoc :tag `JsonParser)))
-
-(defmacro valid [parsed]
-  `(if *valid-json-only*
-     (let [valid-json?# (try (nil? (.nextToken ~'jp))
-                             (catch Exception _# false))]
-       (if-not valid-json?#
-         (throw (Exception. "Invalid json"))
-         ~parsed))
-     ~parsed))
+     `(vary-meta ~obj assoc :tag `JsonParser)))
 
 (definline parse-object [^JsonParser jp key-fn bd? array-coerce-fn]
   (let [jp (tag jp)]
@@ -87,24 +76,23 @@
       (str "Cannot parse " (pr-str (.getCurrentToken jp)))))))
 
 (defn parse-strict [^JsonParser jp key-fn eof array-coerce-fn]
-  (let [key-fn (or (if (identical? key-fn true) keyword key-fn) identity)
-        _ (.nextToken jp)
-        parsed (condp identical? (.getCurrentToken jp)
-                 nil
-                 eof
-                 (parse* jp key-fn *use-bigdecimals?* array-coerce-fn))]
-    (valid parsed)))
+  (let [key-fn (or (if (identical? key-fn true) keyword key-fn) identity)]
+    (.nextToken jp)
+    (condp identical? (.getCurrentToken jp)
+      nil
+      eof
+      (parse* jp key-fn *use-bigdecimals?* array-coerce-fn))))
 
 (defn parse [^JsonParser jp key-fn eof array-coerce-fn]
-  (let [key-fn (or (if (and (instance? Boolean key-fn) key-fn) keyword key-fn) identity)
-        _ (.nextToken jp)
-        parsed (condp identical? (.getCurrentToken jp)
-                 nil
-                 eof
+  (let [key-fn (or (if (and (instance? Boolean key-fn) key-fn) keyword key-fn) identity)]
+    (.nextToken jp)
+    (condp identical? (.getCurrentToken jp)
+      nil
+      eof
 
-                 JsonToken/START_ARRAY
-                 (do
-                   (.nextToken jp)
-                   (lazily-parse-array jp key-fn *use-bigdecimals?* array-coerce-fn))
-                 (parse* jp key-fn *use-bigdecimals?* array-coerce-fn))]
-    (valid parsed)))
+      JsonToken/START_ARRAY
+      (do
+        (.nextToken jp)
+        (lazily-parse-array jp key-fn *use-bigdecimals?* array-coerce-fn))
+
+      (parse* jp key-fn *use-bigdecimals?* array-coerce-fn))))
