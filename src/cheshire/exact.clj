@@ -11,7 +11,9 @@
                          (catch Exception _ false))]
     (if valid-json?
       parsed
-      (throw (Exception. "Invalid json")))))
+      (throw
+       (IllegalArgumentException.
+        "Invalid JSON, expected exactly one parseable object but multiple objects were found")))))
 
 (defn parse-string
   "Like cheshire.core/parse-string

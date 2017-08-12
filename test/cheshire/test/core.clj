@@ -399,15 +399,16 @@
   (is (= {:a 1} (json/decode "{\"a\": 1}" (Boolean. true)))))
 
 (deftest t-invalid-json
-  (are [x y] (= x (try
-                    y
-                    (catch Exception e
-                      (.getMessage e))))
-    "Invalid json" (json-exact/decode "{\"foo\": 1}asdf")
-    "Invalid json" (json-exact/decode "{\"foo\": 123}null")
-    "Invalid json" (json-exact/decode  "\"hello\" : 123}")
-    {"foo" 1} (json/decode "{\"foo\": 1}")
-    "Invalid json" (json-exact/decode-strict "{\"foo\": 1}asdf")
-    "Invalid json" (json-exact/decode-strict "{\"foo\": 123}null")
-    "Invalid json" (json-exact/decode-strict  "\"hello\" : 123}")
-    {"foo" 1} (json/decode-strict "{\"foo\": 1}")))
+  (let [invalid-json-message "Invalid JSON, expected exactly one parseable object but multiple objects were found"]
+    (are [x y] (= x (try
+                      y
+                      (catch Exception e
+                        (.getMessage e))))
+      invalid-json-message (json-exact/decode "{\"foo\": 1}asdf")
+      invalid-json-message (json-exact/decode "{\"foo\": 123}null")
+      invalid-json-message (json-exact/decode  "\"hello\" : 123}")
+      {"foo" 1} (json/decode "{\"foo\": 1}")
+      invalid-json-message (json-exact/decode-strict "{\"foo\": 1}asdf")
+      invalid-json-message (json-exact/decode-strict "{\"foo\": 123}null")
+      invalid-json-message (json-exact/decode-strict  "\"hello\" : 123}")
+      {"foo" 1} (json/decode-strict "{\"foo\": 1}"))))
