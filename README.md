@@ -227,7 +227,7 @@ Cheshire encoding supports:
 - booleans
 - keywords (qualified and unqualified)
 - numbers (Integer, Long, BigInteger, BigInt, Double, Float, Ratio,
-  Short, Byte, primatives)
+  Short, Byte, primitives)
 - clojure.lang.PersistentQueue
 
 ### Java classes
