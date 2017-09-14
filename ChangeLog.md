@@ -1,6 +1,14 @@
-## Changes between Cheshire 5.7.1 and 5.7.2
+## Changes between Cheshire 5.8.0 and 5.8.1
 
+* Add `:quote-field-names` parameter to control quoting field names in encoding
+
+## Changes between Cheshire 5.7.2 and 5.8.0
+
+* Fix type hints for un-imported classes
 * Update Jackson dependencies to mitigate vulnerability https://github.com/FasterXML/jackson-databind/issues/1599
+* Correct spelling in documentation
+* Add `cheshire.exact` namespace for exactly-once decoding
+* Bump Jackson dependencies to 2.9.0
 
 ## Changes between Cheshire 5.6.3 and 5.6.2
 
