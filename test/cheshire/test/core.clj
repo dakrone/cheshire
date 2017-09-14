@@ -243,6 +243,11 @@
     (is (= (type Double/NaN)
            (type (:foo (json/decode "{\"foo\":NaN}" true)))))))
 
+(deftest t-bindable-factories-quoteless
+  (binding [fact/*json-factory* (fact/make-json-factory
+                                  {:quote-field-names false})]
+    (is (= "{a:1}" (json/encode {:a 1})))))
+
 (deftest t-persistent-queue
   (let [q (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)]
     (is (= q (json/decode (json/encode q))))))

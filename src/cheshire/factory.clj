@@ -4,7 +4,8 @@
   (:import (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (com.fasterxml.jackson.dataformat.cbor CBORFactory)
            (com.fasterxml.jackson.core JsonFactory JsonFactory$Feature
-                                       JsonParser$Feature)))
+                                       JsonParser$Feature
+                                       JsonGenerator$Feature)))
 
 ;; default date format used to JSON-encode Date objects
 (def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -19,7 +20,8 @@
    :allow-numeric-leading-zeros false
    :allow-non-numeric-numbers false
    :intern-field-names false
-   :canonicalize-field-names false})
+   :canonicalize-field-names false
+   :quote-field-names true})
 
 ;; Factory objects that are needed to do the encoding and decoding
 (defn make-json-factory
@@ -45,7 +47,9 @@
       (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
                   (boolean (:intern-field-names opts)))
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
-                  (boolean (:canonicalize-field-names opts))))))
+                  (boolean (:canonicalize-field-names opts)))
+      (.configure JsonGenerator$Feature/QUOTE_FIELD_NAMES
+                  (boolean (:quote-field-names opts))))))
 
 (defn make-smile-factory
   ^SmileFactory [opts]
@@ -70,7 +74,9 @@
       (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
                   (boolean (:intern-field-names opts)))
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
-                  (boolean (:canonicalize-field-names opts))))))
+                  (boolean (:canonicalize-field-names opts)))
+      (.configure JsonGenerator$Feature/QUOTE_FIELD_NAMES
+                  (boolean (:quote-field-names opts))))))
 
 (defn make-cbor-factory
   ^CBORFactory [opts]
@@ -95,7 +101,9 @@
       (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
                   (boolean (:intern-field-names opts)))
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
-                  (boolean (:canonicalize-field-names opts))))))
+                  (boolean (:canonicalize-field-names opts)))
+      (.configure JsonGenerator$Feature/QUOTE_FIELD_NAMES
+                  (boolean (:quote-field-names opts))))))
 
 (defonce ^JsonFactory json-factory (make-json-factory default-factory-options))
 (defonce ^SmileFactory smile-factory
