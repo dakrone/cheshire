@@ -305,6 +305,20 @@
       (println expected))
     (is (= expected pretty-str))))
 
+(deftest t-custom-pretty-print-with-noident-objects
+  (let [test-obj  [{:foo 1 :bar 2} {:foo 3 :bar 4}]
+        test-opts {:pretty {:indent-objects? false}}
+        expected (str "[ { \"foo\" : 1, \"bar\" : 2 }, "
+                      "{ \"foo\" : 3, \"bar\" : 4 } ]")
+        pretty-str (json/encode test-obj test-opts)]
+    ; just to be easy on the eyes in case of error
+    (when-not (= expected pretty-str)
+      (println "; pretty print with options - actual")
+      (println pretty-str)
+      (println "; pretty print with options - expected")
+      (println expected))
+    (is (= expected pretty-str))))
+
 (deftest t-unicode-escaping
   (is (= "{\"foo\":\"It costs \\u00A3100\"}"
          (json/encode {:foo "It costs £100"} {:escape-non-ascii true}))))
