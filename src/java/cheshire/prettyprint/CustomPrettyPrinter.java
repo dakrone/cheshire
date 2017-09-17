@@ -49,6 +49,8 @@ public class CustomPrettyPrinter extends DefaultPrettyPrinter {
         }
         if (indentObjects) {
             this.indentObjectsWith(indenter);
+        } else {
+            this.indentObjectsWith(new DefaultPrettyPrinter.FixedSpaceIndenter());
         }
         return this;
     }
