@@ -10,13 +10,14 @@
                  [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.9.0"]
                  [tigris "0.1.1"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.8.0"]
-                                  [org.clojure/test.generative "0.1.4"]]}
+                                  [org.clojure/test.generative "0.1.4"]
+                                  [org.clojure/tools.namespace "0.2.1"]]}
              :1.3 {:dependencies [[org.clojure/clojure "1.3.0"]]}
              :1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
              :1.5 {:dependencies [[org.clojure/clojure "1.5.1"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
              :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
-             :1.9 {:dependencies [[org.clojure/clojure "1.9.0-alpha7"]]}
+             :1.9 {:dependencies [[org.clojure/clojure "1.9.0-beta2"]]}
              :benchmark {:test-paths ["benchmarks"]
                          :jvm-opts ^:replace ["-Xms1g" "-Xmx1g" "-server"]
                          :dependencies [[criterium "0.4.4"]
