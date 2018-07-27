@@ -226,7 +226,7 @@
      (parse/parse-strict
       (.createParser ^JsonFactory (or factory/*json-factory*
                                       factory/json-factory)
-                     ^Writer (StringReader. string))
+                     ^Reader (StringReader. string))
       key-fn nil array-coerce-fn))))
 
 (defn parse-stream
