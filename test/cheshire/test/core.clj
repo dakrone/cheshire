@@ -112,7 +112,10 @@
   (let [br (BufferedReader. (StringReader. "{\"foo\":{\"bar\":1}}"))]
     (is (= 1 (json/parsed-partial br [:foo :bar] true))))
   (let [br (BufferedReader. (StringReader. "{\"foo\":{\"bar\": [{\"foo\": \"1\"}]}}"))]
-    (is (= {"foo" "1"} (json/parsed-partial br ["foo" "bar" 0])))))
+    (is (= {"foo" "1"} (json/parsed-partial br ["foo" "bar" 0]))))
+  (let [br (BufferedReader. (StringReader. "{\"foo\":{\"bar\": [{\"foo\": \"1\"},{\"foo\": 2}, {\"foo\": 3}]}}"))]
+    (is (= [{"foo" "1"} {"foo" 2}]
+           (take 2 (json/parsed-partial br ["foo" "bar" "*"]))))))
 
 (deftest test-smile-round-trip
   (is (= test-obj (json/parse-smile (json/generate-smile test-obj)))))
