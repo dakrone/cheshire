@@ -133,6 +133,9 @@ changed.
 
 ;; parse a SMILE stream lazily (keywords option also supported)
 (parsed-smile-seq (clojure.java.io/reader "/tmp/foo"))
+
+;; parse a nested part of the stream lazily (keywords option also supported)
+(parsed-partial (clojure.java.io/reader "/tmp/foo") ["foo" "bar"])
 ```
 
 In 2.0.4 and up, Cheshire allows passing in a

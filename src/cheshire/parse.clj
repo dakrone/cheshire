@@ -99,12 +99,15 @@
 (defn- parse-xpath* [xpath ^JsonParser jp key-fn bd? array-coerce-fn]
   (if-let [fxpath (first xpath)]
     (cond
-      (and (number? fxpath)
+      (and (or (number? fxpath)
+               (= fxpath "*"))
            (identical? JsonToken/START_ARRAY (.getCurrentToken jp)))
-      (last (take (inc fxpath)
-                  (do
-                    (.nextToken jp)
-                    (lazily-parse-array jp key-fn bd? array-coerce-fn (partial parse-xpath* (rest xpath))))))
+      (do
+        (.nextToken jp)
+        (if (= fxpath "*")
+          (lazily-parse-array jp key-fn bd? array-coerce-fn (partial parse-xpath* (rest xpath)))
+          (last (take (inc fxpath)
+                      (lazily-parse-array jp key-fn bd? array-coerce-fn (partial parse-xpath* (rest xpath)))))))
 
       (or (string? fxpath)
           (keyword? fxpath))
