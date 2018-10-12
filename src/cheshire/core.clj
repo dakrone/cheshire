@@ -314,6 +314,27 @@
                                  ^Reader reader)
                   key-fn array-coerce-fn))))
 
+;; Partial parsers
+(defn parse-path
+  "Returns a Clojure object corresponding to the JSON read from the given reader
+  starting from the point identified as xpath passed as second argument.
+  xpath must be a sequence of attribute names or array indexes.
+  E.g. `[\"root\" \"first-level\" 10 \"second-level\"]`
+  Attribute name should be same type as a result of key-fn (if used).
+
+  The array-coerce-fn is an optional function taking the name of an array field,
+  and returning the collection to be used for array values."
+  ([reader xpath] (parse-path reader xpath nil nil))
+  ([reader xpath key-fn] (parse-path reader xpath key-fn nil))
+  ([^BufferedReader reader xpath key-fn array-coerce-fn]
+   (when (and reader (not-empty xpath))
+     (parse/parse-xpath
+      (.createParser ^JsonFactory
+                     (or factory/*json-factory*
+                         factory/json-factory)
+                     ^Reader reader)
+      key-fn eof array-coerce-fn xpath))))
+
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
   the given reader. The seq continues until the end of the reader is reached.
