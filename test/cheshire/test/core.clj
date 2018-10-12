@@ -104,6 +104,16 @@
   (let [br (BufferedReader. (StringReader. "1\n2\n3\n"))]
     (is (= (list 1 2 3) (json/parsed-seq br)))))
 
+(deftest test-parsed-partial
+  (let [br (BufferedReader. (StringReader. "[1,\n2,\n3\n]"))]
+    (is (= 1 (json/parsed-partial br [0]))))
+  (let [br (BufferedReader. (StringReader. "{\"foo\":{\"bar\":1}}"))]
+    (is (= 1 (json/parsed-partial br ["foo" "bar"]))))
+  (let [br (BufferedReader. (StringReader. "{\"foo\":{\"bar\":1}}"))]
+    (is (= 1 (json/parsed-partial br [:foo :bar] true))))
+  (let [br (BufferedReader. (StringReader. "{\"foo\":{\"bar\": [{\"foo\": \"1\"}]}}"))]
+    (is (= {"foo" "1"} (json/parsed-partial br ["foo" "bar" 0])))))
+
 (deftest test-smile-round-trip
   (is (= test-obj (json/parse-smile (json/generate-smile test-obj)))))
 

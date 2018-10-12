@@ -315,7 +315,7 @@
                   key-fn array-coerce-fn))))
 
 ;; Partial parsers
-(defn parse-path
+(defn parsed-partial
   "Returns a Clojure object corresponding to the JSON read from the given reader
   starting from the point identified as xpath passed as second argument.
   xpath must be a sequence of attribute names or array indexes.
@@ -324,8 +324,8 @@
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  ([reader xpath] (parse-path reader xpath nil nil))
-  ([reader xpath key-fn] (parse-path reader xpath key-fn nil))
+  ([reader xpath] (parsed-partial reader xpath nil nil))
+  ([reader xpath key-fn] (parsed-partial reader xpath key-fn nil))
   ([^BufferedReader reader xpath key-fn array-coerce-fn]
    (when (and reader (not-empty xpath))
      (parse/parse-xpath
