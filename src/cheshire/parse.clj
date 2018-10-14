@@ -96,22 +96,25 @@
      (Exception.
       (str "Cannot parse " (pr-str (.getCurrentToken jp)))))))
 
-(defn- parse-xpath* [xpath ^JsonParser jp key-fn bd? array-coerce-fn]
-  (if-let [fxpath (first xpath)]
+(defn- parse-json-path* [json-path ^JsonParser jp key-fn bd? array-coerce-fn]
+  (if-let [f-json-path (first json-path)]
     (cond
-      (and (or (number? fxpath)
-               (= fxpath "*"))
+      (and (or (number? f-json-path)
+               (= f-json-path "*"))
            (identical? JsonToken/START_ARRAY (.getCurrentToken jp)))
       (do
         (.nextToken jp)
-        (if (= fxpath "*")
-          (lazily-parse-array jp key-fn bd? array-coerce-fn (partial parse-xpath* (rest xpath)))
-          (last (take (inc fxpath)
-                      (lazily-parse-array jp key-fn bd? array-coerce-fn (partial parse-xpath* (rest xpath)))))))
+        (let [parse-child (partial parse-json-path* (rest json-path))
+              children (lazily-parse-array jp key-fn bd? array-coerce-fn parse-child)]
+          (if (= f-json-path "*")
+            children
+            (last (take (inc f-json-path) children)))))
 
-      (or (string? fxpath)
-          (keyword? fxpath))
-      (parse-object-xpath jp key-fn bd? array-coerce-fn fxpath (partial parse-xpath* (rest xpath)))
+      (or (string? f-json-path)
+          (keyword? f-json-path))
+      (parse-object
+       jp key-fn bd? array-coerce-fn f-json-path
+       (partial parse-json-path* (rest json-path)))
 
       :otherwise
       nil)
@@ -139,11 +142,11 @@
 
       (parse* jp key-fn *use-bigdecimals?* array-coerce-fn))))
 
-(defn parse-xpath [^JsonParser jp key-fn eof array-coerce-fn xpath]
+(defn parse-json-path [^JsonParser jp key-fn eof array-coerce-fn xpath]
   (let [key-fn (or (if (identical? key-fn true) keyword key-fn) identity)]
     (.nextToken jp)
     (condp identical? (.getCurrentToken jp)
       nil
       eof
 
-      (parse-xpath* xpath jp key-fn *use-bigdecimals?* array-coerce-fn))))
+      (parse-json-path* xpath jp key-fn *use-bigdecimals?* array-coerce-fn))))

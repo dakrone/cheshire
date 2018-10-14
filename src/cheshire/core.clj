@@ -328,7 +328,7 @@
   ([reader xpath key-fn] (parsed-partial reader xpath key-fn nil))
   ([^BufferedReader reader xpath key-fn array-coerce-fn]
    (when (and reader (not-empty xpath))
-     (parse/parse-xpath
+     (parse/parse-json-path
       (.createParser ^JsonFactory
                      (or factory/*json-factory*
                          factory/json-factory)
