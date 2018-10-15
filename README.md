@@ -135,7 +135,7 @@ changed.
 (parsed-smile-seq (clojure.java.io/reader "/tmp/foo"))
 
 ;; parse a nested part of the stream lazily (keywords option also supported)
-(parsed-partial (clojure.java.io/reader "/tmp/foo") ["foo" "bar"])
+(parse-stream (clojure.java.io/reader "/tmp/foo") nil nil [#{"foo"} #{"bar"}] true)
 ```
 
 In 2.0.4 and up, Cheshire allows passing in a
