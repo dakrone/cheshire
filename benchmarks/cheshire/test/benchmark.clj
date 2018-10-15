@@ -4,7 +4,7 @@
             [cheshire.custom :as old]
             [cheshire.generate :as custom]
             [clojure.data.json :as cj]
-            [clojure.java.io :refer [file input-stream resource]]
+            [clojure.java.io :refer [file input-stream resource reader]]
             [clj-json.core :as clj-json]
             [criterium.core :as bench])
   (:import (java.util.zip GZIPInputStream)))
@@ -29,11 +29,15 @@
    :indent-arrays? true
    :object-field-value-separator ": "})
 
-(def big-test-obj
-  (-> "test/all_month.geojson.gz"
+(defn big-test-reader [f]
+  (-> f
       file
       input-stream
-      (GZIPInputStream. )
+      (GZIPInputStream.)
+      reader))
+
+(def big-test-obj
+  (-> (big-test-reader "test/all_month.geojson.gz")
       slurp
       core/decode))
 
@@ -52,8 +56,15 @@
 
 (deftest t-bench-core
   (println "---------- Core Benchmarks ----------")
+  (println "........encode/decode full object")
   (bench/with-progress-reporting
     (bench/bench (core/decode (core/encode test-obj)) :verbose))
+  (println "........decode single nested property")
+  (bench/with-progress-reporting
+    (bench/bench (take 5 (core/parse-stream
+                          (big-test-reader "test/all_month.geojson.gz")
+                          nil nil
+                          [#{"features"} #{"properties"} #{"url"}] true)) :verbose))
   (println "-------------------------------------"))
 
 (deftest t-bench-pretty
