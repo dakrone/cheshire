@@ -18,24 +18,28 @@
 (defn parse-string
   "Like cheshire.core/parse-string
   but with only valid json string"
-  ([string] (parse-string string nil nil))
-  ([string key-fn] (parse-string string key-fn nil))
-  ([^String string key-fn array-coerce-fn]
+  ([string] (parse-string string nil nil (repeat (constantly true)) false))
+  ([string key-fn] (parse-string string key-fn nil (repeat (constantly true)) false))
+  ([string key-fn array-coerce-fn] (parse-string string key-fn array-coerce-fn (repeat (constantly true)) false))
+  ([string key-fn array-coerce-fn pred-xs] (parse-string string key-fn array-coerce-fn pred-xs false))
+  ([^String string key-fn array-coerce-fn pred-xs detach-children?]
    (when string
      (let [jp (.createParser ^JsonFactory (or factory/*json-factory*
                                               factory/json-factory)
                              ^Reader (StringReader. string))]
-       (exact-parse jp (parse/parse jp key-fn nil array-coerce-fn))))))
+       (exact-parse jp (parse/parse jp key-fn nil array-coerce-fn pred-xs detach-children?))))))
 
 (defn parse-string-strict
-  ([string] (parse-string-strict string nil nil))
-  ([string key-fn] (parse-string-strict string key-fn nil))
-  ([^String string key-fn array-coerce-fn]
+  ([string] (parse-string-strict string nil nil (repeat (constantly true)) false))
+  ([string key-fn] (parse-string-strict string key-fn nil (repeat (constantly true)) false))
+  ([string key-fn array-coerce-fn] (parse-string-strict string key-fn array-coerce-fn (repeat (constantly true)) false))
+  ([string key-fn array-coerce-fn pred-xs] (parse-string-strict string key-fn array-coerce-fn pred-xs false))
+  ([^String string key-fn array-coerce-fn pred-xs detach-children?]
    (when string
      (let [jp (.createParser ^JsonFactory (or factory/*json-factory*
                                               factory/json-factory)
                              ^Writer (StringReader. string))]
-       (exact-parse jp (parse/parse-strict jp key-fn nil array-coerce-fn))))))
+       (exact-parse jp (parse/parse-strict jp key-fn nil array-coerce-fn pred-xs detach-children?))))))
 
 (def decode parse-string)
 (core/copy-arglists decode parse-string)

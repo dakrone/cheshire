@@ -104,19 +104,6 @@
   (let [br (BufferedReader. (StringReader. "1\n2\n3\n"))]
     (is (= (list 1 2 3) (json/parsed-seq br)))))
 
-(deftest test-parsed-partial
-  (let [br (BufferedReader. (StringReader. "[1,\n2,\n3\n]"))]
-    (is (= 1 (json/parsed-partial br [0]))))
-  (let [br (BufferedReader. (StringReader. "{\"foo\":{\"bar\":1}}"))]
-    (is (= 1 (json/parsed-partial br ["foo" "bar"]))))
-  (let [br (BufferedReader. (StringReader. "{\"foo\":{\"bar\":1}}"))]
-    (is (= 1 (json/parsed-partial br [:foo :bar] true))))
-  (let [br (BufferedReader. (StringReader. "{\"foo\":{\"bar\": [{\"foo\": \"1\"}]}}"))]
-    (is (= {"foo" "1"} (json/parsed-partial br ["foo" "bar" 0]))))
-  (let [br (BufferedReader. (StringReader. "{\"foo\":{\"bar\": [{\"foo\": \"1\"},{\"foo\": 2}, {\"foo\": 3}]}}"))]
-    (is (= [{"foo" "1"} {"foo" 2}]
-           (take 2 (json/parsed-partial br ["foo" "bar" "*"]))))))
-
 (deftest test-smile-round-trip
   (is (= test-obj (json/parse-smile (json/generate-smile test-obj)))))
 
@@ -444,3 +431,21 @@
       invalid-json-message (json-exact/decode-strict "{\"foo\": 123}null")
       invalid-json-message (json-exact/decode-strict  "\"hello\" : 123}")
       {"foo" 1} (json/decode-strict "{\"foo\": 1}"))))
+
+(deftest t-parse-children
+  (let [json-string "{\"array\": [1, 2, 3],\"array-of-objects\":[{\"foo\": 1}, {\"foo\": 2}, {\"bar\": 3}], \"nested-object\": {\"foo\": {\"bar\": {\"baz\": 1, \"buz\": 2}}}}"]
+    (let [array (json/parse-string json-string nil nil [#{"array"}] true)]
+      (is (not (realized? array)))
+      (is (seq? array))
+      (is (= '(1 2 3) array)))
+
+    (let [array-of-objects (json/parse-string json-string nil nil [#{"array-of-objects"} #{"foo"}] true)]
+      (is (seq? array-of-objects))
+      (is (not (realized? array-of-objects)))
+      (is (= '({"foo" 1} {"foo" 2} {}) array-of-objects)))
+
+    (let [nested-object (json/parse-string json-string nil nil [#{"nested-object"} #{"foo"} #{"bar"} #{"baz"}])]
+      (is (= {"nested-object" {"foo" {"bar" {"baz" 1}}}} nested-object)))
+
+    (let [detached-nested-object (json/parse-string json-string nil nil [#{"nested-object"} #{"foo"} #{"bar"}] true)]
+      (is (= {"baz" 1 "buz" 2} detached-nested-object)))))

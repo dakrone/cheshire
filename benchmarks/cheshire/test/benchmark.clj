@@ -61,9 +61,10 @@
     (bench/bench (core/decode (core/encode test-obj)) :verbose))
   (println "........decode single nested property")
   (bench/with-progress-reporting
-    (bench/bench (core/parse-partial
-                  (big-test-reader "test/citylots.json.gz")
-                  ["features" 30 "properties" "STREET"]) :verbose))
+    (bench/bench (take 5 (core/parse-stream
+                          (big-test-reader "test/all_month.geojson.gz")
+                          nil nil
+                          [#{"features"} #{"properties"} #{"url"}] true)) :verbose))
   (println "-------------------------------------"))
 
 (deftest t-bench-pretty
