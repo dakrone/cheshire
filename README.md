@@ -134,8 +134,20 @@ changed.
 ;; parse a SMILE stream lazily (keywords option also supported)
 (parsed-smile-seq (clojure.java.io/reader "/tmp/foo"))
 
-;; parse a nested part of the stream lazily (keywords option also supported)
-(parse-stream (clojure.java.io/reader "/tmp/foo") nil nil [#{"foo"} #{"bar"}] true)
+;; path-predicate can be used to skip parts of json
+(defn path-predicate
+  [path]
+  (re-matches #"foo(bar)?(oof)?"
+              (apply str path)))
+(parse-string "{\"foo\": {\"bar\": {\"oof\": 1, \"foo\": 2}}}" nil nil path-predicate)
+;; => {"foo" {"bar" {"oof" 1}}}
+
+;; parse nested arrays lazily
+(defn path-predicate [path]
+  (re-matches #"foo([0-9]+)?"
+              (apply str (take 2 path))))
+(take 2 (parsed-seq-strict (clojure.java.io/reader "/tmp/foo") nil nil path-predicate))
+;; => ({...} {...})
 ```
 
 In 2.0.4 and up, Cheshire allows passing in a
