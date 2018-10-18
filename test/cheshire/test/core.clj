@@ -434,18 +434,27 @@
 
 (deftest t-parse-children
   (let [json-string "{\"array\": [1, 2, 3],\"array-of-objects\":[{\"foo\": 1}, {\"foo\": 2}, {\"bar\": 3}], \"nested-object\": {\"foo\": {\"bar\": {\"baz\": 1, \"buz\": 2}}}}"]
-    (let [array (json/parse-string json-string nil nil [#{"array"}] true)]
+    (let [array (json/parsed-seq-strict (StringReader. json-string) nil nil
+                                        (fn [path]
+                                          (re-matches #"array([0-9]+)?"
+                                                      (apply str path)))
+                                        true)]
       (is (not (realized? array)))
       (is (seq? array))
       (is (= '(1 2 3) array)))
 
-    (let [array-of-objects (json/parse-string json-string nil nil [#{"array-of-objects"} #{"foo"}] true)]
+    (let [array-of-objects (json/parsed-seq-strict (StringReader. json-string) nil nil
+                                                   (fn [path]
+                                                     (re-matches #"array-of-objects([0-9]?)?(foo)?"
+                                                                 (apply str path))))]
       (is (seq? array-of-objects))
       (is (not (realized? array-of-objects)))
       (is (= '({"foo" 1} {"foo" 2} {}) array-of-objects)))
 
-    (let [nested-object (json/parse-string json-string nil nil [#{"nested-object"} #{"foo"} #{"bar"} #{"baz"}])]
+    (let [nested-object (json/parse-string json-string nil nil
+                                           (fn [path]
+                                             (re-matches #"nested-object(foo)?(bar)?(baz)?"
+                                                         (apply str path))))]
       (is (= {"nested-object" {"foo" {"bar" {"baz" 1}}}} nested-object)))
 
-    (let [detached-nested-object (json/parse-string json-string nil nil [#{"nested-object"} #{"foo"} #{"bar"}] true)]
-      (is (= {"baz" 1 "buz" 2} detached-nested-object)))))
+    ))

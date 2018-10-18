@@ -12,94 +12,95 @@
   ([obj]
      `(vary-meta ~obj assoc :tag `JsonParser)))
 
-(definline parse-object [^JsonParser jp key-fn bd? array-coerce-fn pred-xs detach-children?]
+(definline parse-object [^JsonParser jp key-fn bd? array-coerce-fn parent-path path-predicate lazy? leaves-only?]
   (let [jp (tag jp)]
     `(do
        (.nextToken ~jp)
        (loop [mmap# (transient {})]
-         (if-not (identical? (.getCurrentToken ~jp)
-                             JsonToken/END_OBJECT)
+         (if-not (or (and ~lazy? (= 1 (count mmap#)))
+                     (identical? (.getCurrentToken ~jp)
+                                 JsonToken/END_OBJECT))
            (let [key-str# (.getText ~jp)
                  _# (.nextToken ~jp)
-                 key# (~key-fn key-str#)
-                 pred# (or (first ~pred-xs) (constantly true))
-                 match?# (pred# key#)
-                 val# (when match?# (parse* ~jp ~key-fn ~bd? ~array-coerce-fn (next ~pred-xs) ~detach-children?))
-                 mmap# (if match?#
-                         (assoc! mmap# key# val#)
+                 parent-path# (conj ~parent-path key-str#)
+                 mmap# (if (or (nil? ~path-predicate)
+                               (~path-predicate parent-path#))
+                         (assoc! mmap# (~key-fn key-str#)
+                                 (parse* ~jp ~key-fn ~bd? ~array-coerce-fn parent-path# ~path-predicate ~lazy? ~leaves-only?))
                          (do
                            (.skipChildren ~jp)
                            mmap#))]
              (.nextToken ~jp)
-             (if (and ~detach-children? match?#)
-               val#
-               (recur mmap#)))
-           (persistent! mmap#))))))
+             (recur mmap#))
+           ((if (or ~lazy? ~leaves-only?) #(-> % vals first) identity)
+            (persistent! mmap#)))))))
 
-(definline parse-array [^JsonParser jp key-fn bd? array-coerce-fn pred-xs]
+(definline parse-array [^JsonParser jp key-fn bd? array-coerce-fn parent-path path-predicate leaves-only?]
   (let [jp (tag jp)]
     `(let [array-field-name# (.getCurrentName ~jp)]
        (.nextToken ~jp)
        (loop [coll# (transient (if ~array-coerce-fn
                                  (~array-coerce-fn array-field-name#)
-                                 []))]
+                                 []))
+              counter# 0]
          (if-not (identical? (.getCurrentToken ~jp)
                              JsonToken/END_ARRAY)
-           (let [coll# (conj! coll#
-                              (parse* ~jp ~key-fn ~bd? ~array-coerce-fn ~pred-xs))]
+           (let [parent-path# (conj ~parent-path counter#)
+                 coll# (if (or (nil? ~path-predicate)
+                               (~path-predicate parent-path#))
+                         (conj! coll#
+                                (parse* ~jp ~key-fn ~bd? ~array-coerce-fn parent-path# ~path-predicate false ~leaves-only?))
+                         (do
+                           (.skipChildren ~jp)
+                           coll#))]
              (.nextToken ~jp)
-             (recur coll#))
+             (recur coll# (inc counter#)))
            (persistent! coll#))))))
 
-(defn lazily-parse-array
-  ([^JsonParser jp key-fn bd? array-coerce-fn pred-xs]
-   (let [pred-xs (or pred-xs (repeat (constantly true)))]
-     (lazy-seq
-      (loop [chunk-idx 0, buf (chunk-buffer 32)]
-        (if (identical? (.getCurrentToken jp) JsonToken/END_ARRAY)
-          (chunk-cons (chunk buf) nil)
-          (do
-            (chunk-append buf (parse* jp key-fn bd? array-coerce-fn pred-xs))
-            (.nextToken jp)
-            (let [chunk-idx* (unchecked-inc chunk-idx)]
-              (if (< chunk-idx* 32)
-                (recur chunk-idx* buf)
-                (chunk-cons
-                 (chunk buf)
-                 (lazily-parse-array jp key-fn bd? array-coerce-fn pred-xs)))))))))))
+(defn lazily-parse-array [^JsonParser jp key-fn bd? array-coerce-fn parent-path path-predicate position leaves-only?]
+  (lazy-seq
+   (when-not (identical? (.getCurrentToken jp) JsonToken/END_ARRAY)
+     (loop [position position]
+       (let [parent-path* (conj parent-path position)]
+         (if (or (nil? path-predicate)
+                 (path-predicate parent-path*))
+           (cons (let [val (parse* jp key-fn bd? array-coerce-fn parent-path* path-predicate false leaves-only?)]
+                   (.nextToken jp)
+                   val)
+                 (lazily-parse-array jp key-fn bd? array-coerce-fn parent-path path-predicate (inc position) leaves-only?))
+           (do
+             (.skipChildren jp)
+             (.nextToken jp)
+             (recur (inc position)))))))))
 
-(defn parse*
-  ([jp key-fn bd? array-coerce-fn pred-xs] (parse* jp key-fn bd? array-coerce-fn pred-xs false))
-  ([^JsonParser jp key-fn bd? array-coerce-fn pred-xs detach-children?]
-   (condp identical? (.getCurrentToken jp)
-     JsonToken/START_OBJECT (parse-object jp key-fn bd? array-coerce-fn pred-xs (if-not (first pred-xs)
-                                                                                  false
-                                                                                  detach-children?))
-     JsonToken/START_ARRAY (if detach-children?
-                             (lazily-parse-array jp key-fn bd? array-coerce-fn pred-xs)
-                             (parse-array jp key-fn bd? array-coerce-fn pred-xs))
-     JsonToken/VALUE_STRING (.getText jp)
-     JsonToken/VALUE_NUMBER_INT (.getNumberValue jp)
-     JsonToken/VALUE_NUMBER_FLOAT (if bd?
-                                    (.getDecimalValue jp)
-                                    (.getNumberValue jp))
-     JsonToken/VALUE_EMBEDDED_OBJECT (.getBinaryValue jp)
-     JsonToken/VALUE_TRUE true
-     JsonToken/VALUE_FALSE false
-     JsonToken/VALUE_NULL nil
-     (throw
-      (Exception.
-       (str "Cannot parse " (pr-str (.getCurrentToken jp))))))))
+(defn parse* [^JsonParser jp key-fn bd? array-coerce-fn parent-path path-predicate lazy? leaves-only?]
+  (condp identical? (.getCurrentToken jp)
+    JsonToken/START_OBJECT (parse-object jp key-fn bd? array-coerce-fn parent-path path-predicate lazy? leaves-only?)
+    JsonToken/START_ARRAY (if lazy?
+                            (lazily-parse-array jp key-fn bd? array-coerce-fn parent-path path-predicate 0 leaves-only?)
+                            (parse-array jp key-fn bd? array-coerce-fn parent-path path-predicate leaves-only?))
+    JsonToken/VALUE_STRING (.getText jp)
+    JsonToken/VALUE_NUMBER_INT (.getNumberValue jp)
+    JsonToken/VALUE_NUMBER_FLOAT (if bd?
+                                   (.getDecimalValue jp)
+                                   (.getNumberValue jp))
+    JsonToken/VALUE_EMBEDDED_OBJECT (.getBinaryValue jp)
+    JsonToken/VALUE_TRUE true
+    JsonToken/VALUE_FALSE false
+    JsonToken/VALUE_NULL nil
+    (throw
+     (Exception.
+      (str "Cannot parse " (pr-str (.getCurrentToken jp)))))))
 
-(defn parse-strict [^JsonParser jp key-fn eof array-coerce-fn pred-xs detach-children?]
-  (let [key-fn (or (if (identical? key-fn true) keyword key-fn) identity)]
+(defn parse-strict [^JsonParser jp key-fn eof array-coerce-fn path-predicate lazy? leaves-only?]
+  (let [key-fn (or (if (and (instance? Boolean key-fn) key-fn) keyword key-fn) identity)]
     (.nextToken jp)
     (condp identical? (.getCurrentToken jp)
       nil
       eof
-      (parse* jp key-fn *use-bigdecimals?* array-coerce-fn pred-xs detach-children?))))
+      (parse* jp key-fn *use-bigdecimals?* array-coerce-fn [] path-predicate lazy? leaves-only?))))
 
-(defn parse [^JsonParser jp key-fn eof array-coerce-fn pred-xs detach-children?]
+(defn parse [^JsonParser jp key-fn eof array-coerce-fn path-predicate leaves-only?]
   (let [key-fn (or (if (and (instance? Boolean key-fn) key-fn) keyword key-fn) identity)]
     (.nextToken jp)
     (condp identical? (.getCurrentToken jp)
@@ -109,6 +110,6 @@
       JsonToken/START_ARRAY
       (do
         (.nextToken jp)
-        (lazily-parse-array jp key-fn *use-bigdecimals?* array-coerce-fn pred-xs))
+        (lazily-parse-array jp key-fn *use-bigdecimals?* array-coerce-fn [] path-predicate 0 leaves-only?))
 
-      (parse* jp key-fn *use-bigdecimals?* array-coerce-fn pred-xs detach-children?))))
+      (parse* jp key-fn *use-bigdecimals?* array-coerce-fn [] path-predicate false leaves-only?))))

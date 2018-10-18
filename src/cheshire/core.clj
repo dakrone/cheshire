@@ -199,17 +199,17 @@
 
   If the top-level object is an array, it will be parsed lazily (use
   `parse-strict' if strict parsing is required for top-level arrays."
-  ([string] (parse-string string nil nil (repeat (constantly true)) false))
-  ([string key-fn] (parse-string string key-fn nil (repeat (constantly true)) false))
-  ([string key-fn array-coerce-fn] (parse-string string key-fn array-coerce-fn (repeat (constantly true)) false))
-  ([string key-fn array-coerce-fn pred-xs] (parse-string string key-fn array-coerce-fn pred-xs false))
-  ([^String string key-fn array-coerce-fn pred-xs detach-children?]
+  ([string] (parse-string string nil nil nil false))
+  ([string key-fn] (parse-string string key-fn nil nil false))
+  ([string key-fn array-coerce-fn] (parse-string string key-fn array-coerce-fn nil false))
+  ([string key-fn array-coerce-fn path-predicate] (parse-string string key-fn array-coerce-fn path-predicate false))
+  ([^String string key-fn array-coerce-fn path-predicate leaves-only?]
    (when string
      (parse/parse
       (.createParser ^JsonFactory (or factory/*json-factory*
                                       factory/json-factory)
                      ^Reader (StringReader. string))
-      key-fn nil array-coerce-fn pred-xs detach-children?))))
+      key-fn nil array-coerce-fn path-predicate leaves-only?))))
 
 ;; Parsing strictly
 (defn parse-string-strict
@@ -221,17 +221,17 @@
   and returning the collection to be used for array values.
 
   Does not lazily parse top-level arrays."
-  ([string] (parse-string-strict string nil nil (repeat (constantly true)) false))
-  ([string key-fn] (parse-string-strict string key-fn nil (repeat (constantly true)) false))
-  ([string key-fn array-coerce-fn] (parse-string-strict string key-fn array-coerce-fn (repeat (constantly true)) false))
-  ([string key-fn array-coerce-fn pred-xs] (parse-string-strict string key-fn array-coerce-fn pred-xs false))
-  ([^String string key-fn array-coerce-fn pred-xs detach-children?]
+  ([string] (parse-string-strict string nil nil nil false))
+  ([string key-fn] (parse-string-strict string key-fn nil nil false))
+  ([string key-fn array-coerce-fn] (parse-string-strict string key-fn array-coerce-fn nil false))
+  ([string key-fn array-coerce-fn path-predicate] (parse-string-strict string key-fn array-coerce-fn path-predicate false))
+  ([^String string key-fn array-coerce-fn path-predicate leaves-only?]
    (when string
      (parse/parse-strict
       (.createParser ^JsonFactory (or factory/*json-factory*
                                       factory/json-factory)
                      ^Reader (StringReader. string))
-      key-fn nil array-coerce-fn pred-xs detach-children?))))
+      key-fn nil array-coerce-fn path-predicate false leaves-only?))))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
@@ -247,17 +247,17 @@
 
   If multiple objects (enclosed in a top-level `{}' need to be parsed lazily,
   see parsed-seq."
-  ([rdr] (parse-stream rdr nil nil (repeat (constantly true)) false))
-  ([rdr key-fn] (parse-stream rdr key-fn nil (repeat (constantly true)) false))
-  ([rdr key-fn array-coerce-fn] (parse-stream rdr key-fn array-coerce-fn (repeat (constantly true)) false))
-  ([rdr key-fn array-coerce-fn pred-xs] (parse-stream rdr key-fn array-coerce-fn pred-xs false))
-  ([^BufferedReader rdr key-fn array-coerce-fn pred-xs detach-children?]
+  ([rdr] (parse-stream rdr nil nil nil false))
+  ([rdr key-fn] (parse-stream rdr key-fn nil nil false))
+  ([rdr key-fn array-coerce-fn] (parse-stream rdr key-fn array-coerce-fn nil false))
+  ([rdr key-fn array-coerce-fn path-predicate] (parse-stream rdr key-fn array-coerce-fn path-predicate false))
+  ([^BufferedReader rdr key-fn array-coerce-fn path-predicate leaves-only?]
    (when rdr
      (parse/parse
       (.createParser ^JsonFactory (or factory/*json-factory*
                                       factory/json-factory)
                      ^Reader rdr)
-      key-fn nil array-coerce-fn pred-xs detach-children?))))
+      key-fn nil array-coerce-fn path-predicate leaves-only?))))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
@@ -266,16 +266,16 @@
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  ([bytes] (parse-smile bytes nil nil (repeat (constantly true)) false))
-  ([bytes key-fn] (parse-smile bytes key-fn nil (repeat (constantly true)) false))
-  ([bytes key-fn array-coerce-fn] (parse-smile bytes key-fn array-coerce-fn (repeat (constantly true)) false))
-  ([bytes key-fn array-coerce-fn pred-xs] (parse-smile bytes key-fn array-coerce-fn pred-xs false))
-  ([^bytes bytes key-fn array-coerce-fn pred-xs detach-children?]
+  ([bytes] (parse-smile bytes nil nil nil false))
+  ([bytes key-fn] (parse-smile bytes key-fn nil nil false))
+  ([bytes key-fn array-coerce-fn] (parse-smile bytes key-fn array-coerce-fn nil false))
+  ([bytes key-fn array-coerce-fn path-predicate] (parse-smile bytes key-fn array-coerce-fn path-predicate false))
+  ([^bytes bytes key-fn array-coerce-fn path-predicate leaves-only?]
    (when bytes
      (parse/parse
       (.createParser ^SmileFactory (or factory/*smile-factory*
                                        factory/smile-factory) bytes)
-      key-fn nil array-coerce-fn pred-xs detach-children?))))
+      key-fn nil array-coerce-fn path-predicate leaves-only?))))
 
 (defn parse-cbor
   "Returns the Clojure object corresponding to the given CBOR-encoded bytes.
@@ -284,16 +284,16 @@
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  ([bytes] (parse-cbor bytes nil nil (repeat (constantly true)) false))
-  ([bytes key-fn] (parse-cbor bytes key-fn nil (repeat (constantly true)) false))
-  ([bytes key-fn array-coerce-fn] (parse-cbor bytes key-fn array-coerce-fn (repeat (constantly true)) false))
-  ([bytes key-fn array-coerce-fn pred-xs] (parse-cbor bytes key-fn array-coerce-fn pred-xs false))
-  ([^bytes bytes key-fn array-coerce-fn pred-xs detach-children?]
+  ([bytes] (parse-cbor bytes nil nil nil false))
+  ([bytes key-fn] (parse-cbor bytes key-fn nil nil false))
+  ([bytes key-fn array-coerce-fn] (parse-cbor bytes key-fn array-coerce-fn nil false))
+  ([bytes key-fn array-coerce-fn path-predicate] (parse-cbor bytes key-fn array-coerce-fn path-predicate false))
+  ([^bytes bytes key-fn array-coerce-fn path-predicate leaves-only?]
    (when bytes
      (parse/parse
       (.createParser ^CBORFactory (or factory/*cbor-factory*
                                       factory/cbor-factory) bytes)
-      key-fn nil array-coerce-fn pred-xs detach-children?))))
+      key-fn nil array-coerce-fn path-predicate leaves-only?))))
 
 (def ^{:doc "Object used to determine end of lazy parsing attempt."}
   eof (Object.))
@@ -301,11 +301,11 @@
 ;; Lazy parsers
 (defn- parsed-seq*
   "Internal lazy-seq parser"
-  [^JsonParser parser key-fn array-coerce-fn pred-xs detach-children?]
+  [^JsonParser parser key-fn array-coerce-fn path-predicate leaves-only?]
   (lazy-seq
-   (let [elem (parse/parse-strict parser key-fn eof array-coerce-fn pred-xs detach-children?)]
+   (let [elem (parse/parse-strict parser key-fn eof array-coerce-fn path-predicate false leaves-only?)]
      (when-not (identical? elem eof)
-       (cons elem (parsed-seq* parser key-fn array-coerce-fn pred-xs detach-children?))))))
+       (cons elem (parsed-seq* parser key-fn array-coerce-fn path-predicate leaves-only?))))))
 
 (defn parsed-seq
   "Returns a lazy seq of Clojure objects corresponding to the JSON read from
@@ -314,17 +314,17 @@
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
   If non-laziness is needed, see parse-stream."
-  ([reader] (parsed-seq reader nil nil (repeat (constantly true)) false))
-  ([reader key-fn] (parsed-seq reader key-fn nil (repeat (constantly true)) false))
-  ([reader key-fn array-coerce-fn] (parsed-seq reader key-fn array-coerce-fn (repeat (constantly true)) false))
-  ([reader key-fn array-coerce-fn pred-xs] (parsed-seq reader key-fn array-coerce-fn pred-xs false))
-  ([^BufferedReader reader key-fn array-coerce-fn pred-xs detach-children?]
+  ([reader] (parsed-seq reader nil nil nil false))
+  ([reader key-fn] (parsed-seq reader key-fn nil nil false))
+  ([reader key-fn array-coerce-fn] (parsed-seq reader key-fn array-coerce-fn nil false))
+  ([reader key-fn array-coerce-fn path-predicate] (parsed-seq reader key-fn array-coerce-fn path-predicate false))
+  ([^BufferedReader reader key-fn array-coerce-fn path-predicate leaves-only?]
    (when reader
      (parsed-seq* (.createParser ^JsonFactory
                                  (or factory/*json-factory*
                                      factory/json-factory)
                                  ^Reader reader)
-                  key-fn array-coerce-fn pred-xs detach-children?))))
+                  key-fn array-coerce-fn path-predicate leaves-only?))))
 
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
@@ -332,17 +332,30 @@
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  ([reader] (parsed-smile-seq reader nil nil (repeat (constantly true)) false))
-  ([reader key-fn] (parsed-smile-seq reader key-fn nil (repeat (constantly true)) false))
-  ([reader key-fn array-coerce-fn] (parsed-smile-seq reader key-fn array-coerce-fn (repeat (constantly true)) false))
-  ([reader key-fn array-coerce-fn pred-xs] (parsed-smile-seq reader key-fn array-coerce-fn pred-xs false))
-  ([^BufferedReader reader key-fn array-coerce-fn pred-xs detach-children?]
+  ([reader] (parsed-smile-seq reader nil nil nil false))
+  ([reader key-fn] (parsed-smile-seq reader key-fn nil nil false))
+  ([reader key-fn array-coerce-fn] (parsed-smile-seq reader key-fn array-coerce-fn nil false))
+  ([reader key-fn array-coerce-fn path-predicate] (parsed-smile-seq reader key-fn array-coerce-fn path-predicate false))
+  ([^BufferedReader reader key-fn array-coerce-fn path-predicate leaves-only?]
    (when reader
      (parsed-seq* (.createParser ^SmileFactory
                                  (or factory/*smile-factory*
                                      factory/smile-factory)
                                  ^Reader reader)
-                  key-fn array-coerce-fn pred-xs detach-children?))))
+                  key-fn array-coerce-fn path-predicate leaves-only?))))
+
+(defn parsed-seq-strict
+  ([reader] (parsed-seq-strict reader nil nil nil false))
+  ([reader key-fn] (parsed-seq-strict reader key-fn nil nil false))
+  ([reader key-fn array-coerce-fn] (parsed-seq-strict reader key-fn array-coerce-fn nil false))
+  ([reader key-fn array-coerce-fn path-predicate] (parsed-seq-strict reader key-fn array-coerce-fn path-predicate false))
+  ([^BufferedReader reader key-fn array-coerce-fn path-predicate leaves-only?]
+   (when reader
+     (parse/parse-strict (.createParser ^SmileFactory
+                                        (or factory/*json-factory*
+                                            factory/json-factory)
+                                        ^Reader reader)
+                         key-fn nil array-coerce-fn path-predicate true leaves-only?))))
 
 ;; aliases for clojure-json users
 (defmacro copy-arglists

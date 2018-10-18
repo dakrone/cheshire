@@ -18,28 +18,28 @@
 (defn parse-string
   "Like cheshire.core/parse-string
   but with only valid json string"
-  ([string] (parse-string string nil nil (repeat (constantly true)) false))
-  ([string key-fn] (parse-string string key-fn nil (repeat (constantly true)) false))
-  ([string key-fn array-coerce-fn] (parse-string string key-fn array-coerce-fn (repeat (constantly true)) false))
-  ([string key-fn array-coerce-fn pred-xs] (parse-string string key-fn array-coerce-fn pred-xs false))
-  ([^String string key-fn array-coerce-fn pred-xs detach-children?]
+  ([string] (parse-string string nil nil nil false))
+  ([string key-fn] (parse-string string key-fn nil nil false))
+  ([string key-fn array-coerce-fn] (parse-string string key-fn array-coerce-fn nil false))
+  ([string key-fn array-coerce-fn path-predicate] (parse-string string key-fn array-coerce-fn path-predicate false))
+  ([^String string key-fn array-coerce-fn path-predicate leaves-only?]
    (when string
      (let [jp (.createParser ^JsonFactory (or factory/*json-factory*
                                               factory/json-factory)
                              ^Reader (StringReader. string))]
-       (exact-parse jp (parse/parse jp key-fn nil array-coerce-fn pred-xs detach-children?))))))
+       (exact-parse jp (parse/parse jp key-fn nil array-coerce-fn path-predicate leaves-only?))))))
 
 (defn parse-string-strict
-  ([string] (parse-string-strict string nil nil (repeat (constantly true)) false))
-  ([string key-fn] (parse-string-strict string key-fn nil (repeat (constantly true)) false))
-  ([string key-fn array-coerce-fn] (parse-string-strict string key-fn array-coerce-fn (repeat (constantly true)) false))
-  ([string key-fn array-coerce-fn pred-xs] (parse-string-strict string key-fn array-coerce-fn pred-xs false))
-  ([^String string key-fn array-coerce-fn pred-xs detach-children?]
+  ([string] (parse-string-strict string nil nil nil false))
+  ([string key-fn] (parse-string-strict string key-fn nil nil false))
+  ([string key-fn array-coerce-fn] (parse-string-strict string key-fn array-coerce-fn nil false))
+  ([string key-fn array-coerce-fn path-predicate] (parse-string-strict string key-fn array-coerce-fn path-predicate false))
+  ([^String string key-fn array-coerce-fn path-predicate leaves-only?]
    (when string
      (let [jp (.createParser ^JsonFactory (or factory/*json-factory*
                                               factory/json-factory)
                              ^Writer (StringReader. string))]
-       (exact-parse jp (parse/parse-strict jp key-fn nil array-coerce-fn pred-xs detach-children?))))))
+       (exact-parse jp (parse/parse-strict jp key-fn nil array-coerce-fn path-predicate false leaves-only?))))))
 
 (def decode parse-string)
 (core/copy-arglists decode parse-string)

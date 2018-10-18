@@ -61,10 +61,16 @@
     (bench/bench (core/decode (core/encode test-obj)) :verbose))
   (println "........decode single nested property")
   (bench/with-progress-reporting
-    (bench/bench (take 5 (core/parse-stream
+    (bench/bench (take 5 (core/parsed-seq-strict
                           (big-test-reader "test/all_month.geojson.gz")
                           nil nil
-                          [#{"features"} #{"properties"} #{"url"}] true)) :verbose))
+                          (fn [[fpath & [spath & [tpath & [lpath]]]]]
+                            (or (and (= "features" fpath) (nil? spath) (nil? tpath) (nil? lpath))
+                                (and (= "features" fpath) (integer? spath) (nil? tpath) (nil? lpath))
+                                (and (= "features" fpath) (integer? spath) (= "properties" tpath) (nil? lpath))
+                                (and (= "features" fpath) (integer? spath) (= "properties" tpath) (= "url" lpath))))
+                          true))
+                 :verbose))
   (println "-------------------------------------"))
 
 (deftest t-bench-pretty
