@@ -19,6 +19,7 @@
    :allow-backslash-escaping false
    :allow-numeric-leading-zeros false
    :allow-non-numeric-numbers false
+   :allow-trailing-comma false
    :intern-field-names false
    :canonicalize-field-names false
    :quote-field-names true})
@@ -44,6 +45,8 @@
                   (boolean (:allow-numeric-leading-zeros opts)))
       (.configure JsonParser$Feature/ALLOW_NON_NUMERIC_NUMBERS
                   (boolean (:allow-non-numeric-numbers opts)))
+      (.configure JsonParser$Feature/ALLOW_TRAILING_COMMA
+                  (boolean (:allow-trailing-comma opts)))
       (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
                   (boolean (:intern-field-names opts)))
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
@@ -71,6 +74,8 @@
                   (boolean (:allow-numeric-leading-zeros opts)))
       (.configure JsonParser$Feature/ALLOW_NON_NUMERIC_NUMBERS
                   (boolean (:allow-non-numeric-numbers opts)))
+      (.configure JsonParser$Feature/ALLOW_TRAILING_COMMA
+                  (boolean (:allow-trailing-comma opts)))
       (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
                   (boolean (:intern-field-names opts)))
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
@@ -98,6 +103,8 @@
                   (boolean (:allow-numeric-leading-zeros opts)))
       (.configure JsonParser$Feature/ALLOW_NON_NUMERIC_NUMBERS
                   (boolean (:allow-non-numeric-numbers opts)))
+      (.configure JsonParser$Feature/ALLOW_TRAILING_COMMA
+                  (boolean (:allow-trailing-comma opts)))
       (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
                   (boolean (:intern-field-names opts)))
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
