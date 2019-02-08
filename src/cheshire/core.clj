@@ -253,6 +253,26 @@
                      ^Reader rdr)
       key-fn nil array-coerce-fn))))
 
+(defn parse-stream-strict
+  "Returns the Clojure object corresponding to the given reader, reader must
+  implement BufferedReader. An optional key-fn argument can be either true (to
+  coerce keys to keywords),false to leave them as strings, or a function to
+  provide custom coercion.
+
+  The array-coerce-fn is an optional function taking the name of an array field,
+  and returning the collection to be used for array values.
+
+  Does not lazily parse top-level arrays."
+  ([rdr] (parse-stream-strict rdr nil nil))
+  ([rdr key-fn] (parse-stream-strict rdr key-fn nil))
+  ([^BufferedReader rdr key-fn array-coerce-fn]
+   (when rdr
+     (parse/parse-strict
+       (.createParser ^JsonFactory (or factory/*json-factory*
+                                       factory/json-factory)
+                      ^Reader rdr)
+       key-fn nil array-coerce-fn))))
+
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
   An optional key-fn argument can be either true (to coerce keys to keywords),

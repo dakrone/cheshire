@@ -149,16 +149,23 @@
   (is (= "{\"foo\":\"a\"}" (json/encode {:foo \a}))))
 
 (deftest test-streams
-  (is (= {"foo" "bar"}
-         (json/parse-stream
-          (BufferedReader. (StringReader. "{\"foo\":\"bar\"}\n")))))
-  (let [sw (StringWriter.)
-        bw (BufferedWriter. sw)]
-    (json/generate-stream {"foo" "bar"} bw)
-    (is (= "{\"foo\":\"bar\"}" (.toString sw))))
-  (is (= {(keyword "foo baz") "bar"}
-         (with-open [rdr (StringReader. "{\"foo baz\":\"bar\"}\n")]
-           (json/parse-stream rdr true)))))
+  (testing "parse-stream"
+    (are [parsed parse parsee] (= parsed
+                                  (parse (BufferedReader. (StringReader. parsee))))
+      {"foo" "bar"} json/parse-stream "{\"foo\":\"bar\"}\n"
+      {"foo" "bar"} json/parse-stream-strict "{\"foo\":\"bar\"}\n")
+
+    (are [parsed parse parsee] (= parsed
+                                  (with-open [rdr (StringReader. parsee)]
+                                    (parse rdr true)))
+      {(keyword "foo baz") "bar"} json/parse-stream "{\"foo baz\":\"bar\"}\n"
+      {(keyword "foo baz") "bar"} json/parse-stream-strict "{\"foo baz\":\"bar\"}\n"))
+
+  (testing "generate-stream"
+    (let [sw (StringWriter.)
+          bw (BufferedWriter. sw)]
+      (json/generate-stream {"foo" "bar"} bw)
+      (is (= "{\"foo\":\"bar\"}" (.toString sw))))))
 
 (deftest serial-writing
   (is (= "[\"foo\",\"bar\"]"
