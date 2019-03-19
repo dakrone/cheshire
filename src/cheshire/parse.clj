@@ -3,6 +3,8 @@
 
 (declare parse*)
 
+(def ^:dynamic *chunk-size* 32)
+
 (def ^{:doc "Flag to determine whether float values should be returned as
              BigDecimals to retain precision. Defaults to false."
        :dynamic true}
@@ -45,14 +47,14 @@
 
 (defn lazily-parse-array [^JsonParser jp key-fn bd? array-coerce-fn]
   (lazy-seq
-   (loop [chunk-idx 0, buf (chunk-buffer 32)]
+   (loop [chunk-idx 0, buf (chunk-buffer *chunk-size*)]
      (if (identical? (.getCurrentToken jp) JsonToken/END_ARRAY)
        (chunk-cons (chunk buf) nil)
        (do
          (chunk-append buf (parse* jp key-fn bd? array-coerce-fn))
          (.nextToken jp)
          (let [chunk-idx* (unchecked-inc chunk-idx)]
-           (if (< chunk-idx* 32)
+           (if (< chunk-idx* *chunk-size*)
              (recur chunk-idx* buf)
              (chunk-cons
               (chunk buf)
