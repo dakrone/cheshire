@@ -110,8 +110,9 @@
      (.flush generator)
      writer)))
 
-(defn create-generator [writer]
+(defn create-generator
   "Returns JsonGenerator for given writer."
+  [writer]
   (.createGenerator
    ^JsonFactory (or factory/*json-factory*
                     factory/json-factory)
