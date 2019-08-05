@@ -1,3 +1,9 @@
+## Changes between Cheshire 5.8.1 and 5.9.0
+
+* Add `parse-stream-strict` to parse streams strictly rather than lazily
+* Bump Jackson dependencies to 2.9.9
+* Chunk size for lazy seqs is now configurable
+
 ## Changes between Cheshire 5.8.0 and 5.8.1
 
 * Add `:quote-field-names` parameter to control quoting field names in encoding
