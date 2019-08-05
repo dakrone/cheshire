@@ -1,6 +1,7 @@
 language: clojure
 lein: lein
 script: lein all test :all
+dist: trusty
 branches:
   only:
     - master
