@@ -8,7 +8,7 @@
   :dependencies [[com.fasterxml.jackson.core/jackson-core "2.9.9"]
                  [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.9.9"]
                  [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.9.9"]
-                 [tigris "0.1.1"]]
+                 [tigris "0.1.2"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.8.0"]
                                   [org.clojure/test.generative "0.1.4"]
                                   [org.clojure/tools.namespace "0.2.1"]]}
