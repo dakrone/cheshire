@@ -121,11 +121,12 @@
 (def ^:dynamic ^JsonGenerator *generator*)
 (def ^:dynamic *opt-map*)
 
-(defmacro with-writer [[writer opt-map] & body]
+(defmacro with-writer
   "Start writing for series objects using the same json generator.
    Takes writer and options map as arguments.
    Expects its body as sequence of write calls.
    Returns a given writer."
+  [[writer opt-map] & body]
   `(let [c-wr# ~writer]
      (binding [*generator* (create-generator c-wr#)
                *opt-map* ~opt-map]
