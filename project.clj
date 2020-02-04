@@ -5,16 +5,13 @@
             :url "http://opensource.org/licenses/MIT"
             :distribution :repo}
   :global-vars {*warn-on-reflection* false}
-  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.10.0"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.10.0"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.10.0"]
+  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.10.2"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.10.2"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.10.2"]
                  [tigris "0.1.2"]]
-  :profiles {:dev {:dependencies [[org.clojure/clojure "1.8.0"]
+  :profiles {:dev {:dependencies [[org.clojure/clojure "1.10.1"]
                                   [org.clojure/test.generative "0.1.4"]
                                   [org.clojure/tools.namespace "0.3.1"]]}
-             :1.3 {:dependencies [[org.clojure/clojure "1.3.0"]]}
-             :1.4 {:dependencies [[org.clojure/clojure "1.4.0"]]}
-             :1.5 {:dependencies [[org.clojure/clojure "1.5.1"]]}
              :1.7 {:dependencies [[org.clojure/clojure "1.7.0"]]}
              :1.8 {:dependencies [[org.clojure/clojure "1.8.0"]]}
              :1.9 {:dependencies [[org.clojure/clojure "1.9.0"]]}
@@ -23,7 +20,7 @@
                          :dependencies [[criterium "0.4.5"]
                                         [org.clojure/data.json "0.2.6"]
                                         [clj-json "0.5.3"]]}}
-  :aliases {"all" ["with-profile" "dev,1.3:dev,1.4:dev,1.5:dev,1.7:dev,1.8:dev,1.9:dev"]
+  :aliases {"all" ["with-profile" "dev,1.7:dev,1.8:dev,1.9:dev"]
             "benchmark" ["with-profile" "dev,benchmark" "test"]
             "pretty-bench" ["with-profile" "dev,benchmark" "test" ":only"
                           "cheshire.test.benchmark/t-bench-pretty"]
@@ -33,7 +30,8 @@
                                    (not (:generative %)))
                    :generative :generative
                    :all (constantly true)}
-  :plugins [[codox "0.6.3"]]
+  :plugins [[codox "0.6.3"]
+            [lein-ancient "0.6.15"]]
   :java-source-paths ["src/java"]
   :jvm-opts ["-Xmx512M"
 ;;             "-XX:+PrintCompilation"
