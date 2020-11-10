@@ -21,7 +21,8 @@
    :allow-non-numeric-numbers false
    :intern-field-names false
    :canonicalize-field-names false
-   :quote-field-names true})
+   :quote-field-names true
+   :strict-duplicate-detection false})
 
 ;; Factory objects that are needed to do the encoding and decoding
 (defn make-json-factory
@@ -44,6 +45,8 @@
                   (boolean (:allow-numeric-leading-zeros opts)))
       (.configure JsonParser$Feature/ALLOW_NON_NUMERIC_NUMBERS
                   (boolean (:allow-non-numeric-numbers opts)))
+      (.configure JsonParser$Feature/STRICT_DUPLICATE_DETECTION
+                  (boolean (:strict-duplicate-detection opts)))
       (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
                   (boolean (:intern-field-names opts)))
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES

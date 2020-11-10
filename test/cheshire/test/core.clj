@@ -6,7 +6,8 @@
             [cheshire.generate :as gen]
             [cheshire.factory :as fact]
             [cheshire.parse :as parse])
-  (:import (com.fasterxml.jackson.core JsonGenerationException)
+  (:import (com.fasterxml.jackson.core JsonGenerationException
+                                       JsonParseException)
            (java.io FileInputStream StringReader StringWriter
                     BufferedReader BufferedWriter)
            (java.sql Timestamp)
@@ -254,6 +255,17 @@
   (binding [fact/*json-factory* (fact/make-json-factory
                                   {:quote-field-names false})]
     (is (= "{a:1}" (json/encode {:a 1})))))
+
+(deftest t-bindable-factories-strict-duplicate-detection
+  (binding [fact/*json-factory* (fact/make-json-factory
+                                 {:strict-duplicate-detection true})]
+    (is (thrown? JsonParseException
+                 (json/decode "{\"a\": 1, \"b\": 2, \"a\": 3}"))))
+
+  (binding [fact/*json-factory* (fact/make-json-factory
+                                 {:strict-duplicate-detection false})]
+    (is (= {"a" 3 "b" 2}
+           (json/decode "{\"a\": 1, \"b\": 2, \"a\": 3}")))))
 
 (deftest t-persistent-queue
   (let [q (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)]
