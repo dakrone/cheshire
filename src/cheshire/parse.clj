@@ -14,6 +14,15 @@
   ([obj]
      `(vary-meta ~obj assoc :tag `JsonParser)))
 
+(defmacro ^:private token-case [token & clauses]
+  `(case (.ordinal ~token)
+     ~@(->> clauses
+            (partition-all 2)
+            (mapcat (fn [[k v :as clause]]
+                      (case (count clause)
+                        2 [(.ordinal ^JsonToken (eval k)) v]
+                        1 clause))))))
+
 (definline parse-object [^JsonParser jp key-fn bd? array-coerce-fn]
   (let [jp (tag jp)]
     `(do
@@ -61,7 +70,7 @@
               (lazily-parse-array jp key-fn bd? array-coerce-fn)))))))))
 
 (defn parse* [^JsonParser jp key-fn bd? array-coerce-fn]
-  (condp identical? (.getCurrentToken jp)
+  (token-case (.getCurrentToken jp)
     JsonToken/START_OBJECT (parse-object jp key-fn bd? array-coerce-fn)
     JsonToken/START_ARRAY (parse-array jp key-fn bd? array-coerce-fn)
     JsonToken/VALUE_STRING (.getText jp)
