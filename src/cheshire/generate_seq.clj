@@ -35,16 +35,18 @@
   (let [jg (tag jg)]
     `(do
        (write-start-object ~jg ~wholeness)
-       (doseq [m# ~obj]
-         (let [k# (key m#)
-               v# (val m#)]
-           (.writeFieldName ~jg (if (keyword? k#)
-                                  (.substring (str k#) 1)
-                                  (str k#)))
-           (generate ~jg v# ~date-format ~e nil
-                     :wholeness (if (= ~wholeness :start-inner)
-                                  :start
-                                  :all))))
+       (reduce (fn [^JsonGenerator jg# kv#]
+                 (let [k# (key kv#)
+                       v# (val kv#)]
+                   (.writeFieldName jg# (if (keyword? k#)
+                                          (.substring (str k#) 1)
+                                          (str k#)))
+                   (generate jg# v# ~date-format ~e nil
+                             :wholeness (if (= ~wholeness :start-inner)
+                                          :start
+                                          :all))
+                   jg#))
+               ~jg ~obj)
        (write-end-object ~jg ~wholeness))))
 
 (definline generate-key-fn-map
@@ -55,17 +57,19 @@
         jg (tag jg)]
     `(do
        (write-start-object ~jg ~wholeness)
-       (doseq [m# ~obj]
-         (let [~k (key m#)
-               v# (val m#)
-               ^String name# (if (keyword? ~k)
-                               (~key-fn ~k)
-                               (str ~k))]
-           (.writeFieldName ~jg name#)
-           (generate ~jg v# ~date-format ~e ~key-fn
-                     :wholeness (if (= ~wholeness :start-inner)
-                                  :start
-                                  :all))))
+       (reduce (fn [^JsonGenerator jg# kv#]
+                 (let [~k (key kv#)
+                       v# (val kv#)
+                       ^String name# (if (keyword? ~k)
+                                       (~key-fn ~k)
+                                       (str ~k))]
+                   (.writeFieldName jg# name#)
+                   (generate jg# v# ~date-format ~e ~key-fn
+                             :wholeness (if (= ~wholeness :start-inner)
+                                          :start
+                                          :all))
+                   jg#))
+               ~jg ~obj)
        (write-end-object ~jg ~wholeness))))
 
 (definline generate-map
@@ -80,11 +84,13 @@
   (let [jg (tag jg)]
     `(do
        (write-start-array ~jg ~wholeness)
-       (doseq [item# ~obj]
-         (generate ~jg item# ~date-format ~e ~key-fn
-                   :wholeness (if (= ~wholeness :start-inner)
-                                :start
-                                :all)))
+       (reduce (fn [jg# item#]
+                 (generate jg# item# ~date-format ~e ~key-fn
+                           :wholeness (if (= ~wholeness :start-inner)
+                                        :start
+                                        :all))
+                 jg#)
+               ~jg ~obj)
        (write-end-array ~jg ~wholeness))))
 
 (defn generate [^JsonGenerator jg obj ^String date-format

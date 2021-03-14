@@ -155,8 +155,7 @@
   "Encode a seq to the json generator."
   [s ^JsonGenerator jg]
   (.writeStartArray jg)
-  (doseq [i s]
-    (to-json i jg))
+  (reduce (fn [jg i] (to-json i jg) jg) jg s)
   (.writeEndArray jg))
 
 (defn encode-date
@@ -182,13 +181,17 @@
   "Encode a clojure map to the json generator."
   [^clojure.lang.IPersistentMap m ^JsonGenerator jg]
   (.writeStartObject jg)
-  (doseq [[k v] m]
-    (.writeFieldName jg (if (instance? clojure.lang.Keyword k)
-                          (if-let [ns (namespace k)]
-                            (str ns "/" (name k))
-                            (name k))
-                          (str k)))
-    (to-json v jg))
+  (reduce (fn [^JsonGenerator jg kv]
+            (let [k (key kv)
+                  v (val kv)]
+              (.writeFieldName jg (if (instance? clojure.lang.Keyword k)
+                                    (if-let [ns (namespace k)]
+                                      (str ns "/" (name k))
+                                      (name k))
+                                    (str k)))
+              (to-json v jg)
+              jg))
+          jg m)
   (.writeEndObject jg))
 
 (defn encode-symbol
