@@ -61,13 +61,15 @@
   (let [jg (tag jg)]
     `(do
        (.writeStartObject ~jg)
-       (doseq [m# ~obj]
-         (let [k# (key m#)
-               v# (val m#)]
-           (.writeFieldName ~jg (if (keyword? k#)
-                                  (.substring (str k#) 1)
-                                  (str k#)))
-           (generate ~jg v# ~date-format ~e nil)))
+       (reduce (fn [^JsonGenerator jg# kv#]
+                 (let [k# (key kv#)
+                       v# (val kv#)]
+                   (.writeFieldName jg# (if (keyword? k#)
+                                          (.substring (str k#) 1)
+                                          (str k#)))
+                   (generate jg# v# ~date-format ~e nil)
+                   jg#))
+               ~jg ~obj)
        (.writeEndObject ~jg))))
 
 (definline generate-key-fn-map
@@ -77,14 +79,16 @@
         jg (tag jg)]
     `(do
        (.writeStartObject ~jg)
-       (doseq [m# ~obj]
-         (let [~k (key m#)
-               v# (val m#)
-               ^String name# (if (keyword? ~k)
-                               (~key-fn ~k)
-                               (str ~k))]
-           (.writeFieldName ~jg name#)
-           (generate ~jg v# ~date-format ~e ~key-fn)))
+       (reduce (fn [^JsonGenerator jg# kv#]
+                 (let [~k (key kv#)
+                       v# (val kv#)
+                       ^String name# (if (keyword? ~k)
+                                       (~key-fn ~k)
+                                       (str ~k))]
+                   (.writeFieldName jg# name#)
+                   (generate jg# v# ~date-format ~e ~key-fn)
+                   jg#))
+               ~jg ~obj)
        (.writeEndObject ~jg))))
 
 (definline generate-map
@@ -98,8 +102,7 @@
   (let [jg (tag jg)]
     `(do
        (.writeStartArray ~jg)
-       (doseq [item# ~obj]
-         (generate ~jg item# ~date-format ~e ~key-fn))
+       (reduce (fn [jg# item#] (generate jg# item# ~date-format ~e ~key-fn) jg#) ~jg ~obj)
        (.writeEndArray ~jg))))
 
 (defmacro i?
@@ -188,8 +191,7 @@
   "Encode a seq to the json generator."
   [s ^JsonGenerator jg]
   (.writeStartArray jg)
-  (doseq [i s]
-    (generate jg i *date-format* nil nil))
+  (reduce (fn [jg i] (generate jg i *date-format* nil nil) jg) jg s)
   (.writeEndArray jg))
 
 (defn encode-date
@@ -215,13 +217,17 @@
   "Encode a clojure map to the json generator."
   [^clojure.lang.IPersistentMap m ^JsonGenerator jg]
   (.writeStartObject jg)
-  (doseq [[k v] m]
-    (.writeFieldName jg (if (instance? clojure.lang.Keyword k)
-                          (if-let [ns (namespace k)]
-                            (str ns "/" (name k))
-                            (name k))
-                          (str k)))
-    (generate jg v *date-format* nil nil))
+  (reduce (fn [^JsonGenerator jg kv]
+            (let [k (key kv)
+                  v (val kv)]
+              (.writeFieldName jg (if (instance? clojure.lang.Keyword k)
+                                    (if-let [ns (namespace k)]
+                                      (str ns "/" (name k))
+                                      (name k))
+                                    (str k)))
+              (generate jg v *date-format* nil nil)
+              jg))
+          jg m)
   (.writeEndObject jg))
 
 (defn encode-symbol
