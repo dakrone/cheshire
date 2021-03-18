@@ -10,7 +10,7 @@
            (com.fasterxml.jackson.dataformat.cbor CBORFactory)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (cheshire.prettyprint CustomPrettyPrinter)
-           (java.io StringWriter StringReader BufferedReader BufferedWriter
+           (java.io StringWriter BufferedReader BufferedWriter
                     ByteArrayOutputStream OutputStream Reader Writer)))
 
 (defonce default-pretty-print-options
@@ -206,9 +206,7 @@
   ([^String string key-fn array-coerce-fn]
    (when string
      (parse/parse
-      (.createParser ^JsonFactory (or factory/*json-factory*
-                                      factory/json-factory)
-                     ^Reader (StringReader. string))
+      (parse/json-parser string)
       key-fn nil array-coerce-fn))))
 
 ;; Parsing strictly
@@ -226,9 +224,7 @@
   ([^String string key-fn array-coerce-fn]
    (when string
      (parse/parse-strict
-      (.createParser ^JsonFactory (or factory/*json-factory*
-                                      factory/json-factory)
-                     ^Reader (StringReader. string))
+      (parse/json-parser string)
       key-fn nil array-coerce-fn))))
 
 (defn parse-stream
@@ -250,9 +246,7 @@
   ([^BufferedReader rdr key-fn array-coerce-fn]
    (when rdr
      (parse/parse
-      (.createParser ^JsonFactory (or factory/*json-factory*
-                                      factory/json-factory)
-                     ^Reader rdr)
+      (parse/json-parser rdr)
       key-fn nil array-coerce-fn))))
 
 (defn parse-stream-strict
@@ -270,9 +264,7 @@
   ([^BufferedReader rdr key-fn array-coerce-fn]
    (when rdr
      (parse/parse-strict
-       (.createParser ^JsonFactory (or factory/*json-factory*
-                                       factory/json-factory)
-                      ^Reader rdr)
+       (parse/json-parser rdr)
        key-fn nil array-coerce-fn))))
 
 (defn parse-smile
@@ -287,8 +279,7 @@
   ([^bytes bytes key-fn array-coerce-fn]
    (when bytes
      (parse/parse
-      (.createParser ^SmileFactory (or factory/*smile-factory*
-                                       factory/smile-factory) bytes)
+      (parse/smile-parser bytes)
       key-fn nil array-coerce-fn))))
 
 (defn parse-cbor
@@ -303,8 +294,7 @@
   ([^bytes bytes key-fn array-coerce-fn]
    (when bytes
      (parse/parse
-      (.createParser ^CBORFactory (or factory/*cbor-factory*
-                                      factory/cbor-factory) bytes)
+      (parse/cbor-parser bytes)
       key-fn nil array-coerce-fn))))
 
 (def ^{:doc "Object used to determine end of lazy parsing attempt."}
@@ -330,10 +320,7 @@
   ([reader key-fn] (parsed-seq reader key-fn nil))
   ([^BufferedReader reader key-fn array-coerce-fn]
    (when reader
-     (parsed-seq* (.createParser ^JsonFactory
-                                 (or factory/*json-factory*
-                                     factory/json-factory)
-                                 ^Reader reader)
+     (parsed-seq* (parse/json-parser reader)
                   key-fn array-coerce-fn))))
 
 (defn parsed-smile-seq
@@ -346,10 +333,7 @@
   ([reader key-fn] (parsed-smile-seq reader key-fn nil))
   ([^BufferedReader reader key-fn array-coerce-fn]
    (when reader
-     (parsed-seq* (.createParser ^SmileFactory
-                                 (or factory/*smile-factory*
-                                     factory/smile-factory)
-                                 ^Reader reader)
+     (parsed-seq* (parse/smile-parser reader)
                   key-fn array-coerce-fn))))
 
 ;; aliases for clojure-json users

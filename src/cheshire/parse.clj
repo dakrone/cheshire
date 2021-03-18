@@ -1,5 +1,45 @@
 (ns cheshire.parse
-  (:import (com.fasterxml.jackson.core JsonParser JsonToken)))
+  (:require [cheshire.factory :as factory])
+  (:import (java.io Reader)
+           (com.fasterxml.jackson.core JsonFactory JsonParser JsonToken)
+           (com.fasterxml.jackson.dataformat.cbor CBORFactory)
+           (com.fasterxml.jackson.dataformat.smile SmileFactory)))
+
+(defprotocol ToJsonParser
+  (-json-parser [self ^JsonFactory factory]))
+
+(defprotocol ToCBORParser
+  (-cbor-parser [self ^CBORFactory factory]))
+
+(defprotocol ToSmileParser
+  (-smile-parser [self ^SmileFactory factory]))
+
+(extend-protocol ToJsonParser
+  String
+  (-json-parser [self ^JsonFactory factory] (.createParser factory self))
+
+  Reader
+  (-json-parser [self ^JsonFactory factory] (.createParser factory self)))
+
+(extend-protocol ToCBORParser
+  (Class/forName "[B")
+  (-cbor-parser [self ^CBORFactory factory] (.createParser factory self)))
+
+(extend-protocol ToSmileParser
+  (Class/forName "[B")
+  (-smile-parser [self ^SmileFactory factory] (.createParser factory self))
+
+  Reader
+  (-smile-parser [self ^SmileFactory factory] (.createParser factory self)))
+
+(defn json-parser [input]
+  (-json-parser input (or factory/*json-factory* factory/json-factory)))
+
+(defn cbor-parser [input]
+  (-cbor-parser input (or factory/*cbor-factory* factory/cbor-factory)))
+
+(defn smile-parser [input]
+  (-smile-parser input (or factory/*smile-factory* factory/smile-factory)))
 
 (declare parse*)
 
