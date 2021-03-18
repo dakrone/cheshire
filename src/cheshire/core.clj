@@ -243,7 +243,7 @@
   see parsed-seq."
   ([rdr] (parse-stream rdr nil nil))
   ([rdr key-fn] (parse-stream rdr key-fn nil))
-  ([^BufferedReader rdr key-fn array-coerce-fn]
+  ([rdr key-fn array-coerce-fn]
    (when rdr
      (parse/parse
       (parse/json-parser rdr)
@@ -261,7 +261,7 @@
   Does not lazily parse top-level arrays."
   ([rdr] (parse-stream-strict rdr nil nil))
   ([rdr key-fn] (parse-stream-strict rdr key-fn nil))
-  ([^BufferedReader rdr key-fn array-coerce-fn]
+  ([rdr key-fn array-coerce-fn]
    (when rdr
      (parse/parse-strict
        (parse/json-parser rdr)
@@ -276,7 +276,7 @@
   and returning the collection to be used for array values."
   ([bytes] (parse-smile bytes nil nil))
   ([bytes key-fn] (parse-smile bytes key-fn nil))
-  ([^bytes bytes key-fn array-coerce-fn]
+  ([bytes key-fn array-coerce-fn]
    (when bytes
      (parse/parse
       (parse/smile-parser bytes)
@@ -291,7 +291,7 @@
   and returning the collection to be used for array values."
   ([bytes] (parse-cbor bytes nil nil))
   ([bytes key-fn] (parse-cbor bytes key-fn nil))
-  ([^bytes bytes key-fn array-coerce-fn]
+  ([bytes key-fn array-coerce-fn]
    (when bytes
      (parse/parse
       (parse/cbor-parser bytes)
@@ -318,7 +318,7 @@
   If non-laziness is needed, see parse-stream."
   ([reader] (parsed-seq reader nil nil))
   ([reader key-fn] (parsed-seq reader key-fn nil))
-  ([^BufferedReader reader key-fn array-coerce-fn]
+  ([reader key-fn array-coerce-fn]
    (when reader
      (parsed-seq* (parse/json-parser reader)
                   key-fn array-coerce-fn))))
@@ -331,7 +331,7 @@
   and returning the collection to be used for array values."
   ([reader] (parsed-smile-seq reader nil nil))
   ([reader key-fn] (parsed-smile-seq reader key-fn nil))
-  ([^BufferedReader reader key-fn array-coerce-fn]
+  ([reader key-fn array-coerce-fn]
    (when reader
      (parsed-seq* (parse/smile-parser reader)
                   key-fn array-coerce-fn))))

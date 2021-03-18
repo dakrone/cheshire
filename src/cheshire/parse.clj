@@ -1,6 +1,7 @@
 (ns cheshire.parse
   (:require [cheshire.factory :as factory])
-  (:import (java.io Reader)
+  (:import (java.io DataInput File InputStream Reader)
+           (java.net URL)
            (com.fasterxml.jackson.core JsonFactory JsonParser JsonToken)
            (com.fasterxml.jackson.dataformat.cbor CBORFactory)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)))
@@ -14,23 +15,47 @@
 (defprotocol ToSmileParser
   (-smile-parser [self ^SmileFactory factory]))
 
-(extend-protocol ToJsonParser
-  String
-  (-json-parser [self ^JsonFactory factory] (.createParser factory self))
+(defmacro extend-parser [Protocol method Factory & classes]
+  (let [factory (with-meta 'factory {:tag Factory})]
+    `(extend-protocol ~Protocol
+       ~@(mapcat
+           (fn [T] [T `(~method [~'self ~factory] ~'(.createParser factory self))])
+           classes))))
 
-  Reader
+(extend-type (Class/forName "[B")
+  ToJsonParser
   (-json-parser [self ^JsonFactory factory] (.createParser factory self)))
 
-(extend-protocol ToCBORParser
-  (Class/forName "[B")
+(extend-type (Class/forName "[C")
+  ToJsonParser
+  (-json-parser [self ^JsonFactory factory] (.createParser factory self)))
+
+(extend-parser ToJsonParser -json-parser JsonFactory
+  DataInput
+  File
+  InputStream
+  Reader
+  String
+  URL)
+
+(extend-type (Class/forName "[B")
+  ToCBORParser
   (-cbor-parser [self ^CBORFactory factory] (.createParser factory self)))
 
-(extend-protocol ToSmileParser
-  (Class/forName "[B")
-  (-smile-parser [self ^SmileFactory factory] (.createParser factory self))
+(extend-parser ToCBORParser -cbor-parser CBORFactory
+  File
+  InputStream
+  URL)
 
-  Reader
+(extend-type (Class/forName "[B")
+  ToSmileParser
   (-smile-parser [self ^SmileFactory factory] (.createParser factory self)))
+
+(extend-parser ToSmileParser -smile-parser SmileFactory
+  File
+  InputStream
+  URL
+  Reader) ; FIXME: Will actually parse JSON, not SMILE. Kept for backwards compatibility.
 
 (defn json-parser [input]
   (-json-parser input (or factory/*json-factory* factory/json-factory)))
