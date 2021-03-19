@@ -54,8 +54,7 @@
 (extend-parser ToSmileParser -smile-parser SmileFactory
   File
   InputStream
-  URL
-  Reader) ; FIXME: Will actually parse JSON, not SMILE. Kept for backwards compatibility.
+  URL)
 
 (defn json-parser [input]
   (-json-parser input (or factory/*json-factory* factory/json-factory)))

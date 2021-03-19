@@ -347,7 +347,7 @@
 
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
-  the given reader. The seq continues until the end of the reader is reached.
+  the given input. The seq continues until the end of the input is reached.
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
