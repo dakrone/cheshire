@@ -13,6 +13,10 @@
            (java.io StringWriter BufferedReader BufferedWriter
                     ByteArrayOutputStream OutputStream Reader Writer)))
 
+(defmacro copy-arglists
+  [dst src]
+  `(alter-meta! (var ~dst) merge (select-keys (meta (var ~src)) [:arglists])))
+
 (defonce default-pretty-print-options
   {:indentation "  "
    :line-break "\n"
@@ -191,7 +195,45 @@
      (.toByteArray baos))))
 
 ;; Parsers
-(defn parse-string
+
+(defn parse-json
+  "Returns the Clojure object corresponding to the given JSON-encoded input.
+  The input can be a String, a Reader, an InputStream, a DataInput, a File,
+  a URL, a char array or a byte array.
+  An optional key-fn argument can be either true (to coerce keys to keywords),
+  false to leave them as strings, or a function to provide custom coercion.
+
+  The array-coerce-fn is an optional function taking the name of an array field,
+  and returning the collection to be used for array values.
+
+  If the top-level object is an array, it will be parsed lazily (use
+  `parse-json-strict' if strict parsing is required for top-level arrays."
+  ([input] (parse-json input nil nil))
+  ([input key-fn] (parse-json input key-fn nil))
+  ([input key-fn array-coerce-fn]
+   (when input
+     (parse/parse (parse/json-parser input)
+                  key-fn nil array-coerce-fn))))
+
+(defn parse-json-strict
+  "Returns the Clojure object corresponding to the given JSON-encoded input.
+  The input can be a String, a Reader, an InputStream, a DataInput, a File,
+  a URL, a char array or a byte array.
+  An optional key-fn argument can be either true (to coerce keys to keywords),
+  false to leave them as strings, or a function to provide custom coercion.
+
+  The array-coerce-fn is an optional function taking the name of an array field,
+  and returning the collection to be used for array values.
+
+  Does not lazily parse top-level arrays."
+  ([input] (parse-json-strict input nil nil))
+  ([input key-fn] (parse-json-strict input key-fn nil))
+  ([input key-fn array-coerce-fn]
+   (when input
+     (parse/parse-strict (parse/json-parser input)
+                         key-fn nil array-coerce-fn))))
+
+(def parse-string
   "Returns the Clojure object corresponding to the given JSON-encoded string.
   An optional key-fn argument can be either true (to coerce keys to keywords),
   false to leave them as strings, or a function to provide custom coercion.
@@ -201,15 +243,11 @@
 
   If the top-level object is an array, it will be parsed lazily (use
   `parse-strict' if strict parsing is required for top-level arrays."
-  ([string] (parse-string string nil nil))
-  ([string key-fn] (parse-string string key-fn nil))
-  ([^String string key-fn array-coerce-fn]
-   (when string
-     (parse/parse (parse/json-parser string)
-                  key-fn nil array-coerce-fn))))
+  parse-json)
+(copy-arglists parse-string parse-json)
 
 ;; Parsing strictly
-(defn parse-string-strict
+(def parse-string-strict
   "Returns the Clojure object corresponding to the given JSON-encoded string.
   An optional key-fn argument can be either true (to coerce keys to keywords),
   false to leave them as strings, or a function to provide custom coercion.
@@ -218,14 +256,10 @@
   and returning the collection to be used for array values.
 
   Does not lazily parse top-level arrays."
-  ([string] (parse-string-strict string nil nil))
-  ([string key-fn] (parse-string-strict string key-fn nil))
-  ([^String string key-fn array-coerce-fn]
-   (when string
-     (parse/parse-strict (parse/json-parser string)
-                         key-fn nil array-coerce-fn))))
+  parse-json-strict)
+(copy-arglists parse-string-strict parse-json-strict)
 
-(defn parse-stream
+(def parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
   implement BufferedReader. An optional key-fn argument can be either true (to
   coerce keys to keywords),false to leave them as strings, or a function to
@@ -239,14 +273,10 @@
 
   If multiple objects (enclosed in a top-level `{}' need to be parsed lazily,
   see parsed-seq."
-  ([rdr] (parse-stream rdr nil nil))
-  ([rdr key-fn] (parse-stream rdr key-fn nil))
-  ([rdr key-fn array-coerce-fn]
-   (when rdr
-     (parse/parse (parse/json-parser rdr)
-                  key-fn nil array-coerce-fn))))
+  parse-json)
+(copy-arglists parse-stream parse-json)
 
-(defn parse-stream-strict
+(def parse-stream-strict
   "Returns the Clojure object corresponding to the given reader, reader must
   implement BufferedReader. An optional key-fn argument can be either true (to
   coerce keys to keywords),false to leave them as strings, or a function to
@@ -256,15 +286,12 @@
   and returning the collection to be used for array values.
 
   Does not lazily parse top-level arrays."
-  ([rdr] (parse-stream-strict rdr nil nil))
-  ([rdr key-fn] (parse-stream-strict rdr key-fn nil))
-  ([rdr key-fn array-coerce-fn]
-   (when rdr
-     (parse/parse-strict (parse/json-parser rdr)
-                         key-fn nil array-coerce-fn))))
+  parse-json-strict)
+(copy-arglists parse-stream-strict parse-json-strict)
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
+  The bytes can be an InputStream, a File, a URL or a byte array.
   An optional key-fn argument can be either true (to coerce keys to keywords),
   false to leave them as strings, or a function to provide custom coercion.
 
@@ -278,7 +305,8 @@
                   key-fn nil array-coerce-fn))))
 
 (defn parse-cbor
-  "Returns the Clojure object corresponding to the given CBOR-encoded bytes.
+  "Returns the Clojure object corresponding to the given CBOR-encoded bytes. 
+  The bytes can be an InputStream, a File, a URL or a byte array.
   An optional key-fn argument can be either true (to coerce keys to keywords),
   false to leave them as strings, or a function to provide custom coercion.
 
@@ -305,16 +333,16 @@
 
 (defn parsed-seq
   "Returns a lazy seq of Clojure objects corresponding to the JSON read from
-  the given reader. The seq continues until the end of the reader is reached.
+  the given input. The seq continues until the end of the input is reached.
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
   If non-laziness is needed, see parse-stream."
-  ([reader] (parsed-seq reader nil nil))
-  ([reader key-fn] (parsed-seq reader key-fn nil))
-  ([reader key-fn array-coerce-fn]
-   (when reader
-     (parsed-seq* (parse/json-parser reader)
+  ([input] (parsed-seq input nil nil))
+  ([input key-fn] (parsed-seq input key-fn nil))
+  ([input key-fn array-coerce-fn]
+   (when input
+     (parsed-seq* (parse/json-parser input)
                   key-fn array-coerce-fn))))
 
 (defn parsed-smile-seq
@@ -323,17 +351,14 @@
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  ([reader] (parsed-smile-seq reader nil nil))
-  ([reader key-fn] (parsed-smile-seq reader key-fn nil))
-  ([reader key-fn array-coerce-fn]
-   (when reader
-     (parsed-seq* (parse/smile-parser reader)
+  ([input] (parsed-smile-seq input nil nil))
+  ([input key-fn] (parsed-smile-seq input key-fn nil))
+  ([input key-fn array-coerce-fn]
+   (when input
+     (parsed-seq* (parse/smile-parser input)
                   key-fn array-coerce-fn))))
 
 ;; aliases for clojure-json users
-(defmacro copy-arglists
-  [dst src]
-  `(alter-meta! (var ~dst) merge (select-keys (meta (var ~src)) [:arglists])))
 (def encode "Alias to generate-string for clojure-json users" generate-string)
 (copy-arglists encode generate-string)
 (def encode-stream "Alias to generate-stream for clojure-json users" generate-stream)
