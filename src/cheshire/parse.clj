@@ -22,39 +22,39 @@
            (fn [T] [T `(~method [~'self ~factory] ~'(.createParser factory self))])
            classes))))
 
-(extend-type (Class/forName "[B")
-  ToJsonParser
-  (-json-parser [self ^JsonFactory factory] (.createParser factory ^"[B" self)))
+(extend-parser ToJsonParser -json-parser JsonFactory
+  String
+  Reader
+  InputStream
+  DataInput
+  File
+  URL)
 
 (extend-type (Class/forName "[C")
   ToJsonParser
   (-json-parser [self ^JsonFactory factory] (.createParser factory ^"[C" self)))
 
-(extend-parser ToJsonParser -json-parser JsonFactory
-  DataInput
-  File
+(extend-type (Class/forName "[B")
+  ToJsonParser
+  (-json-parser [self ^JsonFactory factory] (.createParser factory ^"[B" self)))
+
+(extend-parser ToCBORParser -cbor-parser CBORFactory
   InputStream
-  Reader
-  String
+  File
   URL)
 
 (extend-type (Class/forName "[B")
   ToCBORParser
   (-cbor-parser [self ^CBORFactory factory] (.createParser factory ^"[B" self)))
 
-(extend-parser ToCBORParser -cbor-parser CBORFactory
-  File
+(extend-parser ToSmileParser -smile-parser SmileFactory
   InputStream
+  File
   URL)
 
 (extend-type (Class/forName "[B")
   ToSmileParser
   (-smile-parser [self ^SmileFactory factory] (.createParser factory ^"[B" self)))
-
-(extend-parser ToSmileParser -smile-parser SmileFactory
-  File
-  InputStream
-  URL)
 
 (defn json-parser [input]
   (-json-parser input (or factory/*json-factory* factory/json-factory)))
