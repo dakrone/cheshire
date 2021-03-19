@@ -24,11 +24,11 @@
 
 (extend-type (Class/forName "[B")
   ToJsonParser
-  (-json-parser [self ^JsonFactory factory] (.createParser factory self)))
+  (-json-parser [self ^JsonFactory factory] (.createParser factory ^"[B" self)))
 
 (extend-type (Class/forName "[C")
   ToJsonParser
-  (-json-parser [self ^JsonFactory factory] (.createParser factory self)))
+  (-json-parser [self ^JsonFactory factory] (.createParser factory ^"[C" self)))
 
 (extend-parser ToJsonParser -json-parser JsonFactory
   DataInput
@@ -40,7 +40,7 @@
 
 (extend-type (Class/forName "[B")
   ToCBORParser
-  (-cbor-parser [self ^CBORFactory factory] (.createParser factory self)))
+  (-cbor-parser [self ^CBORFactory factory] (.createParser factory ^"[B" self)))
 
 (extend-parser ToCBORParser -cbor-parser CBORFactory
   File
@@ -49,7 +49,7 @@
 
 (extend-type (Class/forName "[B")
   ToSmileParser
-  (-smile-parser [self ^SmileFactory factory] (.createParser factory self)))
+  (-smile-parser [self ^SmileFactory factory] (.createParser factory ^"[B" self)))
 
 (extend-parser ToSmileParser -smile-parser SmileFactory
   File
