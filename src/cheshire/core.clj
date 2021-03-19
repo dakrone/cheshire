@@ -205,9 +205,8 @@
   ([string key-fn] (parse-string string key-fn nil))
   ([^String string key-fn array-coerce-fn]
    (when string
-     (parse/parse
-      (parse/json-parser string)
-      key-fn nil array-coerce-fn))))
+     (parse/parse (parse/json-parser string)
+                  key-fn nil array-coerce-fn))))
 
 ;; Parsing strictly
 (defn parse-string-strict
@@ -223,9 +222,8 @@
   ([string key-fn] (parse-string-strict string key-fn nil))
   ([^String string key-fn array-coerce-fn]
    (when string
-     (parse/parse-strict
-      (parse/json-parser string)
-      key-fn nil array-coerce-fn))))
+     (parse/parse-strict (parse/json-parser string)
+                         key-fn nil array-coerce-fn))))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
@@ -245,9 +243,8 @@
   ([rdr key-fn] (parse-stream rdr key-fn nil))
   ([rdr key-fn array-coerce-fn]
    (when rdr
-     (parse/parse
-      (parse/json-parser rdr)
-      key-fn nil array-coerce-fn))))
+     (parse/parse (parse/json-parser rdr)
+                  key-fn nil array-coerce-fn))))
 
 (defn parse-stream-strict
   "Returns the Clojure object corresponding to the given reader, reader must
@@ -263,9 +260,8 @@
   ([rdr key-fn] (parse-stream-strict rdr key-fn nil))
   ([rdr key-fn array-coerce-fn]
    (when rdr
-     (parse/parse-strict
-       (parse/json-parser rdr)
-       key-fn nil array-coerce-fn))))
+     (parse/parse-strict (parse/json-parser rdr)
+                         key-fn nil array-coerce-fn))))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
@@ -278,9 +274,8 @@
   ([bytes key-fn] (parse-smile bytes key-fn nil))
   ([bytes key-fn array-coerce-fn]
    (when bytes
-     (parse/parse
-      (parse/smile-parser bytes)
-      key-fn nil array-coerce-fn))))
+     (parse/parse (parse/smile-parser bytes)
+                  key-fn nil array-coerce-fn))))
 
 (defn parse-cbor
   "Returns the Clojure object corresponding to the given CBOR-encoded bytes.
@@ -293,9 +288,8 @@
   ([bytes key-fn] (parse-cbor bytes key-fn nil))
   ([bytes key-fn array-coerce-fn]
    (when bytes
-     (parse/parse
-      (parse/cbor-parser bytes)
-      key-fn nil array-coerce-fn))))
+     (parse/parse (parse/cbor-parser bytes)
+                  key-fn nil array-coerce-fn))))
 
 (def ^{:doc "Object used to determine end of lazy parsing attempt."}
   eof (Object.))
