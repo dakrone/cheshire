@@ -13,10 +13,6 @@
            (java.io StringWriter BufferedReader BufferedWriter
                     ByteArrayOutputStream OutputStream Reader Writer)))
 
-(defmacro copy-arglists
-  [dst src]
-  `(alter-meta! (var ~dst) merge (select-keys (meta (var ~src)) [:arglists])))
-
 (defonce default-pretty-print-options
   {:indentation "  "
    :line-break "\n"
@@ -233,7 +229,7 @@
      (parse/parse-strict (parse/json-parser input)
                          key-fn nil array-coerce-fn))))
 
-(def parse-string
+(defn parse-string
   "Returns the Clojure object corresponding to the given JSON-encoded string.
   An optional key-fn argument can be either true (to coerce keys to keywords),
   false to leave them as strings, or a function to provide custom coercion.
@@ -243,11 +239,18 @@
 
   If the top-level object is an array, it will be parsed lazily (use
   `parse-strict' if strict parsing is required for top-level arrays."
-  parse-json)
-(copy-arglists parse-string parse-json)
+  ([string] (parse-string string nil nil))
+  ([string key-fn] (parse-string string key-fn nil))
+  ([^String string key-fn array-coerce-fn]
+   (when string
+     (parse/parse
+       (.createParser ^JsonFactory (or factory/*json-factory*
+                                       factory/json-factory)
+                      string)
+       key-fn nil array-coerce-fn))))
 
 ;; Parsing strictly
-(def parse-string-strict
+(defn parse-string-strict
   "Returns the Clojure object corresponding to the given JSON-encoded string.
   An optional key-fn argument can be either true (to coerce keys to keywords),
   false to leave them as strings, or a function to provide custom coercion.
@@ -256,14 +259,20 @@
   and returning the collection to be used for array values.
 
   Does not lazily parse top-level arrays."
-  parse-json-strict)
-(copy-arglists parse-string-strict parse-json-strict)
+  ([string] (parse-string-strict string nil nil))
+  ([string key-fn] (parse-string-strict string key-fn nil))
+  ([^String string key-fn array-coerce-fn]
+   (when string
+     (parse/parse-strict
+       (.createParser ^JsonFactory (or factory/*json-factory*
+                                       factory/json-factory)
+                      string)
+       key-fn nil array-coerce-fn))))
 
-(def parse-stream
-  "Returns the Clojure object corresponding to the given reader, reader must
-  implement BufferedReader. An optional key-fn argument can be either true (to
-  coerce keys to keywords),false to leave them as strings, or a function to
-  provide custom coercion.
+(defn parse-stream
+  "Returns the Clojure object corresponding to the given Reader.
+  An optional key-fn argument can be either true (to coerce keys to keywords),
+  false to leave them as strings, or a function to provide custom coercion.
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
@@ -273,21 +282,34 @@
 
   If multiple objects (enclosed in a top-level `{}' need to be parsed lazily,
   see parsed-seq."
-  parse-json)
-(copy-arglists parse-stream parse-json)
+  ([rdr] (parse-stream rdr nil nil))
+  ([rdr key-fn] (parse-stream rdr key-fn nil))
+  ([^Reader rdr key-fn array-coerce-fn]
+   (when rdr
+     (parse/parse
+       (.createParser ^JsonFactory (or factory/*json-factory*
+                                       factory/json-factory)
+                      rdr)
+       key-fn nil array-coerce-fn))))
 
-(def parse-stream-strict
-  "Returns the Clojure object corresponding to the given reader, reader must
-  implement BufferedReader. An optional key-fn argument can be either true (to
-  coerce keys to keywords),false to leave them as strings, or a function to
-  provide custom coercion.
+(defn parse-stream-strict
+  "Returns the Clojure object corresponding to the given Reader.
+  An optional key-fn argument can be either true (to coerce keys to keywords),
+  false to leave them as strings, or a function to provide custom coercion.
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
 
   Does not lazily parse top-level arrays."
-  parse-json-strict)
-(copy-arglists parse-stream-strict parse-json-strict)
+  ([rdr] (parse-stream rdr nil nil))
+  ([rdr key-fn] (parse-stream rdr key-fn nil))
+  ([^Reader rdr key-fn array-coerce-fn]
+   (when rdr
+     (parse/parse-strict
+       (.createParser ^JsonFactory (or factory/*json-factory*
+                                       factory/json-factory)
+                      rdr)
+       key-fn nil array-coerce-fn))))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
@@ -357,6 +379,10 @@
    (when input
      (parsed-seq* (parse/smile-parser input)
                   key-fn array-coerce-fn))))
+
+(defmacro copy-arglists
+  [dst src]
+  `(alter-meta! (var ~dst) merge (select-keys (meta (var ~src)) [:arglists])))
 
 ;; aliases for clojure-json users
 (def encode "Alias to generate-string for clojure-json users" generate-string)
