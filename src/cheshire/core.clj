@@ -10,7 +10,7 @@
            (com.fasterxml.jackson.dataformat.cbor CBORFactory)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (cheshire.prettyprint CustomPrettyPrinter)
-           (java.io StringWriter BufferedReader BufferedWriter
+           (java.io StringWriter BufferedWriter
                     ByteArrayOutputStream OutputStream Reader Writer)))
 
 (defonce default-pretty-print-options
