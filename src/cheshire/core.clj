@@ -244,10 +244,10 @@
   ([^String string key-fn array-coerce-fn]
    (when string
      (parse/parse
-       (.createParser ^JsonFactory (or factory/*json-factory*
-                                       factory/json-factory)
-                      string)
-       key-fn nil array-coerce-fn))))
+      (.createParser ^JsonFactory (or factory/*json-factory*
+                                      factory/json-factory)
+                     string)
+      key-fn nil array-coerce-fn))))
 
 ;; Parsing strictly
 (defn parse-string-strict
@@ -264,10 +264,10 @@
   ([^String string key-fn array-coerce-fn]
    (when string
      (parse/parse-strict
-       (.createParser ^JsonFactory (or factory/*json-factory*
-                                       factory/json-factory)
-                      string)
-       key-fn nil array-coerce-fn))))
+      (.createParser ^JsonFactory (or factory/*json-factory*
+                                      factory/json-factory)
+                     string)
+      key-fn nil array-coerce-fn))))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given Reader.
@@ -287,10 +287,10 @@
   ([^Reader rdr key-fn array-coerce-fn]
    (when rdr
      (parse/parse
-       (.createParser ^JsonFactory (or factory/*json-factory*
-                                       factory/json-factory)
-                      rdr)
-       key-fn nil array-coerce-fn))))
+      (.createParser ^JsonFactory (or factory/*json-factory*
+                                      factory/json-factory)
+                     rdr)
+      key-fn nil array-coerce-fn))))
 
 (defn parse-stream-strict
   "Returns the Clojure object corresponding to the given Reader.
@@ -301,15 +301,15 @@
   and returning the collection to be used for array values.
 
   Does not lazily parse top-level arrays."
-  ([rdr] (parse-stream rdr nil nil))
-  ([rdr key-fn] (parse-stream rdr key-fn nil))
+  ([rdr] (parse-stream-strict rdr nil nil))
+  ([rdr key-fn] (parse-stream-strict rdr key-fn nil))
   ([^Reader rdr key-fn array-coerce-fn]
    (when rdr
      (parse/parse-strict
-       (.createParser ^JsonFactory (or factory/*json-factory*
-                                       factory/json-factory)
-                      rdr)
-       key-fn nil array-coerce-fn))))
+      (.createParser ^JsonFactory (or factory/*json-factory*
+                                      factory/json-factory)
+                     rdr)
+      key-fn nil array-coerce-fn))))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
@@ -380,11 +380,10 @@
      (parsed-seq* (parse/smile-parser input)
                   key-fn array-coerce-fn))))
 
+;; aliases for clojure-json users
 (defmacro copy-arglists
   [dst src]
   `(alter-meta! (var ~dst) merge (select-keys (meta (var ~src)) [:arglists])))
-
-;; aliases for clojure-json users
 (def encode "Alias to generate-string for clojure-json users" generate-string)
 (copy-arglists encode generate-string)
 (def encode-stream "Alias to generate-stream for clojure-json users" generate-stream)
