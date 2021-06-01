@@ -1,6 +1,6 @@
 # Cheshire
 
-<img src="http://dakrone.github.com/cheshire/cheshire_small.jpg"
+<img src="https://dakrone.github.io/cheshire/cheshire_small.jpg"
 title=":)" align="left" padding="5px" />
 <small>
 'Cheshire Puss,' she began, rather timidly, as she did not at all know
