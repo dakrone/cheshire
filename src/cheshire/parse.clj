@@ -1,5 +1,69 @@
 (ns cheshire.parse
-  (:import (com.fasterxml.jackson.core JsonParser JsonToken)))
+  (:require [cheshire.factory :as factory])
+  (:import (java.io DataInput File InputStream Reader)
+           (java.net URL)
+           (com.fasterxml.jackson.core JsonFactory JsonParser JsonToken)
+           (com.fasterxml.jackson.dataformat.cbor CBORFactory)
+           (com.fasterxml.jackson.dataformat.smile SmileFactory)))
+
+(defprotocol ToJsonParser
+  (-json-parser [self ^JsonFactory factory]))
+
+(defprotocol ToCBORParser
+  (-cbor-parser [self ^CBORFactory factory]))
+
+(defprotocol ToSmileParser
+  (-smile-parser [self ^SmileFactory factory]))
+
+(defmacro extend-parser [Protocol method Factory & classes]
+  (let [factory (with-meta 'factory {:tag Factory})]
+    `(extend-protocol ~Protocol
+       ~@(mapcat
+           (fn [T] [T `(~method [~'self ~factory] ~'(.createParser factory self))])
+           classes))))
+
+(extend-parser ToJsonParser -json-parser JsonFactory
+  String
+  Reader
+  InputStream
+  DataInput
+  File
+  URL)
+
+(extend-type (Class/forName "[C")
+  ToJsonParser
+  (-json-parser [self ^JsonFactory factory] (.createParser factory ^"[C" self)))
+
+(extend-type (Class/forName "[B")
+  ToJsonParser
+  (-json-parser [self ^JsonFactory factory] (.createParser factory ^"[B" self)))
+
+(extend-parser ToCBORParser -cbor-parser CBORFactory
+  InputStream
+  File
+  URL)
+
+(extend-type (Class/forName "[B")
+  ToCBORParser
+  (-cbor-parser [self ^CBORFactory factory] (.createParser factory ^"[B" self)))
+
+(extend-parser ToSmileParser -smile-parser SmileFactory
+  InputStream
+  File
+  URL)
+
+(extend-type (Class/forName "[B")
+  ToSmileParser
+  (-smile-parser [self ^SmileFactory factory] (.createParser factory ^"[B" self)))
+
+(defn json-parser [input]
+  (-json-parser input (or factory/*json-factory* factory/json-factory)))
+
+(defn cbor-parser [input]
+  (-cbor-parser input (or factory/*cbor-factory* factory/cbor-factory)))
+
+(defn smile-parser [input]
+  (-smile-parser input (or factory/*smile-factory* factory/smile-factory)))
 
 (declare parse*)
 
