@@ -215,6 +215,9 @@
   (is (= {"foo" "bar"} (json/decode "{\"foo\": \"bar\"}" false)))
   (is (= {:foo "bar"} (json/decode "{\"foo\": \"bar\"}" true))))
 
+(deftest t-json-reader-tag
+  (is (= "{\"FOO\":\"bar\"}" #cheshire/json {:FOO "bar"} )))
+
 ;; Begin custom-only tests
 
 (deftest test-add-remove-encoder
