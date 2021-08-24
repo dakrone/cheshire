@@ -5,14 +5,14 @@
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
            (java.math BigInteger)
-           (clojure.lang IPersistentCollection Keyword Ratio Symbol)))
+           (clojure.lang Keyword Ratio Symbol)))
 
 ;; date format rebound for custom encoding
 (def ^{:dynamic true :private true} *date-format*)
 
 (defmacro tag
   ([obj]
-     `(vary-meta ~obj assoc :tag `JsonGenerator)))
+   `(vary-meta ~obj assoc :tag `JsonGenerator)))
 
 (defprotocol JSONable
   (to-json [t jg]))
@@ -67,7 +67,7 @@
                    (.writeFieldName jg# (if (keyword? k#)
                                           (.substring (str k#) 1)
                                           (str k#)))
-                   (generate jg# v# ~date-format ~e nil)
+                   (generate jg# v# ~date-format ~e nil nil)
                    jg#))
                ~jg ~obj)
        (.writeEndObject ~jg))))
@@ -75,7 +75,6 @@
 (definline generate-key-fn-map
   [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
   (let [k (gensym 'k)
-        name (gensym 'name)
         jg (tag jg)]
     `(do
        (.writeStartObject ~jg)
@@ -86,23 +85,66 @@
                                        (~key-fn ~k)
                                        (str ~k))]
                    (.writeFieldName jg# name#)
-                   (generate jg# v# ~date-format ~e ~key-fn)
+                   (generate jg# v# ~date-format ~e ~key-fn nil)
+                   jg#))
+               ~jg ~obj)
+       (.writeEndObject ~jg))))
+
+(definline generate-value-fn-map
+  [^JsonGenerator jg obj ^String date-format ^Exception e value-fn]
+  (let [k (gensym 'k)
+        jg (tag jg)]
+    `(do
+       (.writeStartObject ~jg)
+       (reduce (fn [^JsonGenerator jg# kv#]
+                 (let [~k (key kv#)
+                       v# (~value-fn ~k (val kv#))
+                       ^String name# (if (keyword? ~k)
+                                       (name ~k)
+                                       (str ~k))]
+                   (.writeFieldName jg# name#)
+                   (generate jg# v# ~date-format ~e nil ~value-fn)
+                   jg#))
+               ~jg ~obj)
+       (.writeEndObject ~jg))))
+
+(definline generate-kv-fn-map
+  [^JsonGenerator jg obj ^String date-format ^Exception e key-fn value-fn]
+  (let [k (gensym 'k)
+        jg (tag jg)]
+    `(do
+       (.writeStartObject ~jg)
+       (reduce (fn [^JsonGenerator jg# kv#]
+                 (let [~k (key kv#)
+                       v# (~value-fn ~k (val kv#))
+                       ^String name# (if (keyword? ~k)
+                                       (~key-fn ~k)
+                                       (str ~k))]
+                   (.writeFieldName jg# name#)
+                   (generate jg# v# ~date-format ~e ~key-fn ~value-fn)
                    jg#))
                ~jg ~obj)
        (.writeEndObject ~jg))))
 
 (definline generate-map
-  [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
-  `(if (nil? ~key-fn)
-     (generate-basic-map ~jg ~obj ~date-format ~e)
-     (generate-key-fn-map ~jg ~obj ~date-format ~e ~key-fn)))
+  [^JsonGenerator jg obj ^String date-format ^Exception e key-fn value-fn]
+  `(cond
+     (and ~key-fn
+          ~value-fn)
+     (generate-kv-fn-map ~jg ~obj ~date-format ~e ~key-fn ~value-fn)
+     ~key-fn
+     (generate-key-fn-map ~jg ~obj ~date-format ~e ~key-fn)
+     ~value-fn
+     (generate-value-fn-map ~jg ~obj ~date-format ~e ~value-fn)
+     :else
+     (generate-basic-map ~jg ~obj ~date-format ~e)))
 
 (definline generate-array [^JsonGenerator jg obj ^String date-format
-                           ^Exception e key-fn]
+                           ^Exception e key-fn value-fn]
   (let [jg (tag jg)]
     `(do
        (.writeStartArray ~jg)
-       (reduce (fn [jg# item#] (generate jg# item# ~date-format ~e ~key-fn) jg#) ~jg ~obj)
+       (reduce (fn [jg# item#] (generate jg# item# ~date-format ~e ~key-fn ~value-fn) jg#) ~jg ~obj)
        (.writeEndArray ~jg))))
 
 (defmacro i?
@@ -116,43 +158,43 @@
     (and (.isArray c)
          (identical? (.getComponentType c) Byte/TYPE))))
 
-(defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex key-fn]
+(defn generate [^JsonGenerator jg obj ^String date-format ^Exception ex key-fn value-fn]
   (cond
-   (nil? obj) (.writeNull ^JsonGenerator jg)
-   (get (:impls JSONable) (class obj)) (#'to-json obj jg)
+    (nil? obj) (.writeNull ^JsonGenerator jg)
+    (get (:impls JSONable) (class obj)) (#'to-json obj jg)
 
-   (i? clojure.lang.IPersistentMap obj)
-   (generate-map jg obj date-format ex key-fn)
-   (i? clojure.lang.IPersistentVector obj)
-   (generate-array jg obj date-format ex key-fn)
-   (i? clojure.lang.IPersistentSet obj)
-   (generate-array jg obj date-format ex key-fn)
-   (i? clojure.lang.IPersistentList obj)
-   (generate-array jg obj date-format ex key-fn)
-   (i? clojure.lang.ISeq obj)
-   (generate-array jg obj date-format ex key-fn)
-   (i? clojure.lang.Associative obj)
-   (generate-map jg obj date-format ex key-fn)
+    (i? clojure.lang.IPersistentMap obj)
+    (generate-map jg obj date-format ex key-fn value-fn)
+    (i? clojure.lang.IPersistentVector obj)
+    (generate-array jg obj date-format ex key-fn value-fn)
+    (i? clojure.lang.IPersistentSet obj)
+    (generate-array jg obj date-format ex key-fn value-fn)
+    (i? clojure.lang.IPersistentList obj)
+    (generate-array jg obj date-format ex key-fn value-fn)
+    (i? clojure.lang.ISeq obj)
+    (generate-array jg obj date-format ex key-fn value-fn)
+    (i? clojure.lang.Associative obj)
+    (generate-map jg obj date-format ex key-fn value-fn)
 
-   (i? Number obj) (number-dispatch ^JsonGenerator jg obj ex)
-   (i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
-   (i? String obj) (write-string ^JsonGenerator jg ^String obj)
-   (i? Character obj) (write-string ^JsonGenerator jg ^String (str obj))
-   (i? Keyword obj) (write-string ^JsonGenerator jg (.substring (str obj) 1))
-   (i? Map obj) (generate-map jg obj date-format ex key-fn)
-   (i? List obj) (generate-array jg obj date-format ex key-fn)
-   (i? Set obj) (generate-array jg obj date-format ex key-fn)
-   (byte-array? obj) (.writeBinary ^JsonGenerator jg ^bytes obj)
-   (i? UUID obj) (write-string ^JsonGenerator jg (.toString ^UUID obj))
-   (i? Symbol obj) (write-string ^JsonGenerator jg (.toString ^Symbol obj))
-   (i? Date obj) (let [sdf (doto (SimpleDateFormat. date-format)
-                             (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
-                   (write-string ^JsonGenerator jg (.format sdf obj)))
-   (i? Timestamp obj) (let [date (Date. (.getTime ^Timestamp obj))
-                            sdf (doto (SimpleDateFormat. date-format)
-                                  (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
-                        (write-string ^JsonGenerator jg (.format sdf obj)))
-   :else (fail obj jg ex)))
+    (i? Number obj) (number-dispatch ^JsonGenerator jg obj ex)
+    (i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
+    (i? String obj) (write-string ^JsonGenerator jg ^String obj)
+    (i? Character obj) (write-string ^JsonGenerator jg ^String (str obj))
+    (i? Keyword obj) (write-string ^JsonGenerator jg (.substring (str obj) 1))
+    (i? Map obj) (generate-map jg obj date-format ex key-fn value-fn)
+    (i? List obj) (generate-array jg obj date-format ex key-fn value-fn)
+    (i? Set obj) (generate-array jg obj date-format ex key-fn value-fn)
+    (byte-array? obj) (.writeBinary ^JsonGenerator jg ^bytes obj)
+    (i? UUID obj) (write-string ^JsonGenerator jg (.toString ^UUID obj))
+    (i? Symbol obj) (write-string ^JsonGenerator jg (.toString ^Symbol obj))
+    (i? Date obj) (let [sdf (doto (SimpleDateFormat. date-format)
+                              (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
+                    (write-string ^JsonGenerator jg (.format sdf obj)))
+    (i? Timestamp obj) (let [date (Date. (.getTime ^Timestamp obj))
+                             sdf (doto (SimpleDateFormat. date-format)
+                                   (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
+                         (write-string ^JsonGenerator jg (.format sdf date)))
+    :else (fail obj jg ex)))
 
 ;; Generic encoders, these can be used by someone writing a custom
 ;; encoder if so desired, after transforming an arbitrary data
@@ -191,7 +233,7 @@
   "Encode a seq to the json generator."
   [s ^JsonGenerator jg]
   (.writeStartArray jg)
-  (reduce (fn [jg i] (generate jg i *date-format* nil nil) jg) jg s)
+  (reduce (fn [jg i] (generate jg i *date-format* nil nil nil) jg) jg s)
   (.writeEndArray jg))
 
 (defn encode-date
@@ -225,7 +267,7 @@
                                       (str ns "/" (name k))
                                       (name k))
                                     (str k)))
-              (generate jg v *date-format* nil nil)
+              (generate jg v *date-format* nil nil nil)
               jg))
           jg m)
   (.writeEndObject jg))

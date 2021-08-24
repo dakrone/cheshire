@@ -63,18 +63,19 @@
      (when print-pretty
        (condp instance? print-pretty
          Boolean
-           (.useDefaultPrettyPrinter generator)
+         (.useDefaultPrettyPrinter generator)
          clojure.lang.IPersistentMap
-           (.setPrettyPrinter generator (create-pretty-printer print-pretty))
+         (.setPrettyPrinter generator (create-pretty-printer print-pretty))
          PrettyPrinter
-           (.setPrettyPrinter generator print-pretty)
+         (.setPrettyPrinter generator print-pretty)
          nil))
      (when (:escape-non-ascii opt-map)
        (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
      (gen/generate generator obj
                    (or (:date-format opt-map) factory/default-date-format)
                    (:ex opt-map)
-                   (:key-fn opt-map))
+                   (:key-fn opt-map)
+                   (:value-fn opt-map))
      (.flush generator)
      (.toString sw))))
 
@@ -95,18 +96,19 @@
      (when print-pretty
        (condp instance? print-pretty
          Boolean
-       (.useDefaultPrettyPrinter generator)
+         (.useDefaultPrettyPrinter generator)
          clojure.lang.IPersistentMap
-       (.setPrettyPrinter generator (create-pretty-printer print-pretty))
+         (.setPrettyPrinter generator (create-pretty-printer print-pretty))
          PrettyPrinter
-       (.setPrettyPrinter generator print-pretty)
+         (.setPrettyPrinter generator print-pretty)
          nil))
      (when (:escape-non-ascii opt-map)
        (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
      (gen/generate generator obj (or (:date-format opt-map)
                                      factory/default-date-format)
                    (:ex opt-map)
-                   (:key-fn opt-map))
+                   (:key-fn opt-map)
+                   (:value-fn opt-map))
      (.flush generator)
      writer)))
 
@@ -160,13 +162,14 @@
   (^bytes [obj opt-map]
    (let [baos (ByteArrayOutputStream.)
          generator (.createGenerator ^SmileFactory
-                                     (or factory/*smile-factory*
-                                         factory/smile-factory)
+                    (or factory/*smile-factory*
+                        factory/smile-factory)
                                      ^OutputStream baos)]
      (gen/generate generator obj (or (:date-format opt-map)
                                      factory/default-date-format)
                    (:ex opt-map)
-                   (:key-fn opt-map))
+                   (:key-fn opt-map)
+                   (:value-fn opt-map))
      (.flush generator)
      (.toByteArray baos))))
 
@@ -180,13 +183,14 @@
   (^bytes [obj opt-map]
    (let [baos (ByteArrayOutputStream.)
          generator (.createGenerator ^CBORFactory
-                                     (or factory/*cbor-factory*
-                                         factory/cbor-factory)
+                    (or factory/*cbor-factory*
+                        factory/cbor-factory)
                                      ^OutputStream baos)]
      (gen/generate generator obj (or (:date-format opt-map)
                                      factory/default-date-format)
                    (:ex opt-map)
-                   (:key-fn opt-map))
+                   (:key-fn opt-map)
+                   (:value-fn opt-map))
      (.flush generator)
      (.toByteArray baos))))
 
@@ -201,15 +205,14 @@
 
   If the top-level object is an array, it will be parsed lazily (use
   `parse-strict' if strict parsing is required for top-level arrays."
-  ([string] (parse-string string nil nil))
-  ([string key-fn] (parse-string string key-fn nil))
-  ([^String string key-fn array-coerce-fn]
+  ([string] (parse-string string nil))
+  ([^String string {:keys [key-fn value-fn array-coerce-fn]}]
    (when string
      (parse/parse
       (.createParser ^JsonFactory (or factory/*json-factory*
                                       factory/json-factory)
                      ^Reader (StringReader. string))
-      key-fn nil array-coerce-fn))))
+      key-fn value-fn nil array-coerce-fn))))
 
 ;; Parsing strictly
 (defn parse-string-strict
@@ -221,15 +224,14 @@
   and returning the collection to be used for array values.
 
   Does not lazily parse top-level arrays."
-  ([string] (parse-string-strict string nil nil))
-  ([string key-fn] (parse-string-strict string key-fn nil))
-  ([^String string key-fn array-coerce-fn]
+  ([string] (parse-string-strict string nil))
+  ([^String string {:keys [key-fn value-fn array-coerce-fn]}]
    (when string
      (parse/parse-strict
       (.createParser ^JsonFactory (or factory/*json-factory*
                                       factory/json-factory)
                      ^Reader (StringReader. string))
-      key-fn nil array-coerce-fn))))
+      key-fn value-fn nil array-coerce-fn))))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
@@ -245,15 +247,14 @@
 
   If multiple objects (enclosed in a top-level `{}' need to be parsed lazily,
   see parsed-seq."
-  ([rdr] (parse-stream rdr nil nil))
-  ([rdr key-fn] (parse-stream rdr key-fn nil))
-  ([^BufferedReader rdr key-fn array-coerce-fn]
+  ([rdr] (parse-stream rdr nil))
+  ([^BufferedReader rdr {:keys [key-fn value-fn array-coerce-fn]}]
    (when rdr
      (parse/parse
       (.createParser ^JsonFactory (or factory/*json-factory*
                                       factory/json-factory)
                      ^Reader rdr)
-      key-fn nil array-coerce-fn))))
+      key-fn value-fn nil array-coerce-fn))))
 
 (defn parse-stream-strict
   "Returns the Clojure object corresponding to the given reader, reader must
@@ -265,15 +266,14 @@
   and returning the collection to be used for array values.
 
   Does not lazily parse top-level arrays."
-  ([rdr] (parse-stream-strict rdr nil nil))
-  ([rdr key-fn] (parse-stream-strict rdr key-fn nil))
-  ([^BufferedReader rdr key-fn array-coerce-fn]
+  ([rdr] (parse-stream-strict rdr nil))
+  ([^BufferedReader rdr {:keys [key-fn value-fn array-coerce-fn]}]
    (when rdr
      (parse/parse-strict
-       (.createParser ^JsonFactory (or factory/*json-factory*
-                                       factory/json-factory)
-                      ^Reader rdr)
-       key-fn nil array-coerce-fn))))
+      (.createParser ^JsonFactory (or factory/*json-factory*
+                                      factory/json-factory)
+                     ^Reader rdr)
+      key-fn value-fn nil array-coerce-fn))))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
@@ -282,14 +282,13 @@
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  ([bytes] (parse-smile bytes nil nil))
-  ([bytes key-fn] (parse-smile bytes key-fn nil))
-  ([^bytes bytes key-fn array-coerce-fn]
+  ([bytes] (parse-smile bytes nil))
+  ([^bytes bytes {:keys [key-fn value-fn array-coerce-fn]}]
    (when bytes
      (parse/parse
       (.createParser ^SmileFactory (or factory/*smile-factory*
                                        factory/smile-factory) bytes)
-      key-fn nil array-coerce-fn))))
+      key-fn value-fn nil array-coerce-fn))))
 
 (defn parse-cbor
   "Returns the Clojure object corresponding to the given CBOR-encoded bytes.
@@ -298,14 +297,13 @@
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  ([bytes] (parse-cbor bytes nil nil))
-  ([bytes key-fn] (parse-cbor bytes key-fn nil))
-  ([^bytes bytes key-fn array-coerce-fn]
+  ([bytes] (parse-cbor bytes nil))
+  ([^bytes bytes {:keys [key-fn value-fn array-coerce-fn]}]
    (when bytes
      (parse/parse
       (.createParser ^CBORFactory (or factory/*cbor-factory*
                                       factory/cbor-factory) bytes)
-      key-fn nil array-coerce-fn))))
+      key-fn value-fn nil array-coerce-fn))))
 
 (def ^{:doc "Object used to determine end of lazy parsing attempt."}
   eof (Object.))
@@ -313,11 +311,11 @@
 ;; Lazy parsers
 (defn- parsed-seq*
   "Internal lazy-seq parser"
-  [^JsonParser parser key-fn array-coerce-fn]
+  [^JsonParser parser key-fn value-fn array-coerce-fn]
   (lazy-seq
    (let [elem (parse/parse-strict parser key-fn eof array-coerce-fn)]
      (when-not (identical? elem eof)
-       (cons elem (parsed-seq* parser key-fn array-coerce-fn))))))
+       (cons elem (parsed-seq* parser key-fn value-fn array-coerce-fn))))))
 
 (defn parsed-seq
   "Returns a lazy seq of Clojure objects corresponding to the JSON read from
@@ -326,15 +324,14 @@
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values.
   If non-laziness is needed, see parse-stream."
-  ([reader] (parsed-seq reader nil nil))
-  ([reader key-fn] (parsed-seq reader key-fn nil))
-  ([^BufferedReader reader key-fn array-coerce-fn]
+  ([reader] (parsed-seq reader nil))
+  ([^BufferedReader reader {:keys [key-fn value-fn array-coerce-fn]}]
    (when reader
      (parsed-seq* (.createParser ^JsonFactory
-                                 (or factory/*json-factory*
-                                     factory/json-factory)
+                   (or factory/*json-factory*
+                       factory/json-factory)
                                  ^Reader reader)
-                  key-fn array-coerce-fn))))
+                  key-fn value-fn array-coerce-fn))))
 
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
@@ -342,15 +339,14 @@
 
   The array-coerce-fn is an optional function taking the name of an array field,
   and returning the collection to be used for array values."
-  ([reader] (parsed-smile-seq reader nil nil))
-  ([reader key-fn] (parsed-smile-seq reader key-fn nil))
-  ([^BufferedReader reader key-fn array-coerce-fn]
+  ([reader] (parsed-smile-seq reader nil))
+  ([^BufferedReader reader {:keys [key-fn value-fn array-coerce-fn]}]
    (when reader
      (parsed-seq* (.createParser ^SmileFactory
-                                 (or factory/*smile-factory*
-                                     factory/smile-factory)
+                   (or factory/*smile-factory*
+                       factory/smile-factory)
                                  ^Reader reader)
-                  key-fn array-coerce-fn))))
+                  key-fn value-fn array-coerce-fn))))
 
 ;; aliases for clojure-json users
 (defmacro copy-arglists

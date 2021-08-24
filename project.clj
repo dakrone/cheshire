@@ -1,4 +1,4 @@
-(defproject cheshire "5.10.2-SNAPSHOT"
+(defproject cheshire "5.11"
   :description "JSON and JSON SMILE encoding, fast."
   :url "https://github.com/dakrone/cheshire"
   :license {:name "The MIT License"
@@ -7,8 +7,7 @@
   :global-vars {*warn-on-reflection* false}
   :dependencies [[com.fasterxml.jackson.core/jackson-core "2.12.4"]
                  [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.12.4"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.12.4"]
-                 [tigris "0.1.2"]]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.12.4"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.10.3"]
                                   [org.clojure/test.generative "0.1.4"]
                                   [org.clojure/tools.namespace "0.3.1"]]}
@@ -23,7 +22,7 @@
   :aliases {"all" ["with-profile" "dev,1.7:dev,1.8:dev,1.9:dev"]
             "benchmark" ["with-profile" "dev,benchmark" "test"]
             "pretty-bench" ["with-profile" "dev,benchmark" "test" ":only"
-                          "cheshire.test.benchmark/t-bench-pretty"]
+                            "cheshire.test.benchmark/t-bench-pretty"]
             "core-bench" ["with-profile" "dev,benchmark" "test" ":only"
                           "cheshire.test.benchmark/t-bench-core"]}
   :test-selectors {:default  #(and (not (:benchmark %))
