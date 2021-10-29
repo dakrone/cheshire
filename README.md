@@ -38,7 +38,7 @@ encoders.
 ## Usage
 
 ```clojure
-[cheshire "5.10.0"]
+[cheshire "5.10.1"]
 
 ;; Cheshire v5.10.0 uses Jackson 2.10.2
 
