@@ -24,8 +24,10 @@ Cheshire is fast JSON encoding, based off of clj-json and
 clojure-json, with additional features like Date/UUID/Set/Symbol
 encoding and SMILE support.
 
+
 [Clojure code with docs](http://dakrone.github.io/cheshire/)
 
+[![Clojars Project](https://img.shields.io/clojars/v/cheshire.svg)](https://clojars.org/cheshire)
 [![Continuous Integration status](https://secure.travis-ci.org/dakrone/cheshire.png)](http://travis-ci.org/dakrone/cheshire)
 
 ## Why?
