@@ -6,8 +6,10 @@
             :distribution :repo}
   :global-vars {*warn-on-reflection* false}
   :dependencies [[com.fasterxml.jackson.core/jackson-core "2.12.4"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.12.4"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.12.4"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.12.4"
+                  :exclusions [com.fasterxml.jackson.core/jackson-databind]]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.12.4"
+                  :exclusions [com.fasterxml.jackson.core/jackson-databind]]
                  [tigris "0.1.2"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.10.3"]
                                   [org.clojure/test.generative "0.1.4"]
