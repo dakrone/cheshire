@@ -40,9 +40,9 @@ encoders.
 ## Usage
 
 ```clojure
-[cheshire "5.10.1"]
+[cheshire "5.10.2"]
 
-;; Cheshire v5.10.0 uses Jackson 2.10.2
+;; Cheshire v5.10.2 uses Jackson 2.12.4
 
 ;; In your ns statement:
 (ns my.ns
