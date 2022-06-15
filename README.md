@@ -313,9 +313,9 @@ It's experimental, like the name says. Based on [Tigris](http://github.com/dakro
 
 ## Advanced customization for factories
 See
-[this](http://fasterxml.github.com/jackson-core/javadoc/2.10/com/fasterxml/jackson/core/JsonFactory.Feature.html)
+[this](https://fasterxml.github.io/jackson-core/javadoc/2.13/com/fasterxml/jackson/core/JsonFactory.Feature.html)
 and
-[this](http://fasterxml.github.com/jackson-core/javadoc/2.10/com/fasterxml/jackson/core/JsonParser.Feature.html)
+[this](https://fasterxml.github.io/jackson-core/javadoc/2.13/com/fasterxml/jackson/core/JsonParser.Feature.html)
 for a list of features that can be customized if desired. A custom
 factory can be used like so:
 
