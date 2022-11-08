@@ -87,7 +87,7 @@ encoders.
 ;; => "{\"FOO\":\"bar\"}"
 ```
 
-In the event encoding fails, Cheshire will throw a JsonGenerationException.
+In the event encoding fails, Cheshire will throw a `JsonGenerationException`.
 
 #### Custom Pretty Printing Options
 
