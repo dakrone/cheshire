@@ -37,6 +37,18 @@ clj-json had no features, but was fast. Cheshire encodes JSON fast,
 with added support for more types and the ability to use custom
 encoders.
 
+## Import
+
+### Leiningen/Boot
+```clojure
+[cheshire "5.11.0"]
+```
+
+### Clojure CLI/deps.edn
+```
+cheshire/cheshire {:mvn/version "5.11.0"}
+```
+
 ## Usage
 
 ```clojure
