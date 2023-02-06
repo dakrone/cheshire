@@ -1,10 +1,10 @@
 (ns cheshire.test.generative
-  (:use [cheshire.core]
-        [clojure.test.generative]
-        [clojure.test :only [deftest is]]))
-
-;; determines whether generative stuff is printed to stdout
-(def verbose true)
+  (:require
+   [cheshire.core :refer [decode encode]]
+   [clojure.data.generators]
+   [clojure.test :refer [deftest is]]
+   [clojure.test.generative :refer [defspec]]
+   [clojure.test.generative.runner :as runner]))
 
 (defn encode-equality [x]
   [x (decode (encode x))])
@@ -43,13 +43,8 @@
   (is (= (first %) (last %))))
 
 (deftest ^{:generative true} t-generative
-  ;; I want the seeds to change every time, set the number higher if
-  ;; you have more than 16 CPU cores
-  (let [seeds (take 16 (repeatedly #(rand-int 1024)))]
-    (when-not verbose
-      (reset! report-fn identity))
-    (println "Seeds:" seeds)
-    (binding [*msec* 25000
-              *seeds* seeds
-              *verbose* false]
-      (doall (map deref (test-namespaces 'cheshire.test.generative))))))
+  (runner/run-suite {:nthreads (-> (Runtime/getRuntime) .availableProcessors)
+                     :msec 25000
+                     :progress (constantly true)}
+                    (->> 'cheshire.test.generative ns-interns vals
+                         (mapcat runner/get-tests))))
