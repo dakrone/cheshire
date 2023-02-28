@@ -5,10 +5,10 @@
             :url "http://opensource.org/licenses/MIT"
             :distribution :repo}
   :global-vars {*warn-on-reflection* false}
-  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.13.3"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.13.3"
+  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.14.2"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.14.2"
                   :exclusions [com.fasterxml.jackson.core/jackson-databind]]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.13.3"
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.14.2"
                   :exclusions [com.fasterxml.jackson.core/jackson-databind]]
                  [tigris "0.1.2"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.11.1"]
