@@ -5,10 +5,10 @@
             :url "http://opensource.org/licenses/MIT"
             :distribution :repo}
   :global-vars {*warn-on-reflection* false}
-  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.13.3"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.13.3"
+  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.15.2"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.15.2"
                   :exclusions [com.fasterxml.jackson.core/jackson-databind]]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.13.3"
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.15.2"
                   :exclusions [com.fasterxml.jackson.core/jackson-databind]]
                  [tigris "0.1.2"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.11.1"]
@@ -26,7 +26,7 @@
   :aliases {"all" ["with-profile" "dev,1.7:dev,1.8:dev,1.9:dev,1.10:dev"]
             "benchmark" ["with-profile" "dev,benchmark" "test"]
             "pretty-bench" ["with-profile" "dev,benchmark" "test" ":only"
-                          "cheshire.test.benchmark/t-bench-pretty"]
+                            "cheshire.test.benchmark/t-bench-pretty"]
             "core-bench" ["with-profile" "dev,benchmark" "test" ":only"
                           "cheshire.test.benchmark/t-bench-core"]}
   :test-selectors {:default  #(and (not (:benchmark %))
@@ -34,7 +34,7 @@
                    :generative :generative
                    :all (constantly true)}
   :plugins [[codox "0.6.3"]
-            [lein-ancient "0.6.15"]]
+            [lein-ancient "1.0.0-RC3"]]
   :java-source-paths ["src/java"]
   :jvm-opts ["-Xmx512M"
 ;;             "-XX:+PrintCompilation"
