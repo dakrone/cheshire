@@ -85,6 +85,9 @@ encoders.
 ;; generate JSON and munge keys with a custom function
 (generate-string {:foo "bar"} {:key-fn (fn [k] (.toUpperCase (name k)))})
 ;; => "{\"FOO\":\"bar\"}"
+
+;; generate JSON without escaping the characters (by writing it to a file)
+(spit "foo.json" (json/generate-string {:foo "bar"} {:pretty true}))
 ```
 
 In the event encoding fails, Cheshire will throw a `JsonGenerationException`.
