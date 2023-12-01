@@ -24,8 +24,12 @@
    (when string
      (let [jp (.createParser ^JsonFactory (or factory/*json-factory*
                                               factory/json-factory)
-                             ^Reader (StringReader. string))]
-       (exact-parse jp (parse/parse jp key-fn nil array-coerce-fn))))))
+                             ^Reader (StringReader. string))
+           parsed (parse/parse (or core/*parser*
+                                   (parse/backwards-compatible-parser key-fn array-coerce-fn))
+                               jp
+                               nil)]
+       (exact-parse jp parsed)))))
 
 (defn parse-string-strict
   ([string] (parse-string-strict string nil nil))
@@ -34,8 +38,12 @@
    (when string
      (let [jp (.createParser ^JsonFactory (or factory/*json-factory*
                                               factory/json-factory)
-                             ^Writer (StringReader. string))]
-       (exact-parse jp (parse/parse-strict jp key-fn nil array-coerce-fn))))))
+                             ^Writer (StringReader. string))
+           parsed (parse/parse-strict (or core/*parser*
+                                          (parse/backwards-compatible-parser key-fn array-coerce-fn))
+                                      jp
+                                      nil)]
+       (exact-parse jp parsed)))))
 
 (def decode parse-string)
 (core/copy-arglists decode parse-string)
