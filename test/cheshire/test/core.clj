@@ -7,7 +7,8 @@
             [cheshire.factory :as fact]
             [cheshire.parse :as parse])
   (:import (com.fasterxml.jackson.core JsonGenerationException
-                                       JsonParseException)
+                                       JsonParseException
+                                       JsonParser)
            (java.io FileInputStream StringReader StringWriter
                     BufferedReader BufferedWriter)
            (java.sql Timestamp)
@@ -450,3 +451,13 @@
       invalid-json-message (json-exact/decode-strict "{\"foo\": 123}null")
       invalid-json-message (json-exact/decode-strict  "\"hello\" : 123}")
       {"foo" 1} (json/decode-strict "{\"foo\": 1}"))))
+
+;; See https://github.com/dakrone/cheshire/issues/105
+(deftest t-parse-integers-as-long
+  (binding [json/*parser* (parse/make-parser {`parse/parse-number-int
+                                              (fn [p ^JsonParser jp]
+                                                (let [nv (.getNumberValue jp)]
+                                                  (if (= java.lang.Integer (type nv))
+                                                    (long nv)
+                                                    nv)))})]
+    (is (.equals (json/parse-string "31337") (long 31337)))))

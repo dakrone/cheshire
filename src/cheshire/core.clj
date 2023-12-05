@@ -191,6 +191,9 @@
      (.toByteArray baos))))
 
 ;; Parsers
+(def ^{:dynamic true}
+  *parser* nil)
+
 (defn parse-string
   "Returns the Clojure object corresponding to the given JSON-encoded string.
   An optional key-fn argument can be either true (to coerce keys to keywords),
@@ -206,10 +209,12 @@
   ([^String string key-fn array-coerce-fn]
    (when string
      (parse/parse
+      (or *parser*
+          (parse/backwards-compatible-parser key-fn array-coerce-fn))
       (.createParser ^JsonFactory (or factory/*json-factory*
                                       factory/json-factory)
                      ^Reader (StringReader. string))
-      key-fn nil array-coerce-fn))))
+      nil))))
 
 ;; Parsing strictly
 (defn parse-string-strict
@@ -226,10 +231,12 @@
   ([^String string key-fn array-coerce-fn]
    (when string
      (parse/parse-strict
+      (or *parser*
+          (parse/backwards-compatible-parser key-fn array-coerce-fn))
       (.createParser ^JsonFactory (or factory/*json-factory*
                                       factory/json-factory)
                      ^Reader (StringReader. string))
-      key-fn nil array-coerce-fn))))
+      nil))))
 
 (defn parse-stream
   "Returns the Clojure object corresponding to the given reader, reader must
@@ -250,10 +257,12 @@
   ([^BufferedReader rdr key-fn array-coerce-fn]
    (when rdr
      (parse/parse
+      (or *parser*
+          (parse/backwards-compatible-parser key-fn array-coerce-fn))
       (.createParser ^JsonFactory (or factory/*json-factory*
                                       factory/json-factory)
                      ^Reader rdr)
-      key-fn nil array-coerce-fn))))
+      nil))))
 
 (defn parse-stream-strict
   "Returns the Clojure object corresponding to the given reader, reader must
@@ -270,10 +279,12 @@
   ([^BufferedReader rdr key-fn array-coerce-fn]
    (when rdr
      (parse/parse-strict
-       (.createParser ^JsonFactory (or factory/*json-factory*
-                                       factory/json-factory)
-                      ^Reader rdr)
-       key-fn nil array-coerce-fn))))
+      (or *parser*
+          (parse/backwards-compatible-parser key-fn array-coerce-fn))
+      (.createParser ^JsonFactory (or factory/*json-factory*
+                                      factory/json-factory)
+                     ^Reader rdr)
+      nil))))
 
 (defn parse-smile
   "Returns the Clojure object corresponding to the given SMILE-encoded bytes.
@@ -287,9 +298,11 @@
   ([^bytes bytes key-fn array-coerce-fn]
    (when bytes
      (parse/parse
+      (or *parser*
+          (parse/backwards-compatible-parser key-fn array-coerce-fn))
       (.createParser ^SmileFactory (or factory/*smile-factory*
                                        factory/smile-factory) bytes)
-      key-fn nil array-coerce-fn))))
+      nil))))
 
 (defn parse-cbor
   "Returns the Clojure object corresponding to the given CBOR-encoded bytes.
@@ -303,9 +316,11 @@
   ([^bytes bytes key-fn array-coerce-fn]
    (when bytes
      (parse/parse
+      (or *parser*
+          (parse/backwards-compatible-parser key-fn array-coerce-fn))
       (.createParser ^CBORFactory (or factory/*cbor-factory*
                                       factory/cbor-factory) bytes)
-      key-fn nil array-coerce-fn))))
+      nil))))
 
 (def ^{:doc "Object used to determine end of lazy parsing attempt."}
   eof (Object.))
@@ -313,11 +328,11 @@
 ;; Lazy parsers
 (defn- parsed-seq*
   "Internal lazy-seq parser"
-  [^JsonParser parser key-fn array-coerce-fn]
+  [p ^JsonParser jp]
   (lazy-seq
-   (let [elem (parse/parse-strict parser key-fn eof array-coerce-fn)]
+   (let [elem (parse/parse-strict p jp eof)]
      (when-not (identical? elem eof)
-       (cons elem (parsed-seq* parser key-fn array-coerce-fn))))))
+       (cons elem (parsed-seq* p jp))))))
 
 (defn parsed-seq
   "Returns a lazy seq of Clojure objects corresponding to the JSON read from
@@ -330,11 +345,12 @@
   ([reader key-fn] (parsed-seq reader key-fn nil))
   ([^BufferedReader reader key-fn array-coerce-fn]
    (when reader
-     (parsed-seq* (.createParser ^JsonFactory
+     (parsed-seq* (or *parser*
+                      (parse/backwards-compatible-parser key-fn array-coerce-fn))
+                  (.createParser ^JsonFactory
                                  (or factory/*json-factory*
                                      factory/json-factory)
-                                 ^Reader reader)
-                  key-fn array-coerce-fn))))
+                                 ^Reader reader)))))
 
 (defn parsed-smile-seq
   "Returns a lazy seq of Clojure objects corresponding to the SMILE read from
@@ -346,11 +362,12 @@
   ([reader key-fn] (parsed-smile-seq reader key-fn nil))
   ([^BufferedReader reader key-fn array-coerce-fn]
    (when reader
-     (parsed-seq* (.createParser ^SmileFactory
+     (parsed-seq* (or *parser*
+                      (parse/backwards-compatible-parser key-fn array-coerce-fn))
+                  (.createParser ^SmileFactory
                                  (or factory/*smile-factory*
                                      factory/smile-factory)
-                                 ^Reader reader)
-                  key-fn array-coerce-fn))))
+                                 ^Reader reader)))))
 
 ;; aliases for clojure-json users
 (defmacro copy-arglists
