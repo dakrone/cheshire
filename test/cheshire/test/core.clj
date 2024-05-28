@@ -133,6 +133,13 @@
                                    {:date-format "yyyy-MM-dd"})))
       "encode with given date format"))
 
+(deftest roundtrip-test
+  (let [bigmap (zipmap (range 10) (map #(* 2 %) (range 10)))
+        map-s (json/encode bigmap)
+        parsed (json/decode map-s)
+        back-to-s (json/encode parsed)]
+    (is (= map-s back-to-s))))
+
 (deftest test-sql-timestamp
   (is (= {"foo" "1970-01-01T00:00:00Z"}
          (json/decode (json/encode {:foo (Timestamp. (long 0))}))))

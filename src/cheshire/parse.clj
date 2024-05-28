@@ -18,7 +18,7 @@
   (let [jp (tag jp)]
     `(do
        (.nextToken ~jp)
-       (loop [mmap# (transient {})]
+       (loop [mmap# (transient (array-map))]
          (if-not (identical? (.getCurrentToken ~jp)
                              JsonToken/END_OBJECT)
            (let [key-str# (.getText ~jp)

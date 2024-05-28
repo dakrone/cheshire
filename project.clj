@@ -41,4 +41,4 @@
 ;;             "-XX:+UnlockDiagnosticVMOptions"
 ;;             "-XX:+PrintInlining"
              ]
-  :javac-options ["-target" "1.7" "-source" "1.7" "-Xlint:-options"])
+  :javac-options ["-target" "1.8" "-source" "1.8" "-Xlint:-options"])
