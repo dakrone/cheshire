@@ -156,6 +156,16 @@
       {"foo" "bar"} json/parse-stream "{\"foo\":\"bar\"}\n"
       {"foo" "bar"} json/parse-stream-strict "{\"foo\":\"bar\"}\n")
 
+    ;; Lazy parsing should be fully lazy - so e.g. incomplete json should be parsed up until
+    ;; we know the json is incomplete.
+    (let [first-parsed-object (fn [parse]
+                                (with-open [rdr (StringReader. "[{\"foo\": \"bar\"}")]
+                                  (first
+                                    (binding [parse/*chunk-size* 1]
+                                      (parse rdr true)))))]
+      (is (= {:foo "bar"} (first-parsed-object json/parse-stream)))
+      (is (thrown? Exception (first-parsed-object json/parse-stream-strict))))
+
     (are [parsed parse parsee] (= parsed
                                   (with-open [rdr (StringReader. parsee)]
                                     (parse rdr true)))
