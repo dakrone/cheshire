@@ -3,7 +3,7 @@
  custom generators."
   (:import (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (com.fasterxml.jackson.dataformat.cbor CBORFactory)
-           (com.fasterxml.jackson.core JsonFactory JsonFactory$Feature
+           (com.fasterxml.jackson.core TSFBuilder JsonFactory JsonFactory$Feature
                                        StreamReadFeature)
            (com.fasterxml.jackson.core.json JsonReadFeature
                                             JsonWriteFeature)))
@@ -25,7 +25,7 @@
    :quote-field-names true
    :strict-duplicate-detection false})
 
-(defn- apply-base-opts [builder opts]
+(defn- apply-base-opts ^TSFBuilder [^TSFBuilder builder opts]
   (-> builder
       (.configure StreamReadFeature/AUTO_CLOSE_SOURCE
                   (boolean (:auto-close-source opts)))
@@ -36,7 +36,7 @@
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
                   (boolean (:canonicalize-field-names opts)))))
 
-(defn- apply-json-opts [builder opts]
+(defn- apply-json-opts ^TSFBuilder [^TSFBuilder builder opts]
   (-> builder
       (.configure JsonReadFeature/ALLOW_JAVA_COMMENTS
                   (boolean (:allow-comments opts)))
@@ -53,7 +53,7 @@
       (.configure JsonReadFeature/ALLOW_NON_NUMERIC_NUMBERS
                   (boolean (:allow-non-numeric-numbers opts)))
       (.configure JsonWriteFeature/QUOTE_FIELD_NAMES
-                    (boolean (:quote-field-names opts)))))
+                  (boolean (:quote-field-names opts)))))
 
 ;; Factory objects that are needed to do the encoding and decoding
 (defn make-json-factory
