@@ -1,3 +1,7 @@
+## Changes between Cheshire 5.13.0 and 5.13.1
+
+* Internal maintenance: migrate away from usages of deprecated Jackson 
+
 ## Changes between Cheshire 5.8.1 and 5.9.0
 
 * Add `parse-stream-strict` to parse streams strictly rather than lazily
