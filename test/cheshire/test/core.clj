@@ -215,7 +215,15 @@
     (let [sw (StringWriter.)
           bw (BufferedWriter. sw)]
       (json/generate-stream {"foo" "bar"} bw)
-      (is (= "{\"foo\":\"bar\"}" (.toString sw))))))
+      (is (= "{\"foo\":\"bar\"}" (.toString sw))))
+    (let [sw (StringWriter.)
+          bw (BufferedWriter. sw)]
+      (json/generate-stream {:foo "It costs £100"} bw {:escape-non-ascii true})
+      (is (= "{\"foo\":\"It costs \\u00A3100\"}" (.toString sw))))
+    (let [sw (StringWriter.)
+          bw (BufferedWriter. sw)]
+      (json/generate-stream {:foo "It costs £100"} bw {:escape-non-ascii false})
+      (is (= "{\"foo\":\"It costs £100\"}" (.toString sw))))))
 
 (deftest serial-writing
   (is (= "[\"foo\",\"bar\"]"
@@ -473,6 +481,8 @@
     (is (= expected pretty-str))))
 
 (deftest t-unicode-escaping
+  (is (= "{\"foo\":\"It costs £100\"}"
+         (json/encode {:foo "It costs £100"} {:escape-non-ascii false})))
   (is (= "{\"foo\":\"It costs \\u00A3100\"}"
          (json/encode {:foo "It costs £100"} {:escape-non-ascii true}))))
 

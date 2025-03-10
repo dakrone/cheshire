@@ -5,8 +5,8 @@
             [cheshire.generate-seq :as gen-seq]
             [cheshire.parse :as parse])
   (:import (com.fasterxml.jackson.core JsonParser JsonFactory
-                                       JsonGenerator PrettyPrinter
-                                       JsonGenerator$Feature)
+                                       JsonGenerator PrettyPrinter)
+           (com.fasterxml.jackson.core.json JsonWriteFeature)
            (com.fasterxml.jackson.dataformat.cbor CBORFactory)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (cheshire.prettyprint CustomPrettyPrinter)
@@ -70,7 +70,7 @@
            (.setPrettyPrinter generator print-pretty)
          nil))
      (when (:escape-non-ascii opt-map)
-       (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
+       (.enable generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)))
      (gen/generate generator obj
                    (or (:date-format opt-map) factory/default-date-format)
                    (:ex opt-map)
@@ -102,7 +102,7 @@
        (.setPrettyPrinter generator print-pretty)
          nil))
      (when (:escape-non-ascii opt-map)
-       (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
+       (.enable generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)))
      (gen/generate generator obj (or (:date-format opt-map)
                                      factory/default-date-format)
                    (:ex opt-map)

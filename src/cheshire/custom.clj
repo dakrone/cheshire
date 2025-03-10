@@ -11,9 +11,8 @@
            (java.text SimpleDateFormat)
            (java.sql Timestamp)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
-           (com.fasterxml.jackson.core JsonFactory JsonGenerator
-                                       JsonGenerator$Feature
-                                       JsonParser)))
+           (com.fasterxml.jackson.core JsonFactory JsonGenerator)
+           (com.fasterxml.jackson.core.json JsonWriteFeature)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;  DEPRECATED, DO NOT USE  ;;;;;;
@@ -37,7 +36,7 @@
          (when (:pretty opt-map)
            (.useDefaultPrettyPrinter generator))
          (when (:escape-non-ascii opt-map)
-           (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
+           (.enable generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)))
          (if obj
            (to-json obj generator)
            (.writeNull generator))
@@ -57,7 +56,7 @@
          (when (:pretty opt-map)
            (.useDefaultPrettyPrinter generator))
          (when (:escape-non-ascii opt-map)
-           (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
+           (.enable generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)))
          (to-json obj generator)
          (.flush generator)
          w))))
