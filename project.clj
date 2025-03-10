@@ -44,4 +44,15 @@
              ]
   :eastwood {:namespaces [:source-paths]
              :linters [:deprecations]}
-  :javac-options ["--release" "8" "-Xlint:-options" "-Xlint:deprecation" "-Werror"])
+  :javac-options
+  ~(let [version (System/getProperty "java.version")
+        ;; Parse major version from strings like "1.8.0_292" or "11.0.11"
+         major (-> (re-find #"^(1\.)?(\d+)" version)
+                   (last)
+                   (Integer/parseInt))
+         target-opts (case major
+                       8 ["-source" "1.8" "-target" "1.8"]
+                       (if (>= major 9)
+                         ["--release" "8"]
+                         (throw (ex-info "javac needs a min of JDK 8" {}))))]
+     (into target-opts ["-Xlint:-options" "-Xlint:deprecation" "-Werror"])))
