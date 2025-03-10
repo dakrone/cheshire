@@ -32,7 +32,7 @@
   (^String [obj opt-map]
      (binding [*date-format* (or (:date-format opt-map) default-date-format)]
        (let [sw (StringWriter.)
-             generator (.createJsonGenerator
+             generator (.createGenerator
                         ^JsonFactory (or *json-factory* json-factory) sw)]
          (when (:pretty opt-map)
            (.useDefaultPrettyPrinter generator))
@@ -52,7 +52,7 @@
      (encode-stream* obj w nil))
   (^String [obj ^BufferedWriter w opt-map]
      (binding [*date-format* (or (:date-format opt-map) default-date-format)]
-       (let [generator (.createJsonGenerator
+       (let [generator (.createGenerator
                         ^JsonFactory (or *json-factory* json-factory) w)]
          (when (:pretty opt-map)
            (.useDefaultPrettyPrinter generator))
@@ -71,7 +71,7 @@
   (^bytes [obj opt-map]
      (binding [*date-format* (or (:date-format opt-map) default-date-format)]
        (let [baos (ByteArrayOutputStream.)
-             generator (.createJsonGenerator ^SmileFactory
+             generator (.createGenerator ^SmileFactory
                                              (or *smile-factory* smile-factory)
                                              baos)]
          (to-json obj generator)
