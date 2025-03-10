@@ -4,8 +4,9 @@
   (:import (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (com.fasterxml.jackson.dataformat.cbor CBORFactory)
            (com.fasterxml.jackson.core JsonFactory JsonFactory$Feature
-                                       JsonParser$Feature
-                                       JsonGenerator$Feature)))
+                                       StreamReadFeature)
+           (com.fasterxml.jackson.core.json JsonReadFeature
+                                            JsonWriteFeature)))
 
 ;; default date format used to JSON-encode Date objects
 (def default-date-format "yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -24,89 +25,58 @@
    :quote-field-names true
    :strict-duplicate-detection false})
 
-;; Factory objects that are needed to do the encoding and decoding
-(defn make-json-factory
-  ^JsonFactory [opts]
-  (let [opts (merge default-factory-options opts)]
-    (doto (JsonFactory.)
-      (.configure JsonParser$Feature/AUTO_CLOSE_SOURCE
+(defn- apply-base-opts [builder opts]
+  (-> builder
+      (.configure StreamReadFeature/AUTO_CLOSE_SOURCE
                   (boolean (:auto-close-source opts)))
-      (.configure JsonParser$Feature/ALLOW_COMMENTS
-                  (boolean (:allow-comments opts)))
-      (.configure JsonParser$Feature/ALLOW_UNQUOTED_FIELD_NAMES
-                  (boolean (:allow-unquoted-field-names opts)))
-      (.configure JsonParser$Feature/ALLOW_SINGLE_QUOTES
-                  (boolean (:allow-single-quotes opts)))
-      (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS
-                  (boolean (:allow-unquoted-control-chars opts)))
-      (.configure JsonParser$Feature/ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER
-                  (boolean (:allow-backslash-escaping opts)))
-      (.configure JsonParser$Feature/ALLOW_NUMERIC_LEADING_ZEROS
-                  (boolean (:allow-numeric-leading-zeros opts)))
-      (.configure JsonParser$Feature/ALLOW_NON_NUMERIC_NUMBERS
-                  (boolean (:allow-non-numeric-numbers opts)))
-      (.configure JsonParser$Feature/STRICT_DUPLICATE_DETECTION
+      (.configure StreamReadFeature/STRICT_DUPLICATE_DETECTION
                   (boolean (:strict-duplicate-detection opts)))
       (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
                   (boolean (:intern-field-names opts)))
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
-                  (boolean (:canonicalize-field-names opts)))
-      (.configure JsonGenerator$Feature/QUOTE_FIELD_NAMES
-                  (boolean (:quote-field-names opts))))))
+                  (boolean (:canonicalize-field-names opts)))))
+
+(defn- apply-json-opts [builder opts]
+  (-> builder
+      (.configure JsonReadFeature/ALLOW_JAVA_COMMENTS
+                  (boolean (:allow-comments opts)))
+      (.configure JsonReadFeature/ALLOW_UNQUOTED_FIELD_NAMES
+                  (boolean (:allow-unquoted-field-names opts)))
+      (.configure JsonReadFeature/ALLOW_SINGLE_QUOTES
+                  (boolean (:allow-single-quotes opts)))
+      (.configure JsonReadFeature/ALLOW_UNESCAPED_CONTROL_CHARS
+                  (boolean (:allow-unquoted-control-chars opts)))
+      (.configure JsonReadFeature/ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER
+                  (boolean (:allow-backslash-escaping opts)))
+      (.configure JsonReadFeature/ALLOW_LEADING_ZEROS_FOR_NUMBERS
+                  (boolean (:allow-numeric-leading-zeros opts)))
+      (.configure JsonReadFeature/ALLOW_NON_NUMERIC_NUMBERS
+                  (boolean (:allow-non-numeric-numbers opts)))
+      (.configure JsonWriteFeature/QUOTE_FIELD_NAMES
+                    (boolean (:quote-field-names opts)))))
+
+;; Factory objects that are needed to do the encoding and decoding
+(defn make-json-factory
+  ^JsonFactory [opts]
+  (let [opts (merge default-factory-options opts)]
+    (-> (JsonFactory/builder)
+        (apply-base-opts opts)
+        (apply-json-opts opts)
+        (.build))))
 
 (defn make-smile-factory
   ^SmileFactory [opts]
   (let [opts (merge default-factory-options opts)]
-    (doto (SmileFactory.)
-      (.configure JsonParser$Feature/AUTO_CLOSE_SOURCE
-                  (boolean (:auto-close-source opts)))
-      (.configure JsonParser$Feature/ALLOW_COMMENTS
-                  (boolean (:allow-comments opts)))
-      (.configure JsonParser$Feature/ALLOW_UNQUOTED_FIELD_NAMES
-                  (boolean (:allow-unquoted-field-names opts)))
-      (.configure JsonParser$Feature/ALLOW_SINGLE_QUOTES
-                  (boolean (:allow-single-quotes opts)))
-      (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS
-                  (boolean (:allow-unquoted-control-chars opts)))
-      (.configure JsonParser$Feature/ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER
-                  (boolean (:allow-backslash-escaping opts)))
-      (.configure JsonParser$Feature/ALLOW_NUMERIC_LEADING_ZEROS
-                  (boolean (:allow-numeric-leading-zeros opts)))
-      (.configure JsonParser$Feature/ALLOW_NON_NUMERIC_NUMBERS
-                  (boolean (:allow-non-numeric-numbers opts)))
-      (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
-                  (boolean (:intern-field-names opts)))
-      (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
-                  (boolean (:canonicalize-field-names opts)))
-      (.configure JsonGenerator$Feature/QUOTE_FIELD_NAMES
-                  (boolean (:quote-field-names opts))))))
+    (-> (SmileFactory/builder)
+        (apply-base-opts opts)
+        (.build))))
 
 (defn make-cbor-factory
   ^CBORFactory [opts]
   (let [opts (merge default-factory-options opts)]
-    (doto (CBORFactory.)
-      (.configure JsonParser$Feature/AUTO_CLOSE_SOURCE
-                  (boolean (:auto-close-source opts)))
-      (.configure JsonParser$Feature/ALLOW_COMMENTS
-                  (boolean (:allow-comments opts)))
-      (.configure JsonParser$Feature/ALLOW_UNQUOTED_FIELD_NAMES
-                  (boolean (:allow-unquoted-field-names opts)))
-      (.configure JsonParser$Feature/ALLOW_SINGLE_QUOTES
-                  (boolean (:allow-single-quotes opts)))
-      (.configure JsonParser$Feature/ALLOW_UNQUOTED_CONTROL_CHARS
-                  (boolean (:allow-unquoted-control-chars opts)))
-      (.configure JsonParser$Feature/ALLOW_BACKSLASH_ESCAPING_ANY_CHARACTER
-                  (boolean (:allow-backslash-escaping opts)))
-      (.configure JsonParser$Feature/ALLOW_NUMERIC_LEADING_ZEROS
-                  (boolean (:allow-numeric-leading-zeros opts)))
-      (.configure JsonParser$Feature/ALLOW_NON_NUMERIC_NUMBERS
-                  (boolean (:allow-non-numeric-numbers opts)))
-      (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
-                  (boolean (:intern-field-names opts)))
-      (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
-                  (boolean (:canonicalize-field-names opts)))
-      (.configure JsonGenerator$Feature/QUOTE_FIELD_NAMES
-                  (boolean (:quote-field-names opts))))))
+    (-> (CBORFactory/builder)
+        (apply-base-opts opts)
+        (.build))))
 
 (defonce ^JsonFactory json-factory (make-json-factory default-factory-options))
 (defonce ^SmileFactory smile-factory

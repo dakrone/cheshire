@@ -9,7 +9,8 @@
   (:import (com.fasterxml.jackson.core JsonGenerationException
                                        JsonParseException)
            (java.io FileInputStream StringReader StringWriter
-                    BufferedReader BufferedWriter)
+                    BufferedReader BufferedWriter
+                    IOException)
            (java.sql Timestamp)
            (java.util Date UUID)))
 
@@ -118,6 +119,54 @@
           ;; test value equality
           (= (->> bin-obj (get "byte-array") seq)
              (->> roundtripped (get "byte-array") seq))))))
+
+(deftest test-round-trip-binary
+  (doseq [[p g] {json/parse-string json/generate-string
+                 json/parse-smile  json/generate-smile
+                 json/parse-cbor   json/generate-cbor}]
+    (is (let [roundtripped (p (g bin-obj))]
+          ;; test value equality
+          (is (= (->> bin-obj (get "byte-array") seq)
+                 (->> roundtripped (get "byte-array") seq)))))))
+
+(deftest test-smile-factory
+  (binding [fact/*smile-factory* (fact/make-smile-factory {})]
+    (is (= {"a" 1} (-> {:a 1}
+                      json/generate-smile
+                      json/parse-smile)))))
+
+(deftest test-smile-duplicate-detection
+  (let [smile-data (byte-array [0x3a 0x29 0x0a 0x01 ;; smile header
+                                0xFa                ;; object start
+                                0x80 0x61           ;; key a
+                                0xC2                ;; value 1
+                                0x80 0x61           ;; key a (again)
+                                0xC4                ;; value 2
+                                0xFB                ;; object end
+                                ])]
+    (binding [fact/*smile-factory* (fact/make-smile-factory {:strict-duplicate-detection false})]
+      (is (= {"a" 2} (json/parse-smile smile-data))))
+    (binding [fact/*smile-factory* (fact/make-smile-factory {:strict-duplicate-detection true})]
+      (is (thrown? JsonParseException (json/parse-smile smile-data))))))
+
+(deftest test-cbor-factory
+  (binding [fact/*cbor-factory* (fact/make-cbor-factory {})]
+    (is (= {"a" 1} (-> {:a 1}
+                       json/generate-cbor
+                       json/parse-cbor)))))
+
+(deftest test-cbor-duplicate-detection
+  (let [cbor-data (byte-array [0xbf         ;; object begin
+                               0x61 0x61    ;; key a
+                               0x01         ;; value 1
+                               0x61 0x61    ;; key a (again)
+                               0x02         ;; value 2
+                               0xff         ;; object end
+                               ])]
+    (binding [fact/*cbor-factory* (fact/make-cbor-factory {:strict-duplicate-detection false})]
+      (is (= {"a" 2} (json/parse-cbor cbor-data))))
+    (binding [fact/*cbor-factory* (fact/make-cbor-factory {:strict-duplicate-detection true})]
+      (is (thrown? JsonParseException (json/parse-cbor cbor-data))))))
 
 (deftest test-aliases
   (is (= {"foo" "bar" "1" "bat" "2" "bang" "3" "biz"}
@@ -245,16 +294,101 @@
   (is (= "{\"bar\":\"clojure.core/pam\",\"foo\":\"foo.bar/baz\"}"
          (json/encode (sorted-map :foo 'foo.bar/baz :bar 'clojure.core/pam)))))
 
-(deftest t-bindable-factories
+(deftest t-bindable-factories-auto-close-source
   (binding [fact/*json-factory* (fact/make-json-factory
-                                 {:allow-non-numeric-numbers true})]
-    (is (= (type Double/NaN)
-           (type (:foo (json/decode "{\"foo\":NaN}" true)))))))
+                                 {:auto-close-source false})]
+    (let [br (BufferedReader. (StringReader. "123"))]
+      (is (= 123 (json/parse-stream br)))
+      (is (= -1 (.read br)))))
+  (binding [fact/*json-factory* (fact/make-json-factory
+                                 {:auto-close-source true})]
+    (let [br (BufferedReader. (StringReader. "123"))]
+      (is (= 123 (json/parse-stream br)))
+      (is (thrown? IOException (.read br))))))
+
+(deftest t-bindable-factories-allow-comments
+  (let [s "{\"a\": /* comment */ 1, // comment\n \"b\": 2}"]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                   {:allow-comments true})]
+      (is (= {"a" 1 "b" 2} (json/decode s))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                   {:allow-comments false})]
+      (is (thrown? JsonParseException (json/decode s))))))
+
+(deftest t-bindable-factories-allow-unquoted-field-names
+  (let [s "{a: 1, b: 2}"]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                   {:allow-unquoted-field-names true})]
+      (is (= {"a" 1 "b" 2} (json/decode s))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                   {:allow-unquoted-field-names false})]
+      (is (thrown? JsonParseException (json/decode s))))))
+
+(deftest t-bindable-factories-allow-single-quotes
+  (doseq [s ["{'a': \"one\", 'b': \"two\"}"
+             "{\"a\": 'one', \"b\": 'two'}"
+             "{'a': 'one', 'b': 'two'}"]]
+    (testing s
+      (binding [fact/*json-factory* (fact/make-json-factory
+                                      {:allow-single-quotes true})]
+        (is (= {"a" "one" "b" "two"} (json/decode s))))
+      (binding [fact/*json-factory* (fact/make-json-factory
+                                      {:allow-single-quotes false})]
+        (is (thrown? JsonParseException (json/decode s)))))))
+
+(deftest t-bindable-factories-allow-unquoted-control-chars
+  (let [s "{\"a\": \"one\ntwo\"}"]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:allow-unquoted-control-chars true})]
+      (is (= {"a" "one\ntwo"} (json/decode s))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:allow-unquoted-control-chars false})]
+      (is (thrown? JsonParseException (json/decode s))))))
+
+(deftest t-bindable-factories-allow-backslash-escaping-any-char
+  (let [s "{\"a\": 00000000001}"]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:allow-numeric-leading-zeros true})]
+      (is (= {"a" 1} (json/decode s))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:allow-numeric-leading-zeros false})]
+      (is (thrown? JsonParseException (json/decode s))))))
+
+(deftest t-bindable-factories-allow-numeric-leading-zeros
+  (let [s "{\"a\": \"\\o\\n\\e\"}"]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:allow-backslash-escaping true})]
+      (is (= {"a" "o\ne"} (json/decode s))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:allow-backslash-escaping false})]
+      (is (thrown? JsonParseException (json/decode s))))))
+
+(deftest t-bindable-factories-non-numeric-numbers
+  (let [s "{\"foo\":NaN}"]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:allow-non-numeric-numbers true})]
+      (is (= (type Double/NaN)
+             (type (:foo (json/decode s true))))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:allow-non-numeric-numbers false})]
+      (is (thrown? JsonParseException (json/decode s true))))))
+
+(deftest t-bindable-factories-optimization-opts
+  (let [s "{\"a\": \"foo\"}"]
+    (doseq [opts [{:intern-field-names true}
+                  {:intern-field-names false}
+                  {:canonicalize-field-names true}
+                  {:canonicalize-field-names false}]]
+      (binding [fact/*json-factory* (fact/make-json-factory opts)]
+        (is (= {"a" "foo"} (json/decode s)))))))
 
 (deftest t-bindable-factories-quoteless
   (binding [fact/*json-factory* (fact/make-json-factory
+                                  {:quote-field-names true})]
+    (is (= "{\"a\":\"foo\"}" (json/encode {:a "foo"}))))
+  (binding [fact/*json-factory* (fact/make-json-factory
                                   {:quote-field-names false})]
-    (is (= "{a:1}" (json/encode {:a 1})))))
+    (is (= "{a:\"foo\"}" (json/encode {:a "foo"})))))
 
 (deftest t-bindable-factories-strict-duplicate-detection
   (binding [fact/*json-factory* (fact/make-json-factory
