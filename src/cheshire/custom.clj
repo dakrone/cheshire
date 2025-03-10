@@ -13,7 +13,7 @@
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (com.fasterxml.jackson.core JsonFactory JsonGenerator
                                        JsonGenerator$Feature
-                                       JsonGenerationException JsonParser)))
+                                       JsonParser)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;  DEPRECATED, DO NOT USE  ;;;;;;
@@ -22,10 +22,6 @@
 
 ;; date format rebound for custom encoding
 (def ^{:dynamic true :private true} *date-format*)
-
-;; pre-allocated exception for fast-failing core attempt for custom encoding
-(def ^{:private true} core-failure (JsonGenerationException.
-                                    "Cannot custom JSON encode object"))
 
 (defprotocol JSONable
   (to-json [t jg]))

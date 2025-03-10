@@ -4,7 +4,7 @@
   (:use [cheshire.generate :only [tag JSONable to-json i?
                                   number-dispatch write-string
                                   fail]])
-  (:import (com.fasterxml.jackson.core JsonGenerator JsonGenerationException)
+  (:import (com.fasterxml.jackson.core JsonGenerator)
            (java.util Date Map List Set SimpleTimeZone UUID)
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
