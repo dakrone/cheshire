@@ -34,11 +34,14 @@
                    :generative :generative
                    :all (constantly true)}
   :plugins [[codox "0.6.3"]
-            [lein-ancient "1.0.0-RC3"]]
+            [lein-ancient "1.0.0-RC3"]
+            [jonase/eastwood "1.4.3"]]
   :java-source-paths ["src/java"]
   :jvm-opts ["-Xmx512M"
 ;;             "-XX:+PrintCompilation"
 ;;             "-XX:+UnlockDiagnosticVMOptions"
 ;;             "-XX:+PrintInlining"
              ]
+  :eastwood {:namespaces [:source-paths]
+             :linters [:deprecations]}
   :javac-options ["-target" "1.7" "-source" "1.7" "-Xlint:-options"])
