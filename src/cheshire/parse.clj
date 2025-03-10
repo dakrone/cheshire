@@ -32,7 +32,7 @@
 
 (definline parse-array [^JsonParser jp key-fn bd? array-coerce-fn]
   (let [jp (tag jp)]
-    `(let [array-field-name# (.getCurrentName ~jp)]
+    `(let [array-field-name# (.currentName ~jp)]
        (.nextToken ~jp)
        (loop [coll# (transient (if ~array-coerce-fn
                                  (~array-coerce-fn array-field-name#)
