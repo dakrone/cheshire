@@ -44,4 +44,4 @@
              ]
   :eastwood {:namespaces [:source-paths]
              :linters [:deprecations]}
-  :javac-options ["-target" "1.7" "-source" "1.7" "-Xlint:-options"])
+  :javac-options ["--release" "8" "-Xlint:-options" "-Xlint:deprecation" "-Werror"])
