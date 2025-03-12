@@ -112,15 +112,6 @@
 (def bin-obj {"byte-array" (byte-array (map byte [1 2 3]))})
 
 (deftest test-round-trip-binary
-  (for [[p g] {json/parse-string json/generate-string
-               json/parse-smile  json/generate-smile
-               json/parse-cbor   json/generate-cbor}]
-    (is (let [roundtripped (p (g bin-obj))]
-          ;; test value equality
-          (= (->> bin-obj (get "byte-array") seq)
-             (->> roundtripped (get "byte-array") seq))))))
-
-(deftest test-round-trip-binary
   (doseq [[p g] {json/parse-string json/generate-string
                  json/parse-smile  json/generate-smile
                  json/parse-cbor   json/generate-cbor}]
