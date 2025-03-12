@@ -1,0 +1,55 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu ]
+        java-version: [ '8', '11', '17', '21', '23' ]
+
+    name: ${{matrix.os}} jdk${{matrix.java-version}}
+
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Clojure deps cache
+      uses: actions/cache@v4
+      with:
+        path: |
+          ~/.m2/repository
+        key: $${ runner.os }}-cljdeps-${{ hashFiles('project.clj') }}
+        restore-keys: $${ runner.os }}-cljdeps-
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: ${{ matrix.java-version }}
+
+    - name: Install Clojure Tools
+      uses: DeLaGuardo/setup-clojure@13.1
+      with:
+        lein: 'latest'
+
+    - name: Download deps
+      run: lein all deps
+
+    - name: Tools Versions
+      run: |
+        echo "java -version"
+        java -version
+        echo "lein --version"
+        lein --version
+
+    - name: Run Tests
+      run: lein all test :all
