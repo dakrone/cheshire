@@ -38,7 +38,7 @@
             [lein-ancient "1.0.0-RC3"]
             [jonase/eastwood "1.4.3"]]
   :java-source-paths ["src/java"]
-  :jvm-opts ["-Xmx512M"
+  :jvm-opts ["-Xmx1024M"
 ;;             "-XX:+PrintCompilation"
 ;;             "-XX:+UnlockDiagnosticVMOptions"
 ;;             "-XX:+PrintInlining"
