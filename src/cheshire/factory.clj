@@ -4,7 +4,8 @@
   (:import (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (com.fasterxml.jackson.dataformat.cbor CBORFactory)
            (com.fasterxml.jackson.core TSFBuilder JsonFactory JsonFactory$Feature
-                                       StreamReadFeature)
+                                       StreamReadFeature
+                                       StreamReadConstraints StreamWriteConstraints)
            (com.fasterxml.jackson.core.json JsonReadFeature
                                             JsonWriteFeature)))
 
@@ -23,7 +24,16 @@
    :intern-field-names false
    :canonicalize-field-names false
    :quote-field-names true
-   :strict-duplicate-detection false})
+   :strict-duplicate-detection false
+   ;; default values from Jackson 2.18.3
+   ;; as of this version seem to be enforced for json only and not cbor, smile
+   :max-input-document-length nil ;; no limit by default
+   :max-input-token-count nil     ;; no limit by default
+   :max-input-name-length 50000
+   :max-input-nesting-depth 1000
+   :max-input-number-length 1000
+   :max-input-string-length 20000000
+   :max-output-nesting-depth 1000})
 
 (defn- apply-base-opts ^TSFBuilder [^TSFBuilder builder opts]
   (-> builder
@@ -34,7 +44,18 @@
       (.configure JsonFactory$Feature/INTERN_FIELD_NAMES
                   (boolean (:intern-field-names opts)))
       (.configure JsonFactory$Feature/CANONICALIZE_FIELD_NAMES
-                  (boolean (:canonicalize-field-names opts)))))
+                  (boolean (:canonicalize-field-names opts)))
+      (.streamReadConstraints (-> (StreamReadConstraints/builder)
+                                  (.maxDocumentLength (or (:max-input-document-length opts) -1))
+                                  (.maxTokenCount (or (:max-input-token-count opts) -1))
+                                  (.maxNameLength (:max-input-name-length opts))
+                                  (.maxNestingDepth (:max-input-nesting-depth opts))
+                                  (.maxNumberLength (:max-input-number-length opts))
+                                  (.maxStringLength (:max-input-string-length opts))
+                                  (.build)))
+      (.streamWriteConstraints (-> (StreamWriteConstraints/builder)
+                                   (.maxNestingDepth (:max-output-nesting-depth opts))
+                                   (.build)))))
 
 (defn- apply-json-opts ^TSFBuilder [^TSFBuilder builder opts]
   (-> builder
