@@ -5,7 +5,8 @@
             [cheshire.exact :as json-exact]
             [cheshire.generate :as gen]
             [cheshire.factory :as fact]
-            [cheshire.parse :as parse])
+            [cheshire.parse :as parse]
+            [clojure.string :as str])
   (:import (com.fasterxml.jackson.core JsonGenerationException
                                        JsonParseException)
            (com.fasterxml.jackson.core.exc StreamConstraintsException)
@@ -14,6 +15,17 @@
                     IOException)
            (java.sql Timestamp)
            (java.util Date UUID)))
+
+(defn- str-of-len
+  ([len]
+   (str-of-len len "x"))
+  ([len val]
+   (apply str (repeat len val))))
+
+(defn- nested-map [depth]
+  (reduce (fn [acc n] {(str n) acc})
+          {"0" "foo"}
+          (range 1 depth)))
 
 (def test-obj {"int" 3 "long" (long -2147483647) "boolean" true
                "LongObj" (Long/parseLong "2147483647") "double" 1.23
@@ -438,12 +450,17 @@
                                     {:max-input-name-length (dec (count k))})]
       (is (thrown-with-msg?
             StreamConstraintsException #"(?i)name .* exceeds"
+            (json/decode sample-data)))))
+  (let [default-limit (:max-input-name-length fact/default-factory-options)]
+    (let [k (str-of-len default-limit)
+          edn {k 1}
+          sample-data (json/encode edn)]
+      (is (= edn (json/decode sample-data))))
+    (let [k (str-of-len (inc default-limit))
+          sample-data (json/encode {k 1})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)name .* exceeds"
             (json/decode sample-data))))))
-
-(defn- nested-map [depth]
-  (reduce (fn [acc n] {(str n) acc})
-          {"0" "foo"}
-          (range 1 depth)))
 
 (deftest t-bindable-factories-input-nesting-depth
   (let [edn (nested-map 100)
@@ -468,10 +485,20 @@
                                     {:max-input-number-length (-> num str count dec)})]
       (is (thrown-with-msg?
             StreamConstraintsException #"(?i)number value length .* exceeds"
+            (json/decode sample-data)))))
+  (let [default-limit (:max-input-number-length fact/default-factory-options)]
+    (let [num (bigint (str-of-len default-limit 2))
+          edn {"foo" num}
+          sample-data (json/encode edn)]
+      (is (= edn (json/decode sample-data))))
+    (let [num (bigint (str-of-len (inc default-limit) 2))
+          sample-data (json/encode {"foo" num})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)number value length .* exceeds"
             (json/decode sample-data))))))
 
 (deftest t-bindable-factories-max-input-string-length
-  (let [big-string (apply str (repeat 40000000 "x"))
+  (let [big-string (str-of-len 40000000)
         edn {"big-string" big-string}
         sample-data (json/encode edn)]
     (binding [fact/*json-factory* (fact/make-json-factory
@@ -481,13 +508,23 @@
                                     {:max-input-string-length (dec (count big-string))})]
       (is (thrown-with-msg?
             StreamConstraintsException #"(?i)string value length .* exceeds"
+            (json/decode sample-data)))))
+  (let [default-limit (:max-input-string-length fact/default-factory-options)]
+    (let [big-string (str-of-len default-limit)
+          edn {"big-string" big-string}
+          sample-data (json/encode edn)]
+      (is (= edn (json/decode sample-data))))
+    (let [big-string (str-of-len (inc default-limit))
+          sample-data (json/encode {"big-string" big-string})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)string value length .* exceeds"
             (json/decode sample-data))))))
 
 (deftest t-bindable-factories-max-output-nesting-depth
   (let [edn (nested-map 100)]
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:max-output-nesting-depth 100})]
-      (is (= (json/encode edn) (json/encode edn))))
+      (is (str/includes? (json/encode edn) "\"99\"")))
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:max-output-nesting-depth 99})]
       (is (thrown-with-msg?
