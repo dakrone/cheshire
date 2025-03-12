@@ -7,8 +7,8 @@
             [cheshire.factory :as fact]
             [cheshire.parse :as parse])
   (:import (com.fasterxml.jackson.core JsonGenerationException
-                                       JsonParseException
-                                       JsonProcessingException)
+                                       JsonParseException)
+           (com.fasterxml.jackson.core.exc StreamConstraintsException)
            (java.io FileInputStream StringReader StringWriter
                     BufferedReader BufferedWriter
                     IOException)
@@ -411,7 +411,7 @@
                                     ;; as per Jackson docs, limit is inexact, so dividing input length by 2 should do the trick
                                     {:max-input-document-length (/ (count sample-data) 2)})]
       (is (thrown-with-msg?
-            JsonProcessingException #"(?i)document length .* exceeds"
+            StreamConstraintsException #"(?i)document length .* exceeds"
             (json/decode sample-data))))))
 
 (deftest t-bindable-factories-max-input-token-count
@@ -424,7 +424,7 @@
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:max-input-token-count 5})]
       (is (thrown-with-msg?
-            JsonProcessingException #"(?i)token count .* exceeds"
+            StreamConstraintsException #"(?i)token count .* exceeds"
             (json/decode sample-data))))))
 
 (deftest t-bindable-factories-max-input-name-length
@@ -437,7 +437,7 @@
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:max-input-name-length (dec (count k))})]
       (is (thrown-with-msg?
-            JsonProcessingException #"(?i)name .* exceeds"
+            StreamConstraintsException #"(?i)name .* exceeds"
             (json/decode sample-data))))))
 
 (defn- nested-map [depth]
@@ -454,7 +454,7 @@
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:max-input-nesting-depth 99})]
       (is (thrown-with-msg?
-            JsonProcessingException #"(?i)nesting depth .* exceeds"
+            StreamConstraintsException #"(?i)nesting depth .* exceeds"
             (json/decode sample-data))))))
 
 (deftest t-bindable-factories-max-input-number-length
@@ -467,7 +467,7 @@
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:max-input-number-length (-> num str count dec)})]
       (is (thrown-with-msg?
-            JsonProcessingException #"(?i)number value length .* exceeds"
+            StreamConstraintsException #"(?i)number value length .* exceeds"
             (json/decode sample-data))))))
 
 (deftest t-bindable-factories-max-input-string-length
@@ -480,7 +480,7 @@
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:max-input-string-length (dec (count big-string))})]
       (is (thrown-with-msg?
-            JsonProcessingException #"(?i)string value length .* exceeds"
+            StreamConstraintsException #"(?i)string value length .* exceeds"
             (json/decode sample-data))))))
 
 (deftest t-bindable-factories-max-output-nesting-depth
@@ -491,7 +491,7 @@
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:max-output-nesting-depth 99})]
       (is (thrown-with-msg?
-            JsonProcessingException #"(?i)nesting depth .* exceeds"
+            StreamConstraintsException #"(?i)nesting depth .* exceeds"
             (json/encode edn))))))
 
 (deftest t-persistent-queue
