@@ -5,8 +5,7 @@
             [cheshire.exact :as json-exact]
             [cheshire.generate :as gen]
             [cheshire.factory :as fact]
-            [cheshire.parse :as parse]
-            [clojure.string :as str])
+            [cheshire.parse :as parse])
   (:import (com.fasterxml.jackson.core JsonGenerationException
                                        JsonParseException)
            (com.fasterxml.jackson.core.exc StreamConstraintsException)
@@ -524,7 +523,7 @@
   (let [edn (nested-map 100)]
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:max-output-nesting-depth 100})]
-      (is (str/includes? (json/encode edn) "\"99\"")))
+      (is (.contains (json/encode edn) "\"99\"")))
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:max-output-nesting-depth 99})]
       (is (thrown-with-msg?
