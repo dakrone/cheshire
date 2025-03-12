@@ -2,7 +2,7 @@
 
 * Bump minimum JDK version from v7 to v8
 * Bump Jackson dependencies to 2.18.3
-* Expose new Jackson processing limits via factories
+* Expose new Jackson processing limits via factory options
 * Internal maintenance: migrate away from usages of deprecated Jackson 
 
 ## Changes between Cheshire 5.8.1 and 5.9.0
