@@ -37,7 +37,7 @@ jobs:
         java-version: ${{ matrix.java-version }}
 
     - name: Install Clojure Tools
-      uses: DeLaGuardo/setup-clojure@13.1
+      uses: DeLaGuardo/setup-clojure@13.2
       with:
         lein: 'latest'
 
