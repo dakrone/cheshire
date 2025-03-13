@@ -10,7 +10,7 @@
            (com.fasterxml.jackson.dataformat.cbor CBORFactory)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (cheshire.prettyprint CustomPrettyPrinter)
-           (java.io StringWriter StringReader BufferedReader BufferedWriter
+           (java.io StringWriter StringReader BufferedReader
                     ByteArrayOutputStream OutputStream Reader Writer)))
 
 (defonce default-pretty-print-options
@@ -86,13 +86,13 @@
   objects will be encoded with.
 
   The default date format (in UTC) is: yyyy-MM-dd'T'HH:mm:ss'Z'"
-  (^BufferedWriter [obj ^BufferedWriter writer]
+  (^Writer [obj ^Writer writer]
    (generate-stream obj writer nil))
-  (^BufferedWriter [obj ^BufferedWriter writer opt-map]
+  (^Writer [obj ^Writer writer opt-map]
    (let [generator (.createGenerator
                     ^JsonFactory (or factory/*json-factory*
                                      factory/json-factory)
-                    ^Writer writer)
+                    writer)
          print-pretty (:pretty opt-map)]
      (when print-pretty
        (condp instance? print-pretty
