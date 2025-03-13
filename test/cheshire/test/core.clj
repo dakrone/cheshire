@@ -8,11 +8,23 @@
             [cheshire.parse :as parse])
   (:import (com.fasterxml.jackson.core JsonGenerationException
                                        JsonParseException)
+           (com.fasterxml.jackson.core.exc StreamConstraintsException)
            (java.io FileInputStream StringReader StringWriter
                     BufferedReader BufferedWriter
                     IOException)
            (java.sql Timestamp)
            (java.util Date UUID)))
+
+(defn- str-of-len
+  ([len]
+   (str-of-len len "x"))
+  ([len val]
+   (apply str (repeat len val))))
+
+(defn- nested-map [depth]
+  (reduce (fn [acc n] {(str n) acc})
+          {"0" "foo"}
+          (range 1 depth)))
 
 (def test-obj {"int" 3 "long" (long -2147483647) "boolean" true
                "LongObj" (Long/parseLong "2147483647") "double" 1.23
@@ -399,6 +411,124 @@
                                  {:strict-duplicate-detection false})]
     (is (= {"a" 3 "b" 2}
            (json/decode "{\"a\": 1, \"b\": 2, \"a\": 3}")))))
+
+(deftest t-bindable-factories-max-input-document-length
+  (let [edn {"a" (apply str (repeat 10000 "x"))}
+        sample-data (json/encode edn)]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-input-document-length (count sample-data)})]
+      (is (= edn (json/decode sample-data))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    ;; as per Jackson docs, limit is inexact, so dividing input length by 2 should do the trick
+                                    {:max-input-document-length (/ (count sample-data) 2)})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)document length .* exceeds"
+            (json/decode sample-data))))))
+
+(deftest t-bindable-factories-max-input-token-count
+  ;; A token is a single unit of input, such as a number, a string, an object start or end, or an array start or end.
+  (let [edn {"1" 2 "3" 4}
+        sample-data (json/encode edn)]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-input-token-count 6})]
+      (is (= edn (json/decode sample-data))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-input-token-count 5})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)token count .* exceeds"
+            (json/decode sample-data))))))
+
+(deftest t-bindable-factories-max-input-name-length
+  (let [k "somekey"
+        edn {k 1}
+        sample-data (json/encode edn)]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-input-name-length (count k)})]
+      (is (= edn (json/decode sample-data))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-input-name-length (dec (count k))})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)name .* exceeds"
+            (json/decode sample-data)))))
+  (let [default-limit (:max-input-name-length fact/default-factory-options)]
+    (let [k (str-of-len default-limit)
+          edn {k 1}
+          sample-data (json/encode edn)]
+      (is (= edn (json/decode sample-data))))
+    (let [k (str-of-len (inc default-limit))
+          sample-data (json/encode {k 1})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)name .* exceeds"
+            (json/decode sample-data))))))
+
+(deftest t-bindable-factories-input-nesting-depth
+  (let [edn (nested-map 100)
+        sample-data (json/encode edn)]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-input-nesting-depth 100})]
+      (is (= edn (json/decode sample-data))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-input-nesting-depth 99})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)nesting depth .* exceeds"
+            (json/decode sample-data))))))
+
+(deftest t-bindable-factories-max-input-number-length
+  (let [num 123456789
+        edn {"foo" num}
+        sample-data (json/encode edn)]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-input-number-length (-> num str count)})]
+      (is (= edn (json/decode sample-data))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-input-number-length (-> num str count dec)})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)number value length .* exceeds"
+            (json/decode sample-data)))))
+  (let [default-limit (:max-input-number-length fact/default-factory-options)]
+    (let [num (bigint (str-of-len default-limit 2))
+          edn {"foo" num}
+          sample-data (json/encode edn)]
+      (is (= edn (json/decode sample-data))))
+    (let [num (bigint (str-of-len (inc default-limit) 2))
+          sample-data (json/encode {"foo" num})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)number value length .* exceeds"
+            (json/decode sample-data))))))
+
+(deftest t-bindable-factories-max-input-string-length
+  (let [big-string (str-of-len 40000000)
+        edn {"big-string" big-string}
+        sample-data (json/encode edn)]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-input-string-length (count big-string)})]
+      (is (= edn (json/decode sample-data))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-input-string-length (dec (count big-string))})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)string value length .* exceeds"
+            (json/decode sample-data)))))
+  (let [default-limit (:max-input-string-length fact/default-factory-options)]
+    (let [big-string (str-of-len default-limit)
+          edn {"big-string" big-string}
+          sample-data (json/encode edn)]
+      (is (= edn (json/decode sample-data))))
+    (let [big-string (str-of-len (inc default-limit))
+          sample-data (json/encode {"big-string" big-string})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)string value length .* exceeds"
+            (json/decode sample-data))))))
+
+(deftest t-bindable-factories-max-output-nesting-depth
+  (let [edn (nested-map 100)]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-output-nesting-depth 100})]
+      (is (.contains (json/encode edn) "\"99\"")))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                    {:max-output-nesting-depth 99})]
+      (is (thrown-with-msg?
+            StreamConstraintsException #"(?i)nesting depth .* exceeds"
+            (json/encode edn))))))
 
 (deftest t-persistent-queue
   (let [q (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)]

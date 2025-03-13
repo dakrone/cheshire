@@ -5,10 +5,10 @@
             :url "http://opensource.org/licenses/MIT"
             :distribution :repo}
   :global-vars {*warn-on-reflection* false}
-  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.17.0"]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.17.0"
+  :dependencies [[com.fasterxml.jackson.core/jackson-core "2.18.3"]
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-smile "2.18.3"
                   :exclusions [com.fasterxml.jackson.core/jackson-databind]]
-                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.17.0"
+                 [com.fasterxml.jackson.dataformat/jackson-dataformat-cbor "2.18.3"
                   :exclusions [com.fasterxml.jackson.core/jackson-databind]]
                  [tigris "0.1.2"]]
   :profiles {:dev {:dependencies [[org.clojure/clojure "1.12.0"]
@@ -38,7 +38,7 @@
             [lein-ancient "1.0.0-RC3"]
             [jonase/eastwood "1.4.3"]]
   :java-source-paths ["src/java"]
-  :jvm-opts ["-Xmx512M"
+  :jvm-opts ["-Xmx1024M"
 ;;             "-XX:+PrintCompilation"
 ;;             "-XX:+UnlockDiagnosticVMOptions"
 ;;             "-XX:+PrintInlining"
