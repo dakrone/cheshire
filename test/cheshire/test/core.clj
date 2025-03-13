@@ -26,6 +26,12 @@
           {"0" "foo"}
           (range 1 depth)))
 
+(defn- encode-stream->str [obj opts]
+  (let [sw (StringWriter.)
+        bw (BufferedWriter. sw)]
+    (json/generate-stream obj bw opts)
+    (.toString sw)))
+
 (def test-obj {"int" 3 "long" (long -2147483647) "boolean" true
                "LongObj" (Long/parseLong "2147483647") "double" 1.23
                "nil" nil "string" "string" "vec" [1 2 3] "map" {"a" "b"}
@@ -218,15 +224,7 @@
     (let [sw (StringWriter.)
           bw (BufferedWriter. sw)]
       (json/generate-stream {"foo" "bar"} bw)
-      (is (= "{\"foo\":\"bar\"}" (.toString sw))))
-    (let [sw (StringWriter.)
-          bw (BufferedWriter. sw)]
-      (json/generate-stream {:foo "It costs £100"} bw {:escape-non-ascii true})
-      (is (= "{\"foo\":\"It costs \\u00A3100\"}" (.toString sw))))
-    (let [sw (StringWriter.)
-          bw (BufferedWriter. sw)]
-      (json/generate-stream {:foo "It costs £100"} bw {:escape-non-ascii false})
-      (is (= "{\"foo\":\"It costs £100\"}" (.toString sw))))))
+      (is (= "{\"foo\":\"bar\"}" (.toString sw))))))
 
 (deftest serial-writing
   (is (= "[\"foo\",\"bar\"]"
@@ -392,6 +390,37 @@
                   {:canonicalize-field-names false}]]
       (binding [fact/*json-factory* (fact/make-json-factory opts)]
         (is (= {"a" "foo"} (json/decode s)))))))
+
+(deftest t-bindable-factories-escape-non-ascii
+  ;; includes testing legacy fn opt of same name can override factory
+  (let [edn {:foo "It costs £100"}
+        expected-esc "{\"foo\":\"It costs \\u00A3100\"}"
+        expected-no-esc "{\"foo\":\"It costs £100\"}"
+        opt-esc {:escape-non-ascii true}
+        opt-no-esc {:escape-non-ascii false}]
+    (testing "default factory"
+      (doseq [[fn-opts     expected]
+              [[{}         expected-no-esc]
+               [opt-esc    expected-esc]
+               [opt-no-esc expected-no-esc]]]
+        (testing fn-opts
+          (is (= expected (json/encode edn fn-opts) (encode-stream->str edn fn-opts))))))
+    (testing (str "factory: " opt-esc)
+      (binding [fact/*json-factory* (fact/make-json-factory opt-esc)]
+        (doseq [[fn-opts     expected]
+                [[{}         expected-esc]
+                 [opt-esc    expected-esc]
+                 [opt-no-esc expected-no-esc]]]
+          (testing (str "fn: " fn-opts)
+            (is (= expected (json/encode edn fn-opts) (encode-stream->str edn fn-opts)))))))
+    (testing (str "factory: " opt-no-esc)
+      (binding [fact/*json-factory* (fact/make-json-factory opt-no-esc)]
+        (doseq [[fn-opts     expected]
+                [[{}         expected-no-esc]
+                 [opt-esc    expected-esc]
+                 [opt-no-esc expected-no-esc]]]
+          (testing (str "fn: " fn-opts)
+            (is (= expected (json/encode edn fn-opts) (encode-stream->str edn fn-opts)))))))))
 
 (deftest t-bindable-factories-quoteless
   (binding [fact/*json-factory* (fact/make-json-factory
@@ -600,12 +629,6 @@
       (println "; pretty print with options - expected")
       (println expected))
     (is (= expected pretty-str))))
-
-(deftest t-unicode-escaping
-  (is (= "{\"foo\":\"It costs £100\"}"
-         (json/encode {:foo "It costs £100"} {:escape-non-ascii false})))
-  (is (= "{\"foo\":\"It costs \\u00A3100\"}"
-         (json/encode {:foo "It costs £100"} {:escape-non-ascii true}))))
 
 (deftest t-custom-keyword-fn
   (is (= {:FOO "bar"} (json/decode "{\"foo\": \"bar\"}"

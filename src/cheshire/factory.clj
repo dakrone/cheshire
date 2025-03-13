@@ -23,6 +23,7 @@
    :allow-non-numeric-numbers false
    :intern-field-names false
    :canonicalize-field-names false
+   :escape-non-ascii false
    :quote-field-names true
    :strict-duplicate-detection false
    ;; default values from Jackson 2.18.3
@@ -74,7 +75,9 @@
       (.configure JsonReadFeature/ALLOW_NON_NUMERIC_NUMBERS
                   (boolean (:allow-non-numeric-numbers opts)))
       (.configure JsonWriteFeature/QUOTE_FIELD_NAMES
-                  (boolean (:quote-field-names opts)))))
+                  (boolean (:quote-field-names opts)))
+      (.configure JsonWriteFeature/ESCAPE_NON_ASCII
+                  (boolean (:escape-non-ascii opts)))))
 
 ;; Factory objects that are needed to do the encoding and decoding
 (defn make-json-factory

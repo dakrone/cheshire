@@ -69,8 +69,10 @@
          PrettyPrinter
            (.setPrettyPrinter generator print-pretty)
          nil))
-     (when (:escape-non-ascii opt-map)
-       (.enable generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)))
+     ;; legacy fn opt, consider using fatory opt instead
+     (when (some? (:escape-non-ascii opt-map))
+       (.configure generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)
+                   (boolean (:escape-non-ascii opt-map))))
      (gen/generate generator obj
                    (or (:date-format opt-map) factory/default-date-format)
                    (:ex opt-map)
@@ -101,8 +103,10 @@
          PrettyPrinter
        (.setPrettyPrinter generator print-pretty)
          nil))
-     (when (:escape-non-ascii opt-map)
-       (.enable generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)))
+     ;; legacy fn opt, consider using fatory opt instead
+     (when (some? (:escape-non-ascii opt-map))
+       (.configure generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)
+                   (boolean (:escape-non-ascii opt-map))))
      (gen/generate generator obj (or (:date-format opt-map)
                                      factory/default-date-format)
                    (:ex opt-map)
