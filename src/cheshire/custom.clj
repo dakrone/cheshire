@@ -35,8 +35,9 @@
                         ^JsonFactory (or *json-factory* json-factory) sw)]
          (when (:pretty opt-map)
            (.useDefaultPrettyPrinter generator))
-         (when (:escape-non-ascii opt-map)
-           (.enable generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)))
+         (when (some? (:escape-non-ascii opt-map))
+           (.configure generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)
+                       (boolean (:escape-non-ascii opt-map))))
          (if obj
            (to-json obj generator)
            (.writeNull generator))
@@ -55,11 +56,14 @@
                         ^JsonFactory (or *json-factory* json-factory) w)]
          (when (:pretty opt-map)
            (.useDefaultPrettyPrinter generator))
-         (when (:escape-non-ascii opt-map)
-           (.enable generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)))
+         (when (some? (:escape-non-ascii opt-map))
+           (.configure generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)
+                       (boolean (:escape-non-ascii opt-map))))
          (to-json obj generator)
          (.flush generator)
          w))))
+
+
 
 (def encode-stream encode-stream*)
 (core/copy-arglists encode-stream encode-stream*)
