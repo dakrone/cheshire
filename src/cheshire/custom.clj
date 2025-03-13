@@ -11,9 +11,8 @@
            (java.text SimpleDateFormat)
            (java.sql Timestamp)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
-           (com.fasterxml.jackson.core JsonFactory JsonGenerator
-                                       JsonGenerator$Feature
-                                       JsonGenerationException JsonParser)))
+           (com.fasterxml.jackson.core JsonFactory JsonGenerator)
+           (com.fasterxml.jackson.core.json JsonWriteFeature)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;;  DEPRECATED, DO NOT USE  ;;;;;;
@@ -22,10 +21,6 @@
 
 ;; date format rebound for custom encoding
 (def ^{:dynamic true :private true} *date-format*)
-
-;; pre-allocated exception for fast-failing core attempt for custom encoding
-(def ^{:private true} core-failure (JsonGenerationException.
-                                    "Cannot custom JSON encode object"))
 
 (defprotocol JSONable
   (to-json [t jg]))
@@ -36,12 +31,13 @@
   (^String [obj opt-map]
      (binding [*date-format* (or (:date-format opt-map) default-date-format)]
        (let [sw (StringWriter.)
-             generator (.createJsonGenerator
+             generator (.createGenerator
                         ^JsonFactory (or *json-factory* json-factory) sw)]
          (when (:pretty opt-map)
            (.useDefaultPrettyPrinter generator))
-         (when (:escape-non-ascii opt-map)
-           (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
+         (when (some? (:escape-non-ascii opt-map))
+           (.configure generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)
+                       (boolean (:escape-non-ascii opt-map))))
          (if obj
            (to-json obj generator)
            (.writeNull generator))
@@ -56,15 +52,18 @@
      (encode-stream* obj w nil))
   (^String [obj ^BufferedWriter w opt-map]
      (binding [*date-format* (or (:date-format opt-map) default-date-format)]
-       (let [generator (.createJsonGenerator
+       (let [generator (.createGenerator
                         ^JsonFactory (or *json-factory* json-factory) w)]
          (when (:pretty opt-map)
            (.useDefaultPrettyPrinter generator))
-         (when (:escape-non-ascii opt-map)
-           (.enable generator JsonGenerator$Feature/ESCAPE_NON_ASCII))
+         (when (some? (:escape-non-ascii opt-map))
+           (.configure generator (.mappedFeature JsonWriteFeature/ESCAPE_NON_ASCII)
+                       (boolean (:escape-non-ascii opt-map))))
          (to-json obj generator)
          (.flush generator)
          w))))
+
+
 
 (def encode-stream encode-stream*)
 (core/copy-arglists encode-stream encode-stream*)
@@ -75,7 +74,7 @@
   (^bytes [obj opt-map]
      (binding [*date-format* (or (:date-format opt-map) default-date-format)]
        (let [baos (ByteArrayOutputStream.)
-             generator (.createJsonGenerator ^SmileFactory
+             generator (.createGenerator ^SmileFactory
                                              (or *smile-factory* smile-factory)
                                              baos)]
          (to-json obj generator)

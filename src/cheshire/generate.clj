@@ -26,7 +26,8 @@
      (catch IllegalArgumentException _#
        (throw (or ~e (JsonGenerationException.
                       (str "Cannot JSON encode object of class: "
-                           (class ~obj) ": " ~obj)))))))
+                           (class ~obj) ": " ~obj)
+                      ~jg))))))
 
 (defmacro number-dispatch [jg obj e]
   (let [g (tag (gensym 'jg))

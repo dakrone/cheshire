@@ -1,3 +1,11 @@
+## Changes between Cheshire 5.13.0 and 5.13.1
+
+* Bump minimum JDK version from v7 to v8
+* Bump Jackson dependencies to 2.18.3
+* Expose new Jackson processing limits via factory options
+* Add `:escape-non-ascii` to factory options
+* Internal maintenance: migrate away from usages of deprecated Jackson 
+
 ## Changes between Cheshire 5.8.1 and 5.9.0
 
 * Add `parse-stream-strict` to parse streams strictly rather than lazily

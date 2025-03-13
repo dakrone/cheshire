@@ -28,7 +28,7 @@ encoding and SMILE support.
 [Clojure code with docs](http://dakrone.github.io/cheshire/)
 
 [![Clojars Project](https://img.shields.io/clojars/v/cheshire.svg)](https://clojars.org/cheshire)
-[![Continuous Integration status](https://secure.travis-ci.org/dakrone/cheshire.png)](http://travis-ci.org/dakrone/cheshire)
+[![Continuous Integration Tests](https://github.com/dakrone/cheshire/actions/workflows/test.yml/badge.svg)](https://github.com/dakrone/cheshire/actions/workflows/test.yml)
 
 ## Why?
 
