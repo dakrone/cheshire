@@ -1,4 +1,4 @@
-(ns cheshire.custom
+(ns ^{:deprecated "5.0.0"} cheshire.custom
   "DEPRECATED
 
   Methods used for extending JSON generation to different Java classes.

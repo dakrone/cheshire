@@ -1,8 +1,8 @@
 # Cheshire
 
-<img src="https://dakrone.github.io/cheshire/cheshire_small.jpg"
-title=":)" align="left" padding="5px" />
-<small>
+<img src="cheshire_puss.png" title=":)" align="left" />
+<!-- use italics to distiguish quote from other text -->
+<i>
 'Cheshire Puss,' she began, rather timidly, as she did not at all know
 whether it would like the name: however, it only grinned a little
 wider.  'Come, it's pleased so far,' thought Alice, and she went
@@ -18,15 +18,14 @@ on. 'Would you tell me, please, which way I ought to go from here?'
 
 'Oh, you're sure to do that,' said the Cat, 'if you only walk long
 enough.'
-</small>
-<br clear=all /><br />
+</i>
+<br clear=all />
+
 Cheshire is fast JSON encoding, based off of clj-json and
 clojure-json, with additional features like Date/UUID/Set/Symbol
 encoding and SMILE support.
 
-
-[Clojure code with docs](http://dakrone.github.io/cheshire/)
-
+[![Docs](https://cljdoc.org/badge/cheshire/cheshire)](https://cljdoc.org/d/cheshire/cheshire)
 [![Clojars Project](https://img.shields.io/clojars/v/cheshire.svg)](https://clojars.org/cheshire)
 [![Continuous Integration Tests](https://github.com/dakrone/cheshire/actions/workflows/test.yml/badge.svg)](https://github.com/dakrone/cheshire/actions/workflows/test.yml)
 
