@@ -560,7 +560,7 @@
             (json/encode edn))))))
 
 (deftest t-persistent-queue
-  (let [q (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)]
+  (let [q (conj clojure.lang.PersistentQueue/EMPTY 1 2 3)]
     (is (= q (json/decode (json/encode q))))))
 
 (deftest t-pretty-print
