@@ -1,19 +1,19 @@
 (ns cheshire.test.generative
-  (:use [cheshire.core]
-        [clojure.test.generative]
-        [clojure.test :only [deftest is]]))
+  (:require [cheshire.core :as json]
+            [clojure.test.generative :refer [defspec] :as g]
+            [clojure.test :refer [deftest is]]))
 
 ;; determines whether generative stuff is printed to stdout
 (def verbose true)
 
 (defn encode-equality [x]
-  [x (decode (encode x))])
+  [x (json/decode (json/encode x))])
 
 (defn encode-equality-keys [x]
-  [x (decode (encode x) true)])
+  [x (json/decode (json/encode x) true)])
 
 (defspec number-json-encoding
-  (fn [a b c] [[a b c] (decode (encode [a b c]))])
+  (fn [a b c] [[a b c] (json/decode (json/encode [a b c]))])
   [^int a ^long b ^double c]
   (is (= (first %) (last %))))
 
@@ -47,9 +47,9 @@
   ;; you have more than 16 CPU cores
   (let [seeds (take 16 (repeatedly #(rand-int 1024)))]
     (when-not verbose
-      (reset! report-fn identity))
+      (reset! g/report-fn identity))
     (println "Seeds:" seeds)
-    (binding [*msec* 25000
-              *seeds* seeds
-              *verbose* false]
-      (doall (map deref (test-namespaces 'cheshire.test.generative))))))
+    (binding [g/*msec* 25000
+              g/*seeds* seeds
+              g/*verbose* false]
+      (doall (map deref (g/test-namespaces 'cheshire.test.generative))))))

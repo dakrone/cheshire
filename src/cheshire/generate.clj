@@ -5,10 +5,10 @@
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
            (java.math BigInteger)
-           (clojure.lang IPersistentCollection Keyword Ratio Symbol)))
+           (clojure.lang  Keyword Ratio Symbol)))
 
 ;; date format rebound for custom encoding
-(def ^{:dynamic true :private true} *date-format*)
+(def ^{:dynamic true :private true} *date-format* nil)
 
 (defmacro tag
   ([obj]
@@ -76,7 +76,6 @@
 (definline generate-key-fn-map
   [^JsonGenerator jg obj ^String date-format ^Exception e key-fn]
   (let [k (gensym 'k)
-        name (gensym 'name)
         jg (tag jg)]
     `(do
        (.writeStartObject ~jg)
@@ -149,8 +148,7 @@
    (i? Date obj) (let [sdf (doto (SimpleDateFormat. date-format)
                              (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
                    (write-string ^JsonGenerator jg (.format sdf obj)))
-   (i? Timestamp obj) (let [date (Date. (.getTime ^Timestamp obj))
-                            sdf (doto (SimpleDateFormat. date-format)
+   (i? Timestamp obj) (let [sdf (doto (SimpleDateFormat. date-format)
                                   (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
                         (write-string ^JsonGenerator jg (.format sdf obj)))
    :else (fail obj jg ex)))

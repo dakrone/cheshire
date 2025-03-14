@@ -1,15 +1,12 @@
 (ns cheshire.generate-seq
   "Namespace used to generate JSON from Clojure data structures in a
   sequential way."
-  (:use [cheshire.generate :only [tag JSONable to-json i?
-                                  number-dispatch write-string
-                                  fail]])
+  (:require [cheshire.generate :as g])
   (:import (com.fasterxml.jackson.core JsonGenerator)
            (java.util Date Map List Set SimpleTimeZone UUID)
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
-           (java.math BigInteger)
-           (clojure.lang IPersistentCollection Keyword Ratio Symbol)))
+           (clojure.lang IPersistentCollection Keyword Symbol)))
 
 (definline write-start-object [^JsonGenerator jg wholeness]
   `(if (contains? #{:all :start :start-inner} ~wholeness)
@@ -32,7 +29,7 @@
 (definline generate-basic-map
   [^JsonGenerator jg obj ^String date-format ^Exception e
    wholeness]
-  (let [jg (tag jg)]
+  (let [jg (g/tag jg)]
     `(do
        (write-start-object ~jg ~wholeness)
        (reduce (fn [^JsonGenerator jg# kv#]
@@ -53,8 +50,7 @@
   [^JsonGenerator jg obj ^String date-format ^Exception e
    key-fn wholeness]
   (let [k (gensym 'k)
-        name (gensym 'name)
-        jg (tag jg)]
+        jg (g/tag jg)]
     `(do
        (write-start-object ~jg ~wholeness)
        (reduce (fn [^JsonGenerator jg# kv#]
@@ -81,7 +77,7 @@
 
 (definline generate-array [^JsonGenerator jg obj ^String date-format
                            ^Exception e key-fn wholeness]
-  (let [jg (tag jg)]
+  (let [jg (g/tag jg)]
     `(do
        (write-start-array ~jg ~wholeness)
        (reduce (fn [jg# item#]
@@ -98,9 +94,9 @@
   (let [wholeness (or wholeness :all)]
     (cond
      (nil? obj) (.writeNull ^JsonGenerator jg)
-     (get (:impls JSONable) (class obj)) (#'to-json obj jg)
+     (get (:impls g/JSONable) (class obj)) (#'g/to-json obj jg)
 
-     (i? IPersistentCollection obj)
+     (g/i? IPersistentCollection obj)
      (condp instance? obj
        clojure.lang.IPersistentMap
        (generate-map jg obj date-format ex key-fn wholeness)
@@ -115,21 +111,20 @@
        clojure.lang.Associative
        (generate-map jg obj date-format ex key-fn wholeness))
 
-     (i? Number obj) (number-dispatch ^JsonGenerator jg obj ex)
-     (i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
-     (i? String obj) (write-string ^JsonGenerator jg ^String obj)
-     (i? Character obj) (write-string ^JsonGenerator jg ^String (str obj))
-     (i? Keyword obj) (write-string ^JsonGenerator jg (.substring (str obj) 1))
-     (i? Map obj) (generate-map jg obj date-format ex key-fn wholeness)
-     (i? List obj) (generate-array jg obj date-format ex key-fn wholeness)
-     (i? Set obj) (generate-array jg obj date-format ex key-fn wholeness)
-     (i? UUID obj) (write-string ^JsonGenerator jg (.toString ^UUID obj))
-     (i? Symbol obj) (write-string ^JsonGenerator jg (.toString ^Symbol obj))
-     (i? Date obj) (let [sdf (doto (SimpleDateFormat. date-format)
+     (g/i? Number obj) (g/number-dispatch ^JsonGenerator jg obj ex)
+     (g/i? Boolean obj) (.writeBoolean ^JsonGenerator jg ^Boolean obj)
+     (g/i? String obj) (g/write-string ^JsonGenerator jg ^String obj)
+     (g/i? Character obj) (g/write-string ^JsonGenerator jg ^String (str obj))
+     (g/i? Keyword obj) (g/write-string ^JsonGenerator jg (.substring (str obj) 1))
+     (g/i? Map obj) (generate-map jg obj date-format ex key-fn wholeness)
+     (g/i? List obj) (generate-array jg obj date-format ex key-fn wholeness)
+     (g/i? Set obj) (generate-array jg obj date-format ex key-fn wholeness)
+     (g/i? UUID obj) (g/write-string ^JsonGenerator jg (.toString ^UUID obj))
+     (g/i? Symbol obj) (g/write-string ^JsonGenerator jg (.toString ^Symbol obj))
+     (g/i? Date obj) (let [sdf (doto (SimpleDateFormat. date-format)
                                (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
-                     (write-string ^JsonGenerator jg (.format sdf obj)))
-     (i? Timestamp obj) (let [date (Date. (.getTime ^Timestamp obj))
-                              sdf (doto (SimpleDateFormat. date-format)
-                                    (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
-                          (write-string ^JsonGenerator jg (.format sdf obj)))
-     :else (fail obj jg ex))))
+                     (g/write-string ^JsonGenerator jg (.format sdf obj)))
+     (g/i? Timestamp obj) (let [sdf (doto (SimpleDateFormat. date-format)
+                                      (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
+                            (g/write-string ^JsonGenerator jg (.format sdf obj)))
+     :else (g/fail obj jg ex))))

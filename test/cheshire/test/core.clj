@@ -1,6 +1,6 @@
 (ns cheshire.test.core
-  (:use [clojure.test]
-        [clojure.java.io :only [file reader]])
+  (:require [clojure.test :refer [deftest testing is are]]
+            [clojure.java.io :as io])
   (:require [cheshire.core :as json]
             [cheshire.exact :as json-exact]
             [cheshire.generate :as gen]
@@ -270,11 +270,11 @@
 
 (deftest test-multiple-objs-in-file
   (is (= {"one" 1, "foo" "bar"}
-         (first (json/parsed-seq (reader "test/multi.json")))))
+         (first (json/parsed-seq (io/reader "test/multi.json")))))
   (is (= {"two" 2, "foo" "bar"}
-         (second (json/parsed-seq (reader "test/multi.json")))))
-  (with-open [s (FileInputStream. (file "test/multi.json"))]
-    (let [r (reader s)]
+         (second (json/parsed-seq (io/reader "test/multi.json")))))
+  (with-open [s (FileInputStream. (io/file "test/multi.json"))]
+    (let [r (io/reader s)]
       (is (= [{"one" 1, "foo" "bar"} {"two" 2, "foo" "bar"}]
              (json/parsed-seq r))))))
 
@@ -560,7 +560,7 @@
             (json/encode edn))))))
 
 (deftest t-persistent-queue
-  (let [q (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)]
+  (let [q (conj clojure.lang.PersistentQueue/EMPTY 1 2 3)]
     (is (= q (json/decode (json/encode q))))))
 
 (deftest t-pretty-print
@@ -680,41 +680,41 @@
 (deftest t-custom-helpers
   (let [thing (CTestR. :state)
         remove #(gen/remove-encoder CTestR)]
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-nil nil jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-nil nil jg)))
     (is (= nil (json/decode (json/encode thing) true)))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-str "foo" jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-str "foo" jg)))
     (is (= "foo" (json/decode (json/encode thing) true)))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-number 5 jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-number 5 jg)))
     (is (= 5 (json/decode (json/encode thing) true)))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-long 4 jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-long 4 jg)))
     (is (= 4 (json/decode (json/encode thing) true)))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-int 3 jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-int 3 jg)))
     (is (= 3 (json/decode (json/encode thing) true)))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-ratio 1/2 jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-ratio 1/2 jg)))
     (is (= 0.5 (json/decode (json/encode thing) true)))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-seq [:foo :bar] jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-seq [:foo :bar] jg)))
     (is (= ["foo" "bar"] (json/decode (json/encode thing) true)))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-date (Date. (long 0)) jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-date (Date. (long 0)) jg)))
     (binding [gen/*date-format* "yyyy-MM-dd'T'HH:mm:ss'Z'"]
       (is (= "1970-01-01T00:00:00Z" (json/decode (json/encode thing) true))))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-bool true jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-bool true jg)))
     (is (= true (json/decode (json/encode thing) true)))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-named :foo jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-named :foo jg)))
     (is (= "foo" (json/decode (json/encode thing) true)))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-map {:foo "bar"} jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-map {:foo "bar"} jg)))
     (is (= {:foo "bar"} (json/decode (json/encode thing) true)))
     (remove)
-    (gen/add-encoder CTestR (fn [obj jg] (gen/encode-symbol 'foo jg)))
+    (gen/add-encoder CTestR (fn [_obj jg] (gen/encode-symbol 'foo jg)))
     (is (= "foo" (json/decode (json/encode thing) true)))
     (remove)))
 

@@ -12,6 +12,6 @@ doc*
 .idea
 *.iml
 .DS_Store
-.clj-kondo
 .lsp
 .eastwood
+.cache
