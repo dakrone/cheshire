@@ -1,7 +1,7 @@
 (ns cheshire.test.custom
   "DEPRECATED, kept here to ensure backward compatibility."
-  (:use [clojure.test]
-        [clojure.java.io :only [reader]])
+  (:require [clojure.test :refer [deftest is]]
+            [clojure.java.io :as io])
   (:require [cheshire.custom :as json] :reload
             [cheshire.factory :as fact]
             [cheshire.parse :as parse])
@@ -157,9 +157,9 @@
 
 (deftest test-multiple-objs-in-file
   (is (= {"one" 1, "foo" "bar"}
-         (first (json/parsed-seq (reader "test/multi.json")))))
+         (first (json/parsed-seq (io/reader "test/multi.json")))))
   (is (= {"two" 2, "foo" "bar"}
-         (second (json/parsed-seq (reader "test/multi.json"))))))
+         (second (json/parsed-seq (io/reader "test/multi.json"))))))
 
 (deftest test-jsondotorg-pass1
   (let [string (slurp "test/pass1.json")

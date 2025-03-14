@@ -1,6 +1,6 @@
 (ns cheshire.test.core
-  (:use [clojure.test]
-        [clojure.java.io :only [file reader]])
+  (:require [clojure.test :refer [deftest testing is are]]
+            [clojure.java.io :as io])
   (:require [cheshire.core :as json]
             [cheshire.exact :as json-exact]
             [cheshire.generate :as gen]
@@ -270,11 +270,11 @@
 
 (deftest test-multiple-objs-in-file
   (is (= {"one" 1, "foo" "bar"}
-         (first (json/parsed-seq (reader "test/multi.json")))))
+         (first (json/parsed-seq (io/reader "test/multi.json")))))
   (is (= {"two" 2, "foo" "bar"}
-         (second (json/parsed-seq (reader "test/multi.json")))))
-  (with-open [s (FileInputStream. (file "test/multi.json"))]
-    (let [r (reader s)]
+         (second (json/parsed-seq (io/reader "test/multi.json")))))
+  (with-open [s (FileInputStream. (io/file "test/multi.json"))]
+    (let [r (io/reader s)]
       (is (= [{"one" 1, "foo" "bar"} {"two" 2, "foo" "bar"}]
              (json/parsed-seq r))))))
 

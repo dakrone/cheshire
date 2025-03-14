@@ -1,7 +1,6 @@
 (ns cheshire.experimental
   "Experimental JSON encoding/decoding tools."
-  (:require [cheshire.core :refer :all]
-            [clojure.java.io :refer :all]
+  (:require [cheshire.core :as json]
             [tigris.core :refer [str-escaping-input-stream]])
   (:import (java.io ByteArrayInputStream SequenceInputStream)))
 
@@ -19,7 +18,7 @@
   ([obj field stream]
      (encode-large-field-in-map obj field stream nil))
   ([obj field stream & [opt-map]]
-     (let [otherstr (encode (dissoc obj field) opt-map)
+     (let [otherstr (json/encode (dissoc obj field) opt-map)
            truncstr (subs otherstr 0 (dec (count otherstr)))
            stream (str-escaping-input-stream stream)
            pre-stream (ByteArrayInputStream.
