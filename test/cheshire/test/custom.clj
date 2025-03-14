@@ -1,8 +1,9 @@
 (ns cheshire.test.custom
   "DEPRECATED, kept here to ensure backward compatibility."
   (:require [clojure.test :refer [deftest is]]
-            [clojure.java.io :as io])
-  (:require [cheshire.custom :as json] :reload
+            [clojure.java.io :as io]
+            #_{:clj-kondo/ignore [:deprecated-namespace]}
+            [cheshire.custom :as json] :reload
             [cheshire.factory :as fact]
             [cheshire.parse :as parse])
   (:import (java.io StringReader StringWriter
