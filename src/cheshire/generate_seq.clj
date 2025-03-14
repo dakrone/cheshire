@@ -50,7 +50,6 @@
   [^JsonGenerator jg obj ^String date-format ^Exception e
    key-fn wholeness]
   (let [k (gensym 'k)
-        name (gensym 'name)
         jg (g/tag jg)]
     `(do
        (write-start-object ~jg ~wholeness)
@@ -125,8 +124,7 @@
      (g/i? Date obj) (let [sdf (doto (SimpleDateFormat. date-format)
                                (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
                      (g/write-string ^JsonGenerator jg (.format sdf obj)))
-     (g/i? Timestamp obj) (let [date (Date. (.getTime ^Timestamp obj))
-                              sdf (doto (SimpleDateFormat. date-format)
-                                    (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
-                          (g/write-string ^JsonGenerator jg (.format sdf obj)))
+     (g/i? Timestamp obj) (let [sdf (doto (SimpleDateFormat. date-format)
+                                      (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
+                            (g/write-string ^JsonGenerator jg (.format sdf obj)))
      :else (g/fail obj jg ex))))
