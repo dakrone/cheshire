@@ -9,7 +9,6 @@
   (:import (java.io BufferedWriter ByteArrayOutputStream StringWriter)
            (java.util Date SimpleTimeZone)
            (java.text SimpleDateFormat)
-           (java.sql Timestamp)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (com.fasterxml.jackson.core JsonFactory JsonGenerator)
            (com.fasterxml.jackson.core.json JsonWriteFeature)))

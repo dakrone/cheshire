@@ -8,8 +8,7 @@
            (java.util Date Map List Set SimpleTimeZone UUID)
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
-           (java.math BigInteger)
-           (clojure.lang IPersistentCollection Keyword Ratio Symbol)))
+           (clojure.lang IPersistentCollection Keyword Symbol)))
 
 (definline write-start-object [^JsonGenerator jg wholeness]
   `(if (contains? #{:all :start :start-inner} ~wholeness)

@@ -2,7 +2,7 @@
   (:require [cheshire.factory :as factory]
             [cheshire.parse :as parse]
             [cheshire.core :as core])
-  (:import (java.io StringReader Reader BufferedReader
+  (:import (java.io StringReader Reader
                     Writer)
            (com.fasterxml.jackson.core JsonFactory)))
 

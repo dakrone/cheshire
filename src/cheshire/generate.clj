@@ -5,7 +5,7 @@
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
            (java.math BigInteger)
-           (clojure.lang IPersistentCollection Keyword Ratio Symbol)))
+           (clojure.lang  Keyword Ratio Symbol)))
 
 ;; date format rebound for custom encoding
 (def ^{:dynamic true :private true} *date-format*)
