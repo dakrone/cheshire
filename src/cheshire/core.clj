@@ -122,8 +122,8 @@
                     factory/json-factory)
    ^Writer writer))
 
-(def ^:dynamic ^JsonGenerator *generator*)
-(def ^:dynamic *opt-map*)
+(def ^:dynamic ^JsonGenerator *generator* nil)
+(def ^:dynamic *opt-map* nil)
 
 (defmacro with-writer
   "Start writing for series objects using the same json generator.
