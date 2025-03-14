@@ -20,7 +20,7 @@
      (encode-large-field-in-map obj field stream nil))
   ([obj field stream & [opt-map]]
      (let [otherstr (encode (dissoc obj field) opt-map)
-           truncstr (str (subs otherstr 0 (dec (count otherstr))))
+           truncstr (subs otherstr 0 (dec (count otherstr)))
            stream (str-escaping-input-stream stream)
            pre-stream (ByteArrayInputStream.
                        (.getBytes (str truncstr ",\"" (name field) "\":\"")))
