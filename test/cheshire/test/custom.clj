@@ -1,8 +1,9 @@
 (ns cheshire.test.custom
   "DEPRECATED, kept here to ensure backward compatibility."
-  (:use [clojure.test]
-        [clojure.java.io :only [reader]])
-  (:require [cheshire.custom :as json] :reload
+  (:require [clojure.test :refer [deftest is]]
+            [clojure.java.io :as io]
+            #_{:clj-kondo/ignore [:deprecated-namespace]}
+            [cheshire.custom :as json] :reload
             [cheshire.factory :as fact]
             [cheshire.parse :as parse])
   (:import (java.io StringReader StringWriter
@@ -157,9 +158,9 @@
 
 (deftest test-multiple-objs-in-file
   (is (= {"one" 1, "foo" "bar"}
-         (first (json/parsed-seq (reader "test/multi.json")))))
+         (first (json/parsed-seq (io/reader "test/multi.json")))))
   (is (= {"two" 2, "foo" "bar"}
-         (second (json/parsed-seq (reader "test/multi.json"))))))
+         (second (json/parsed-seq (io/reader "test/multi.json"))))))
 
 (deftest test-jsondotorg-pass1
   (let [string (slurp "test/pass1.json")
@@ -195,7 +196,7 @@
            (type (:foo (json/decode "{\"foo\":NaN}" true)))))))
 
 (deftest t-persistent-queue
-  (let [q (conj (clojure.lang.PersistentQueue/EMPTY) 1 2 3)]
+  (let [q (conj clojure.lang.PersistentQueue/EMPTY 1 2 3)]
     (is (= q (json/decode (json/encode* q))))))
 
 (deftest t-pretty-print
@@ -233,7 +234,7 @@
 (deftest test-shadowing-default-encoder
   (json/remove-encoder java.util.Date)
   (json/add-encoder java.util.Date
-                    (fn [d jg] (json/encode-str "foo" jg)))
+                    (fn [_d jg] (json/encode-str "foo" jg)))
   (is (= "\"foo\"" (json/encode* (java.util.Date.))))
   (is (= "\"foo\"" (json/encode* :foo)))
   (json/remove-encoder java.util.Date)

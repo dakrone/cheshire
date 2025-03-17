@@ -3,13 +3,12 @@
 
   Methods used for extending JSON generation to different Java classes.
   Has the same public API as core.clj so they can be swapped in and out."
-  (:use [cheshire.factory])
   (:require [cheshire.core :as core]
+            [cheshire.factory :as fact]
             [cheshire.generate :as generate])
   (:import (java.io BufferedWriter ByteArrayOutputStream StringWriter)
            (java.util Date SimpleTimeZone)
            (java.text SimpleDateFormat)
-           (java.sql Timestamp)
            (com.fasterxml.jackson.dataformat.smile SmileFactory)
            (com.fasterxml.jackson.core JsonFactory JsonGenerator)
            (com.fasterxml.jackson.core.json JsonWriteFeature)))
@@ -20,7 +19,7 @@
 
 
 ;; date format rebound for custom encoding
-(def ^{:dynamic true :private true} *date-format*)
+(def ^{:dynamic true :private true} *date-format* nil)
 
 (defprotocol JSONable
   (to-json [t jg]))
@@ -29,10 +28,10 @@
   (^String [obj]
      (encode* obj nil))
   (^String [obj opt-map]
-     (binding [*date-format* (or (:date-format opt-map) default-date-format)]
+     (binding [*date-format* (or (:date-format opt-map) fact/default-date-format)]
        (let [sw (StringWriter.)
              generator (.createGenerator
-                        ^JsonFactory (or *json-factory* json-factory) sw)]
+                        ^JsonFactory (or fact/*json-factory* fact/json-factory) sw)]
          (when (:pretty opt-map)
            (.useDefaultPrettyPrinter generator))
          (when (some? (:escape-non-ascii opt-map))
@@ -51,9 +50,9 @@
   (^String [obj ^BufferedWriter w]
      (encode-stream* obj w nil))
   (^String [obj ^BufferedWriter w opt-map]
-     (binding [*date-format* (or (:date-format opt-map) default-date-format)]
+     (binding [*date-format* (or (:date-format opt-map) fact/default-date-format)]
        (let [generator (.createGenerator
-                        ^JsonFactory (or *json-factory* json-factory) w)]
+                        ^JsonFactory (or fact/*json-factory* fact/json-factory) w)]
          (when (:pretty opt-map)
            (.useDefaultPrettyPrinter generator))
          (when (some? (:escape-non-ascii opt-map))
@@ -72,10 +71,10 @@
   (^bytes [obj]
      (encode-smile* obj nil))
   (^bytes [obj opt-map]
-     (binding [*date-format* (or (:date-format opt-map) default-date-format)]
+     (binding [*date-format* (or (:date-format opt-map) fact/default-date-format)]
        (let [baos (ByteArrayOutputStream.)
              generator (.createGenerator ^SmileFactory
-                                             (or *smile-factory* smile-factory)
+                                             (or fact/*smile-factory* fact/smile-factory)
                                              baos)]
          (to-json obj generator)
          (.flush generator)
