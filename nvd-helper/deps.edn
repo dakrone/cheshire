@@ -1,0 +1,5 @@
+{:deps {org.clojure/clojure {:mvn/version "1.12.0"}
+        ;; it is generally considered bad practice to use RELEASE, but we always want the latest
+        ;; security tooling
+        nvd-clojure/nvd-clojure #_:clj-kondo/ignore {:mvn/version "RELEASE"}
+        org.owasp/dependency-check-core #_:clj-kondo/ignore {:mvn/version "RELEASE"}}}
