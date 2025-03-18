@@ -25,9 +25,10 @@ Cheshire is fast JSON encoding, based off of clj-json and
 clojure-json, with additional features like Date/UUID/Set/Symbol
 encoding and SMILE support.
 
-[![Docs](https://cljdoc.org/badge/cheshire/cheshire)](https://cljdoc.org/d/cheshire/cheshire)
-[![Clojars Project](https://img.shields.io/clojars/v/cheshire.svg)](https://clojars.org/cheshire)
-[![Continuous Integration Tests](https://github.com/dakrone/cheshire/actions/workflows/test.yml/badge.svg)](https://github.com/dakrone/cheshire/actions/workflows/test.yml)
+- [![Docs](https://cljdoc.org/badge/cheshire/cheshire)](https://cljdoc.org/d/cheshire/cheshire)
+- [![Clojars Project](https://img.shields.io/clojars/v/cheshire.svg)](https://clojars.org/cheshire)
+- [![Continuous Integration Tests](https://github.com/dakrone/cheshire/actions/workflows/test.yml/badge.svg)](https://github.com/dakrone/cheshire/actions/workflows/test.yml)
+- Cheshire is a built-in library in the [Babashka](https://babashka.org/) project
 
 ## Why?
 
