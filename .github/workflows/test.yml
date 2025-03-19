@@ -21,8 +21,8 @@ jobs:
       with:
         path: |
           ~/.m2/repository
-        key: $${ runner.os }}-cljdeps-${{ hashFiles('project.clj') }}
-        restore-keys: $${ runner.os }}-cljdeps-
+        key: ${{ runner.os }}-cljdeps-${{ hashFiles('project.clj') }}
+        restore-keys: ${{ runner.os }}-cljdeps-
 
     - name: Setup Java
       uses: actions/setup-java@v4
@@ -70,8 +70,8 @@ jobs:
       with:
         path: |
           ~/.m2/repository
-        key: $${ runner.os }}-cljdeps-${{ hashFiles('project.clj') }}
-        restore-keys: $${ runner.os }}-cljdeps-
+        key: ${{ runner.os }}-cljdeps-${{ hashFiles('project.clj') }}
+        restore-keys: ${{ runner.os }}-cljdeps-
 
     - name: Setup Java
       uses: actions/setup-java@v4
