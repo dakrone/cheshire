@@ -1,7 +1,7 @@
 (ns cheshire.test.core
   (:require [clojure.test :refer [deftest testing is are]]
-            [clojure.java.io :as io])
-  (:require [cheshire.core :as json]
+            [clojure.java.io :as io]
+            [cheshire.core :as json]
             [cheshire.exact :as json-exact]
             [cheshire.generate :as gen]
             [cheshire.factory :as fact]
