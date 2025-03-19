@@ -24,7 +24,9 @@
                          :dependencies [[criterium "0.4.6"]
                                         [org.clojure/data.json "0.2.6"]
                                         [clj-json "0.5.3"]]}
-             :antq {:dependencies [[com.github.liquidz/antq "2.11.1276"]]}}
+             :antq {:dependencies [[com.github.liquidz/antq "2.11.1276"]
+                                   ;; to avoid logger init warnings
+                                   [org.slf4j/slf4j-simple "2.0.17"]]}}
   :aliases {"all" ["with-profile" "dev,1.7:dev,1.8:dev,1.9:dev,1.10:dev"]
             "benchmark" ["with-profile" "dev,benchmark" "test"]
             "pretty-bench" ["with-profile" "dev,benchmark" "test" ":only"
