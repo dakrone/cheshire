@@ -1,6 +1,7 @@
 (ns cheshire.test.core
   (:require [clojure.test :refer [deftest testing is are]]
             [clojure.java.io :as io]
+            [clojure.string :as str]
             [cheshire.core :as json]
             [cheshire.exact :as json-exact]
             [cheshire.generate :as gen]
@@ -564,10 +565,26 @@
     (is (= q (json/decode (json/encode q))))))
 
 (deftest t-pretty-print
-  (is (= (str "{\n  \"bar\" : [ {\n    \"baz\" : 2\n  }, "
-              "\"quux\", [ 1, 2, 3 ] ],\n  \"foo\" : 1\n}")
+  (is (= (str/join (System/lineSeparator)
+                   ["{"
+                    "  \"bar\" : [ {"
+                    "    \"baz\" : 2"
+                    "  }, \"quux\", [ 1, 2, 3 ] ],"
+                    "  \"foo\" : 1"
+                    "}"])
          (json/encode (sorted-map :foo 1 :bar [{:baz 2} :quux [1 2 3]])
                       {:pretty true}))))
+
+(deftest t-pretty-print-custom-linebreak
+  (is (= (str/join "foo"
+                   ["{"
+                    "  \"bar\" : [ {"
+                    "    \"baz\" : 2"
+                    "  }, \"quux\", [ 1, 2, 3 ] ],"
+                    "  \"foo\" : 1"
+                    "}"])
+         (json/encode (sorted-map :foo 1 :bar [{:baz 2} :quux [1 2 3]])
+                      {:pretty {:line-break "foo"}}))))
 
 (deftest t-pretty-print-illegal-argument
   ; just expecting this not to throw
@@ -595,17 +612,18 @@
                             :before-array-values ""
                             :after-array-values ""
                             :object-field-value-separator ": "}}
-        expected (str "{\n"
-                      "    \"bar\": {\n"
-                      "        \"baz\": [{\n"
-                      "            \"ulu\": \"mulu\"\n"
-                      "        }, {\n"
-                      "            \"moot\": \"foo\"\n"
-                      "        }, 3]\n"
-                      "    },\n"
-                      "    \"foo\": 1,\n"
-                      "    \"quux\": \"blub\"\n"
-                      "}")
+        expected (str/join (System/lineSeparator)
+                           ["{"
+                            "    \"bar\": {"
+                            "        \"baz\": [{"
+                            "            \"ulu\": \"mulu\""
+                            "        }, {"
+                            "            \"moot\": \"foo\""
+                            "        }, 3]"
+                            "    },"
+                            "    \"foo\": 1,"
+                            "    \"quux\": \"blub\""
+                            "}"])
         pretty-str (json/encode test-obj test-opts)]
 
     ; just to be easy on the eyes in case of error
