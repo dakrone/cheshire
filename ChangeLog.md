@@ -1,4 +1,4 @@
-## Changes between Cheshire 5.13.0 and 5.14.0
+## Changes between Cheshire 5.13.0 and 6.0.0
 
 * Breaking Fix
   * Windows only: pretty printing now consistently uses JVM's OS default of `\r\n` for `:line-break` [#217](https://github.com/dakrone/cheshire/issues/217)
