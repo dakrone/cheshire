@@ -23,7 +23,8 @@
                          :jvm-opts ^:replace ["-Xms1g" "-Xmx1g" "-server"]
                          :dependencies [[criterium "0.4.6"]
                                         [org.clojure/data.json "0.2.6"]
-                                        [clj-json "0.5.3"]]}}
+                                        [clj-json "0.5.3"]]}
+             :antq {:dependencies [[com.github.liquidz/antq "2.11.1276"]]}}
   :aliases {"all" ["with-profile" "dev,1.7:dev,1.8:dev,1.9:dev,1.10:dev"]
             "benchmark" ["with-profile" "dev,benchmark" "test"]
             "pretty-bench" ["with-profile" "dev,benchmark" "test" ":only"
@@ -31,13 +32,13 @@
             "core-bench" ["with-profile" "dev,benchmark" "test" ":only"
                           "cheshire.test.benchmark/t-bench-core"]
             "clj-kondo-deps" ["with-profile" "+test" "clj-kondo" "--skip-lint" "--copy-configs" "--dependencies" "--parallel" "--lint" "$classpath"]
-            "clj-kondo-lint" ["do" ["clj-kondo-deps"] ["with-profile" "+test" "clj-kondo" "--parallel" "--lint" "src" "test" "project.clj"]]}
+            "clj-kondo-lint" ["do" ["clj-kondo-deps"] ["with-profile" "+test" "clj-kondo" "--parallel" "--lint" "src" "test" "project.clj"]]
+            "outdated" ["with-profile" "antq" "run" "-m" "antq.core"]}
   :test-selectors {:default  #(and (not (:benchmark %))
                                    (not (:generative %)))
                    :generative :generative
                    :all (constantly true)}
   :plugins [[codox "0.6.3"]
-            [lein-ancient "1.0.0-RC3"]
             [jonase/eastwood "1.4.3"]
             [com.github.clj-kondo/lein-clj-kondo "2025.02.20"]]
   :java-source-paths ["src/java"]
