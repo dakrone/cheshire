@@ -21,8 +21,8 @@ jobs:
       with:
         path: |
           ~/.m2/repository
-        key: $${ runner.os }}-cljdeps-${{ hashFiles('project.clj') }}
-        restore-keys: $${ runner.os }}-cljdeps-
+        key: ${{ runner.os }}-cljdeps-${{ hashFiles('project.clj') }}
+        restore-keys: ${{ runner.os }}-cljdeps-
 
     - name: Setup Java
       uses: actions/setup-java@v4
@@ -56,8 +56,13 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ ubuntu ]
+        os: [ ubuntu, windows ]
         java-version: [ '8', '11', '17', '21', '23' ]
+
+    defaults:
+      run:
+        # Windows lein.ps1 script is problematic, force lein.bat by using cmd shell
+        shell: ${{ matrix.os == 'windows' && 'cmd' || 'bash' }}
 
     name: test ${{matrix.os}} jdk${{matrix.java-version}}
 
@@ -70,8 +75,8 @@ jobs:
       with:
         path: |
           ~/.m2/repository
-        key: $${ runner.os }}-cljdeps-${{ hashFiles('project.clj') }}
-        restore-keys: $${ runner.os }}-cljdeps-
+        key: ${{ runner.os }}-cljdeps-${{ hashFiles('project.clj') }}
+        restore-keys: ${{ runner.os }}-cljdeps-
 
     - name: Setup Java
       uses: actions/setup-java@v4

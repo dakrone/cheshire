@@ -15,7 +15,7 @@
 
 (defonce default-pretty-print-options
   {:indentation "  "
-   :line-break "\n"
+   :line-break (System/lineSeparator)
    :indent-arrays? false
    :indent-objects? true
    :before-array-values nil

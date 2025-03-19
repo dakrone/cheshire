@@ -2,6 +2,7 @@
   "DEPRECATED, kept here to ensure backward compatibility."
   (:require [clojure.test :refer [deftest is]]
             [clojure.java.io :as io]
+            [clojure.string :as str]
             #_{:clj-kondo/ignore [:deprecated-namespace]}
             [cheshire.custom :as json] :reload
             [cheshire.factory :as fact]
@@ -200,8 +201,13 @@
     (is (= q (json/decode (json/encode* q))))))
 
 (deftest t-pretty-print
-  (is (= (str "{\n  \"bar\" : [ {\n    \"baz\" : 2\n  }, "
-              "\"quux\", [ 1, 2, 3 ] ],\n  \"foo\" : 1\n}")
+  (is (= (str/join (System/lineSeparator)
+                   ["{"
+                    "  \"bar\" : [ {"
+                    "    \"baz\" : 2"
+                    "  }, \"quux\", [ 1, 2, 3 ] ],"
+                    "  \"foo\" : 1"
+                    "}"])
          (json/encode* (sorted-map :foo 1 :bar [{:baz 2} :quux [1 2 3]])
                        {:pretty true}))))
 
