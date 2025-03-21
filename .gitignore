@@ -4,7 +4,7 @@ coref
 classes/*
 .lein-failures
 .lein-deps-sum
-target/*
+target
 pom.xml*
 doc*
 .lein*
@@ -15,3 +15,4 @@ doc*
 .lsp
 .eastwood
 .cache
+.cpcache
