@@ -36,8 +36,7 @@
                                    (not (:generative %)))
                    :generative :generative
                    :all (constantly true)}
-  :plugins [[codox "0.6.3"]
-            [lein-ancient "1.0.0-RC3"]
+  :plugins [[com.github.liquidz/antq "2.11.1276"]
             [jonase/eastwood "1.4.3"]
             [com.github.clj-kondo/lein-clj-kondo "2025.02.20"]]
   :java-source-paths ["src/java"]
