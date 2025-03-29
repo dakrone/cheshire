@@ -7,9 +7,6 @@ on:
   push:
     branches:
     - master
-    - lread/add-cve-check # temporary for troubleshooting
-  pull_request:
-    types: [opened, synchronize, reopened]
 
 jobs:
   nvd-scan:
