@@ -1,0 +1,82 @@
+name: Vulnerability Scan
+
+on:
+  schedule:
+    # daily
+    - cron: "5 0 * * *"
+  push:
+    branches:
+    - master
+
+jobs:
+  nvd-scan:
+    environment: nvd
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v4
+
+    - name: Setup Java
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: 21
+
+    - name: Install Clojure Tools
+      uses: DeLaGuardo/setup-clojure@13.2
+      with:
+        cli: 'latest'
+        lein: 'latest'
+
+    - name: Generate Cache Key File
+      run: |
+        # We are using RELEASE for deps, grab current versions for CI cache key
+        mkdir -p target
+        VERSION_NVD_CLOJURE=$(curl -s --fail https://clojars.org/api/artifacts/nvd-clojure/nvd-clojure | jq -r '.recent_versions[0].version')
+        VERSION_DEPENDENCY_CHECK=$(curl -s --fail 'https://search.maven.org/solrsearch/select?q=g:org.owasp+AND+a:dependency-check-core&core=gav&rows=1&wt=json' | jq '.response.docs[0].v')
+        echo "nvd-clojure=${VERSION_NVD_CLOJURE}" > target/ci-versions.txt
+        echo "dependency-check=${VERSION_DEPENDENCY_CHECK}" >> target/ci-versions.txt
+        cat target/ci-versions.txt
+      working-directory: nvd-helper
+
+    - name: Restore NVD DB & Clojure Deps Cache
+      # nvd caches its db under ~/.m2/repository/org/owasp so that it can
+      # conveniently be cached with deps
+      uses: actions/cache/restore@v4
+      with:
+        path: |
+          ~/.m2/repository
+          ~/.deps.clj
+          ~/.gitlibs
+        key: |
+          nvd-${{ hashFiles('nvd-helper/target/ci-versions.txt') }}
+        restore-keys: |
+          nvd-
+
+    - name: Tools Versions
+      run: |
+        echo "java -version"
+        java -version
+        echo "lein --version"
+        lein --version
+        echo "clojure --version"
+        clojure --version
+
+    - name: Run NVD Scanner
+      env:
+        NVD_API_TOKEN: ${{ secrets.NVD_API_TOKEN }}
+      run: clojure -J-Dclojure.main.report=stderr -M -m nvd.task.check "nvd-clojure.edn" "$(cd ..; lein classpath)"
+      working-directory: nvd-helper
+
+    - name: Save NVD DB & Clojure Deps Cache
+      if: always() # always cache regardless of outcome of nvd scan
+      uses: actions/cache/save@v4
+      with:
+        path: |
+          ~/.m2/repository
+          ~/.deps.clj
+          ~/.gitlibs
+        # we tack on github.run_id to uniquely identify the cache
+        # the next cache restore will find the best (and most current) match
+        key: |
+          nvd-${{ hashFiles('nvd-helper/target/ci-versions.txt') }}-${{ github.run_id }}
