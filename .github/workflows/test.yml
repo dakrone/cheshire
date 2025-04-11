@@ -28,6 +28,8 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
+        # We also lint with eastwood, using latest jdk release can help find
+        # JDK deprecations
         java-version: 24
 
     - name: Install Clojure Tools
