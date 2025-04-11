@@ -41,6 +41,9 @@ Place any breaking changes under a "BREAKING changes" list item
   * [#222](https://github.com/dakrone/cheshire/issues/222):
     Add linting
     ([@lread](https://github.com/lread))
+  * [#226](https://github.com/dakrone/cheshire/issues/226):
+    Add vulnerability scanning for cheshire dependencies
+    ([@lread](https://github.com/lread))
 
 [commit log](https://github.com/dakrone/cheshire/compare/5.13.0...master)
 
