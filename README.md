@@ -28,6 +28,7 @@ encoding and SMILE support.
 - [![Docs](https://cljdoc.org/badge/cheshire/cheshire)](https://cljdoc.org/d/cheshire/cheshire)
 - [![Clojars Project](https://img.shields.io/clojars/v/cheshire.svg)](https://clojars.org/cheshire)
 - [![Continuous Integration Tests](https://github.com/dakrone/cheshire/actions/workflows/test.yml/badge.svg)](https://github.com/dakrone/cheshire/actions/workflows/test.yml)
+- [![Vulnerability Scan](https://github.com/dakrone/cheshire/actions/workflows/nvd_scan.yml/badge.svg)](https://github.com/dakrone/cheshire/actions/workflows/nvd_scan.yml)
 - Cheshire is a built-in library in the [Babashka](https://babashka.org/) project
 
 ## Why?
