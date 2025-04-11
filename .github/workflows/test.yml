@@ -28,7 +28,7 @@ jobs:
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
-        java-version: 21
+        java-version: 24
 
     - name: Install Clojure Tools
       uses: DeLaGuardo/setup-clojure@13.2
