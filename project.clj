@@ -38,7 +38,7 @@
                    :all (constantly true)}
   :plugins [[com.github.liquidz/antq "2.11.1276"]
             [jonase/eastwood "1.4.3"]
-            [com.github.clj-kondo/lein-clj-kondo "2025.02.20"]]
+            [com.github.clj-kondo/lein-clj-kondo "2025.04.07"]]
   :java-source-paths ["src/java"]
   :jvm-opts ["-Xmx1024M"
 ;;             "-XX:+PrintCompilation"
