@@ -277,7 +277,7 @@ to true:
 
 ## Change Log
 
-[Change log](https://github.com/dakrone/cheshire/blob/master/ChangeLog.md) is available on GitHub.
+[Change log](/ChangeLog.md) is available on GitHub.
 
 ## Speed
 
@@ -316,12 +316,7 @@ once (it returns a stream). Check out the docstring for full usage.
 It's experimental, like the name says. Based on [Tigris](http://github.com/dakrone/tigris).
 
 ## Advanced customization for factories
-See
-[this](https://fasterxml.github.io/jackson-core/javadoc/2.13/com/fasterxml/jackson/core/JsonFactory.Feature.html)
-and
-[this](https://fasterxml.github.io/jackson-core/javadoc/2.13/com/fasterxml/jackson/core/JsonParser.Feature.html)
-for a list of features that can be customized if desired. A custom
-factory can be used like so:
+A custom factory can be used like so:
 
 ```clojure
 (ns myns
@@ -330,12 +325,12 @@ factory can be used like so:
 
 (binding [factory/*json-factory* (factory/make-json-factory
                                   {:allow-non-numeric-numbers true})]
-  (json/decode "{\"foo\":NaN}" true))))))
+  (json/decode "{\"foo\":NaN}" true))
 ```
 
 See the `default-factory-options` map in
-[factory.clj](https://github.com/dakrone/cheshire/blob/master/src/cheshire/factory.clj)
-for a full list of configurable options. Smile factories can also be
+[factory.clj](/src/cheshire/factory.clj)
+for a full list of configurable options. Smile and CBOR factories can also be
 created, and factories work exactly the same with custom encoding.
 
 ## Future Ideas/TODOs
