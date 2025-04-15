@@ -330,7 +330,7 @@ factory can be used like so:
 
 (binding [factory/*json-factory* (factory/make-json-factory
                                   {:allow-non-numeric-numbers true})]
-  (json/decode "{\"foo\":NaN}" true))))))
+  (json/decode "{\"foo\":NaN}" true))
 ```
 
 See the `default-factory-options` map in
