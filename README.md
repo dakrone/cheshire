@@ -316,12 +316,7 @@ once (it returns a stream). Check out the docstring for full usage.
 It's experimental, like the name says. Based on [Tigris](http://github.com/dakrone/tigris).
 
 ## Advanced customization for factories
-See
-[this](https://fasterxml.github.io/jackson-core/javadoc/2.13/com/fasterxml/jackson/core/JsonFactory.Feature.html)
-and
-[this](https://fasterxml.github.io/jackson-core/javadoc/2.13/com/fasterxml/jackson/core/JsonParser.Feature.html)
-for a list of features that can be customized if desired. A custom
-factory can be used like so:
+A custom factory can be used like so:
 
 ```clojure
 (ns myns
