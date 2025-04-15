@@ -35,6 +35,9 @@ Place any breaking changes under a "BREAKING changes" list item
     Migrate away from usages of deprecated Jackson 
     ([@lread](https://github.com/lread))
 * Quality
+  * [#114](https://github.com/dakrone/cheshire/issues/114):
+    Freshen changelog and add missing history
+    ([@lread](https://github.com/lread))
   * [#214](https://github.com/dakrone/cheshire/issues/214):
     Add CI on GitHub Actions and with test coverage on Linux and Windows
     ([@lread](https://github.com/lread))
