@@ -330,7 +330,7 @@ A custom factory can be used like so:
 
 See the `default-factory-options` map in
 [factory.clj](/src/cheshire/factory.clj)
-for a full list of configurable options. Smile factories can also be
+for a full list of configurable options. Smile and CBOR factories can also be
 created, and factories work exactly the same with custom encoding.
 
 ## Future Ideas/TODOs
