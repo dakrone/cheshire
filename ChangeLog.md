@@ -11,7 +11,7 @@ Each change should include:
 Place any breaking changes under a "BREAKING changes" list item 
 -->
 
-# v6.0.0 - not yet released 
+# v6.0.0 - 2025-04-15
 
 * **BREAKING** changes 
   * [#217](https://github.com/dakrone/cheshire/issues/217):
@@ -48,7 +48,7 @@ Place any breaking changes under a "BREAKING changes" list item
     Add vulnerability scanning for cheshire dependencies
     ([@lread](https://github.com/lread))
 
-[commit log](https://github.com/dakrone/cheshire/compare/5.13.0...master)
+[commit log](https://github.com/dakrone/cheshire/compare/5.13.0...6.0.0)
 
 # v5.13.0 - 2024-04-01
 
