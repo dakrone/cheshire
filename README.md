@@ -277,7 +277,7 @@ to true:
 
 ## Change Log
 
-[Change log](https://github.com/dakrone/cheshire/blob/master/ChangeLog.md) is available on GitHub.
+[Change log](/ChangeLog.md) is available on GitHub.
 
 ## Speed
 
@@ -334,7 +334,7 @@ factory can be used like so:
 ```
 
 See the `default-factory-options` map in
-[factory.clj](https://github.com/dakrone/cheshire/blob/master/src/cheshire/factory.clj)
+[factory.clj](/src/cheshire/factory.clj)
 for a full list of configurable options. Smile factories can also be
 created, and factories work exactly the same with custom encoding.
 
