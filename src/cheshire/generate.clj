@@ -4,6 +4,7 @@
            (java.util Date Map List Set SimpleTimeZone UUID)
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
+           (java.time Instant)
            (java.math BigInteger)
            (clojure.lang  Keyword Ratio Symbol)))
 
@@ -151,6 +152,10 @@
    (i? Timestamp obj) (let [sdf (doto (SimpleDateFormat. date-format)
                                   (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
                         (write-string ^JsonGenerator jg (.format sdf obj)))
+   (i? Instant obj) (let [sdf (doto (SimpleDateFormat. date-format)
+                                (.setTimeZone (SimpleTimeZone. 0 "UTC")))
+                          d (Date/from obj)]
+                      (write-string ^JsonGenerator jg (.format sdf d)))
    :else (fail obj jg ex)))
 
 ;; Generic encoders, these can be used by someone writing a custom
