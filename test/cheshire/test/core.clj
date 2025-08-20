@@ -14,6 +14,7 @@
                     BufferedReader BufferedWriter
                     IOException)
            (java.sql Timestamp)
+           (java.time Instant)
            (java.util Date UUID)))
 
 (defn- str-of-len
@@ -199,6 +200,18 @@
          (json/decode (json/encode {:foo (Timestamp. (long 0))}
                                    {:date-format "yyyy-MM-dd"})))
       "encode with given date format"))
+
+(deftest test-instant
+  (is (= {"foo" "1970-01-01T00:00:00Z"}
+         (json/decode (json/encode {:foo (Instant/ofEpochSecond (long 0))}))))
+  (is (= {"foo" "1970-01-01"}
+         (json/decode (json/encode {:foo (Instant/ofEpochSecond (long 0))}
+                                   {:date-format "yyyy-MM-dd"})))
+      "encode with given date format")
+  (is (= {"foo" "1970-01-01-0004"}
+         (json/decode (json/encode {:foo (Instant/ofEpochSecond (long 0))}
+                                   {:date-format "yyyy-MM-dd-uuuu"})))
+      "use [[java.text.SimpleDateFormat]] format rules"))
 
 (deftest test-uuid
   (let [id (UUID/randomUUID)
