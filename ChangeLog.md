@@ -11,6 +11,12 @@ Each change should include:
 Place any breaking changes under a "BREAKING changes" list item 
 -->
 
+# v6.1.0 - UNRELEASED
+
+* Add encoding for `java.time.Instant`
+  [#241](https://github.com/dakrone/cheshire/pull/241)
+  ([@mthl](https://github.com/mthl))
+
 # v6.0.0 - 2025-04-15
 
 * **BREAKING** changes 
