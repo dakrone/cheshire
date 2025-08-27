@@ -6,6 +6,7 @@
            (java.util Date Map List Set SimpleTimeZone UUID)
            (java.sql Timestamp)
            (java.text SimpleDateFormat)
+           (java.time Instant)
            (clojure.lang IPersistentCollection Keyword Symbol)))
 
 (definline write-start-object [^JsonGenerator jg wholeness]
@@ -127,4 +128,8 @@
      (g/i? Timestamp obj) (let [sdf (doto (SimpleDateFormat. date-format)
                                       (.setTimeZone (SimpleTimeZone. 0 "UTC")))]
                             (g/write-string ^JsonGenerator jg (.format sdf obj)))
+     (g/i? Instant obj) (let [sdf (doto (SimpleDateFormat. date-format)
+                                    (.setTimeZone (SimpleTimeZone. 0 "UTC")))
+                              d (Date/from obj)]
+                          (g/write-string ^JsonGenerator jg (.format sdf d)))
      :else (g/fail obj jg ex))))
