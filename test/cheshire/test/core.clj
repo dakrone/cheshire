@@ -15,7 +15,8 @@
                     IOException)
            (java.sql Timestamp)
            (java.time Instant)
-           (java.util Date UUID)))
+           (java.util Date UUID)
+           (java.util.concurrent.atomic AtomicInteger AtomicLong)))
 
 (defn- str-of-len
   ([len]
@@ -59,6 +60,24 @@
     (is (= (.doubleValue n) (:num (json/decode (json/encode {:num n}) true))))
     (binding [parse/*use-bigdecimals?* true]
       (is (= n (:num (json/decode (json/encode {:num n}) true)))))))
+
+(deftest test-atomic-long
+  (is (= {"x" 42}
+         (json/decode (json/encode {:x (AtomicLong. 42)}))))
+  (is (= {"x" 42}
+         (json/decode
+          (str
+           (json/with-writer [(StringWriter.) nil]
+             (json/write {:x (AtomicLong. 42)})))))))
+
+(deftest test-atomic-integer
+  (is (= {"y" 14}
+         (json/decode (json/encode {:y (AtomicInteger. 14)}))))
+  (is (= {"y" 14}
+         (json/decode
+          (str
+           (json/with-writer [(StringWriter.) nil]
+             (json/write {:y (AtomicInteger. 14)})))))))
 
 (deftest test-string-round-trip
   (is (= test-obj (json/decode (json/encode test-obj)))))
