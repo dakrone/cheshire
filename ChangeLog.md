@@ -22,6 +22,8 @@ Place any breaking changes under a "BREAKING changes" list item
 * Add encoding for `java.util.concurrent.atomic.AtomicLong`
   [#243](https://github.com/dakrone/cheshire/pull/243)
   ([@mthl](https://github.com/mthl))
+* Update Jackson dependencies to v2.20.0
+  ([@dakrone](https://github.com/dakrone))
 
 # v6.0.0 - 2025-04-15
 
