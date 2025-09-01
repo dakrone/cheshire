@@ -6,6 +6,7 @@
            (java.text SimpleDateFormat)
            (java.time Instant)
            (java.math BigInteger)
+           (java.util.concurrent.atomic AtomicInteger AtomicLong)
            (clojure.lang  Keyword Ratio Symbol)))
 
 ;; date format rebound for custom encoding
@@ -43,7 +44,9 @@
                                      ~g ~(with-meta o {:tag `BigDecimal}))
                          Ratio (.writeNumber ~g (double ~o))
                          Short (.writeNumber ~g (int ~o))
-                         Byte (.writeNumber ~g (int ~o))]]
+                         Byte (.writeNumber ~g (int ~o))
+                         AtomicLong (.writeNumber ~g (long ~o))
+                         AtomicInteger (.writeNumber ~g (int ~o))]]
     `(let [~g ~jg
            ~o ~obj]
        (condp instance? ~o
