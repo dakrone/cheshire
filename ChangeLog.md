@@ -16,6 +16,12 @@ Place any breaking changes under a "BREAKING changes" list item
 * Add encoding for `java.time.Instant`
   [#241](https://github.com/dakrone/cheshire/pull/241)
   ([@mthl](https://github.com/mthl))
+* Add encoding for `java.util.concurrent.atomic.AtomicInteger`
+  [#243](https://github.com/dakrone/cheshire/pull/243)
+  ([@mthl](https://github.com/mthl))
+* Add encoding for `java.util.concurrent.atomic.AtomicLong`
+  [#243](https://github.com/dakrone/cheshire/pull/243)
+  ([@mthl](https://github.com/mthl))
 
 # v6.0.0 - 2025-04-15
 
