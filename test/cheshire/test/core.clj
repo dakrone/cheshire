@@ -399,7 +399,7 @@
                                     {:allow-unquoted-control-chars false})]
       (is (thrown? JsonParseException (json/decode s))))))
 
-(deftest t-bindable-factories-allow-backslash-escaping-any-char
+(deftest t-bindable-factories-allow-numeric-leading-zeros
   (let [s "{\"a\": 00000000001}"]
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:allow-numeric-leading-zeros true})]
@@ -408,7 +408,7 @@
                                     {:allow-numeric-leading-zeros false})]
       (is (thrown? JsonParseException (json/decode s))))))
 
-(deftest t-bindable-factories-allow-numeric-leading-zeros
+(deftest t-bindable-factories-allow-backslash-escaping-any-char
   (let [s "{\"a\": \"\\o\\n\\e\"}"]
     (binding [fact/*json-factory* (fact/make-json-factory
                                     {:allow-backslash-escaping true})]
