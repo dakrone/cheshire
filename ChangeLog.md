@@ -27,6 +27,8 @@ Place any breaking changes under a "BREAKING changes" list item
 * Update Jackson dependencies to v2.20.0
   ([@dakrone](https://github.com/dakrone))
 
+[commit log](https://github.com/dakrone/cheshire/compare/6.0.0...6.1.0)
+
 # v6.0.0 - 2025-04-15
 
 * **BREAKING** changes 
