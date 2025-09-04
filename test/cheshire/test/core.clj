@@ -427,6 +427,16 @@
                                     {:allow-non-numeric-numbers false})]
       (is (thrown? JsonParseException (json/decode s true))))))
 
+(deftest t-bindable-factories-allow-trailing-comma
+  (let [s "{\"foo\":\"bar\",}"]
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                   {:allow-trailing-comma true})]
+      (is (= "bar"
+             (:foo (json/decode s true)))))
+    (binding [fact/*json-factory* (fact/make-json-factory
+                                   {:allow-trailing-comma false})]
+      (is (thrown? JsonParseException (json/decode s true))))))
+
 (deftest t-bindable-factories-optimization-opts
   (let [s "{\"a\": \"foo\"}"]
     (doseq [opts [{:intern-field-names true}
