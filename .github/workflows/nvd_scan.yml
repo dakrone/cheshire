@@ -65,7 +65,7 @@ jobs:
     - name: Run NVD Scanner
       env:
         NVD_API_TOKEN: ${{ secrets.NVD_API_TOKEN }}
-      run: clojure -J-Dclojure.main.report=stderr -M -m nvd.task.check "nvd-clojure.edn" "$(cd ..; lein classpath)"
+      run: clojure -J-Dclojure.main.report=stderr -J-Danalyzer.ossindex.enabled=false -M -m nvd.task.check "nvd-clojure.edn" "$(cd ..; lein classpath)"
       working-directory: nvd-helper
 
     - name: Save NVD DB & Clojure Deps Cache
