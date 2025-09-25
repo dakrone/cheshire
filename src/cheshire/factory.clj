@@ -21,6 +21,7 @@
    :allow-backslash-escaping false
    :allow-numeric-leading-zeros false
    :allow-non-numeric-numbers false
+   :allow-trailing-comma false
    :intern-field-names false
    :canonicalize-field-names false
    :escape-non-ascii false
@@ -74,6 +75,8 @@
                   (boolean (:allow-numeric-leading-zeros opts)))
       (.configure JsonReadFeature/ALLOW_NON_NUMERIC_NUMBERS
                   (boolean (:allow-non-numeric-numbers opts)))
+      (.configure JsonReadFeature/ALLOW_TRAILING_COMMA
+                  (boolean (:allow-trailing-comma opts)))
       (.configure JsonWriteFeature/QUOTE_FIELD_NAMES
                   (boolean (:quote-field-names opts)))
       (.configure JsonWriteFeature/ESCAPE_NON_ASCII
