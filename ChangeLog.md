@@ -11,7 +11,16 @@ Each change should include:
 Place any breaking changes under a "BREAKING changes" list item 
 -->
 
-# v6.2.0 - UNRELEASED
+# v6.2.0 - 2026-03-19
+
+* Add support for JsonReadFeature `ALLOW_TRAILING_COMMA`
+  [#245](https://github.com/dakrone/cheshire/pull/245)
+  ([@esnyder](https://github.com/esnyder))
+* Update Jackson dependencies to v2.21.1
+  [#250](https://github.com/dakrone/cheshire/pull/250)
+  ([@dbasedow0000](https://github.com/dbasedow0000))
+
+[commit log](https://github.com/dakrone/cheshire/compare/6.1.0...6.2.0)
 
 # v6.1.0 - 2025-09-01
 
