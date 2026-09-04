@@ -273,7 +273,7 @@ to true:
 ```
 
 - Replacing default encoders for builtin types
-- [SMILE encoding/decoding](http://wiki.fasterxml.com/SmileFormatSpec)
+- [SMILE encoding/decoding](https://github.com/FasterXML/smile-format-specification/blob/master/smile-specification.md)
 
 ## Change Log
 
