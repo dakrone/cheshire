@@ -41,9 +41,9 @@ encoders.
 ## Usage
 
 ```clojure
-[cheshire "6.2.0"]
+[cheshire "6.2.1"]
 
-;; Cheshire v6.2.0 uses Jackson 2.21.1
+;; Cheshire v6.2.1 uses Jackson 2.21.8
 
 ;; In your ns statement:
 (ns my.ns
@@ -101,8 +101,8 @@ or `encode` methods:
 
 ```clojure
 (let [my-pretty-printer (create-pretty-printer
-                          (assoc default-pretty-print-options
-                                 :indent-arrays? true))]
+						  (assoc default-pretty-print-options
+								 :indent-arrays? true))]
   (generate-string {:foo [1 2 3]} {:pretty my-pretty-printer}))
 ```
 
@@ -147,10 +147,10 @@ function to specify what kind of types to return, like so:
 ```clojure
 ;; In this example a function that checks for a certain key
 (decode "{\"myarray\":[2,3,3,2],\"myset\":[1,2,2,1]}" true
-        (fn [field-name]
-          (if (= field-name "myset")
-            #{}
-            [])))
+		(fn [field-name]
+		  (if (= field-name "myset")
+			#{}
+			[])))
 ;; => {:myarray [2 3 3 2], :myset #{1 2}}
 ```
 The type must be "transient-able", so use either #{} or []
@@ -169,12 +169,12 @@ namespace change)
 ;; things to be encoded:
 (ns myns
   (:require [cheshire.core :refer :all]
-            [cheshire.generate :refer [add-encoder encode-str remove-encoder]]))
+			[cheshire.generate :refer [add-encoder encode-str remove-encoder]]))
 
 ;; First, add a custom encoder for a class:
 (add-encoder java.awt.Color
-             (fn [c jsonGenerator]
-               (.writeString jsonGenerator (str c))))
+			 (fn [c jsonGenerator]
+			   (.writeString jsonGenerator (str c))))
 
 ;; There are also helpers for common encoding actions:
 (add-encoder java.net.URL encode-str)
@@ -210,12 +210,12 @@ on what you would like to use.
 
 There are also a few aliases for commonly used functions:
 
-    encode -> generate-string
-    encode-stream -> generate-stream
-    encode-smile -> generate-smile
-    decode -> parse-string
-    decode-stream -> parse-stream
-    decode-smile -> parse-smile
+	encode -> generate-string
+	encode-stream -> generate-stream
+	encode-smile -> generate-smile
+	decode -> parse-string
+	decode-stream -> parse-stream
+	decode-smile -> parse-smile
 
 ## Features
 Cheshire supports encoding standard clojure datastructures, with a few
@@ -262,7 +262,7 @@ to true:
 ```clojure
 (ns foo.bar
   (require [cheshire.core :as json]
-           [cheshire.parse :as parse]))
+		   [cheshire.parse :as parse]))
 
 (json/decode "111111111111111111111111111111111.111111111111111111111111111111111111")
 ;; => 1.1111111111111112E32 (a Double)
@@ -301,10 +301,10 @@ nil
 user> (use 'clojure.java.io)
 nil
 user> (println (slurp (encode-large-field-in-map {:id "10"
-                                                  :things [1 2 3]
-                                                  :body "I'll be removed"}
-                                                 :body
-                                                 (input-stream (file "/tmp/foo")))))
+												  :things [1 2 3]
+												  :body "I'll be removed"}
+												 :body
+												 (input-stream (file "/tmp/foo")))))
 {"things":[1,2,3],"id":"10","body":"Hi. \"THIS\" is a string.\\yep.\n"}
 nil
 ```
@@ -321,10 +321,10 @@ A custom factory can be used like so:
 ```clojure
 (ns myns
   (:require [cheshire.core :as core]
-            [cheshire.factory :as factory]))
+			[cheshire.factory :as factory]))
 
 (binding [factory/*json-factory* (factory/make-json-factory
-                                  {:allow-non-numeric-numbers true})]
+								  {:allow-non-numeric-numbers true})]
   (json/decode "{\"foo\":NaN}" true))
 ```
 

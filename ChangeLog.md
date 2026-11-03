@@ -1,4 +1,4 @@
-<!-- 
+<!--
 The changelog is currently manually updated
 
 Changes should always be included when potentially interesting to users.
@@ -8,8 +8,16 @@ Each change should include:
 - short description of change
 - link to github profile of author of change
 
-Place any breaking changes under a "BREAKING changes" list item 
+Place any breaking changes under a "BREAKING changes" list item
 -->
+
+# v6.2.1 - 2026-11-02
+
+* Update Jackson dependencies to v2.21.8
+  [#255](https://github.com/dakrone/cheshire/pull/255)
+  ([@ray1729](https://github.com/ray1729))
+
+[commit log](https://github.com/dakrone/cheshire/compare/6.2.0...6.2.1)
 
 # v6.2.0 - 2026-03-19
 
@@ -40,10 +48,10 @@ Place any breaking changes under a "BREAKING changes" list item
 
 # v6.0.0 - 2025-04-15
 
-* **BREAKING** changes 
+* **BREAKING** changes
   * [#217](https://github.com/dakrone/cheshire/issues/217):
-    Windows only: pretty printing now consistently uses JVM's OS default of `\r\n` for `:line-break`
-    ([@lread](https://github.com/lread))
+	Windows only: pretty printing now consistently uses JVM's OS default of `\r\n` for `:line-break`
+	([@lread](https://github.com/lread))
 * Bump minimum JDK version from v7 to v8
   ([@lread](https://github.com/lread))
 * Bump Jackson to v2.18.3
@@ -57,23 +65,23 @@ Place any breaking changes under a "BREAKING changes" list item
 * [#215](https://github.com/dakrone/cheshire/issues/215):
   Add `:escape-non-ascii` to factory options
   ([@lread](https://github.com/lread))
-* Internal maintenance: 
+* Internal maintenance:
   * [#212](https://github.com/dakrone/cheshire/issues/212):
-    Migrate away from usages of deprecated Jackson 
-    ([@lread](https://github.com/lread))
+	Migrate away from usages of deprecated Jackson
+	([@lread](https://github.com/lread))
 * Quality
   * [#114](https://github.com/dakrone/cheshire/issues/114):
-    Freshen changelog and add missing history
-    ([@lread](https://github.com/lread))
+	Freshen changelog and add missing history
+	([@lread](https://github.com/lread))
   * [#214](https://github.com/dakrone/cheshire/issues/214):
-    Add CI on GitHub Actions and with test coverage on Linux and Windows
-    ([@lread](https://github.com/lread))
+	Add CI on GitHub Actions and with test coverage on Linux and Windows
+	([@lread](https://github.com/lread))
   * [#222](https://github.com/dakrone/cheshire/issues/222):
-    Add linting
-    ([@lread](https://github.com/lread))
+	Add linting
+	([@lread](https://github.com/lread))
   * [#226](https://github.com/dakrone/cheshire/issues/226):
-    Add vulnerability scanning for cheshire dependencies
-    ([@lread](https://github.com/lread))
+	Add vulnerability scanning for cheshire dependencies
+	([@lread](https://github.com/lread))
 
 [commit log](https://github.com/dakrone/cheshire/compare/5.13.0...6.0.0)
 
@@ -170,7 +178,7 @@ Place any breaking changes under a "BREAKING changes" list item
 
 [commit log](https://github.com/dakrone/cheshire/compare/5.8.0...5.8.1)
 
-# v5.8.0 - 2017-08-15 
+# v5.8.0 - 2017-08-15
 
 * Bump Jackson to v2.9.0
   ([@brabster](https://github.com/brabster))
@@ -197,7 +205,7 @@ Place any breaking changes under a "BREAKING changes" list item
 * Bump Jackson to v2.8.6
   ([@dakrone](https://github.com/dakrone))
 * [847077d](https://github.com/dakrone/cheshire/commit/847077d):
-  Allow non const booleans `decode` for `key-fn` 
+  Allow non const booleans `decode` for `key-fn`
   ([@bfabry](https://github.com/bfabry))
 
 [commit log](https://github.com/dakrone/cheshire/compare/5.6.3...5.7.0)
@@ -251,7 +259,7 @@ Place any breaking changes under a "BREAKING changes" list item
 * [7124611](https://github.com/dakrone/cheshire/commit/7124611):
   Add docstrings for clojure-json aliases
   ([@danielcompton](https://github.com/danielcompton))
-* [#72](https://github.com/dakrone/cheshire/issues/72) 
+* [#72](https://github.com/dakrone/cheshire/issues/72)
   Address Jackson deprecations
   ([@dakrone](https://github.com/dakrone))
 
@@ -264,7 +272,7 @@ Place any breaking changes under a "BREAKING changes" list item
 * [ffac717](https://github.com/dakrone/cheshire/commit/ffac717):
   Add CBOR encoding/decoding
   ([@dakrone](https://github.com/dakrone))
-* [#53](https://github.com/dakrone/cheshire/issues/53): 
+* [#53](https://github.com/dakrone/cheshire/issues/53):
   Add default encoder for `java.lang.Character`
   ([@dakrone](https://github.com/dakrone))
 * [56662c2](https://github.com/dakrone/cheshire/commit/56662c2):
@@ -277,7 +285,7 @@ Place any breaking changes under a "BREAKING changes" list item
 
 * Bump Jackson to v2.3.1
   ([@dakrone](https://github.com/dakrone))
-* [#46](https://github.com/dakrone/cheshire/issues/46) 
+* [#46](https://github.com/dakrone/cheshire/issues/46)
 & [#48](https://github.com/dakrone/cheshire/issues/48):
   Fix string parsing for 1 and 2 arity methods
   ([@maxnoel](https://github.com/maxnoel))
@@ -316,10 +324,10 @@ Place any breaking changes under a "BREAKING changes" list item
 # v5.1.1 - 2013-04-12
 
 * [e4cc3b3](https://github.com/dakrone/cheshire/commit/e4cc3b3):
-  Remove all reflection 
+  Remove all reflection
   ([@amalloy](https://github.com/amalloy))
 * [6d78a56](https://github.com/dakrone/cheshire/commit/6d78a56):
-  Fixed custom encoder helpers 
+  Fixed custom encoder helpers
   ([@lynaghk](https://github.com/lynaghk))
 
 [commit log](https://github.com/dakrone/cheshire/compare/5.1.0...5.1.1)
@@ -329,7 +337,7 @@ Place any breaking changes under a "BREAKING changes" list item
 * Bump Jackson to v2.1.4
   ([@dakrone](https://github.com/dakrone))
 * [c5f0be3](https://github.com/dakrone/cheshire/commit/c5f0be3):
-  Allow custom keyword function for encoding 
+  Allow custom keyword function for encoding
   ([@goodwink](https://github.com/goodwink))
 
 [commit log](https://github.com/dakrone/cheshire/compare/5.0.2...5.1.0)
@@ -339,7 +347,7 @@ Place any breaking changes under a "BREAKING changes" list item
 * Bump Jackson to v2.1.3
   ([@dakrone](https://github.com/dakrone))
 * [03aff88](https://github.com/dakrone/cheshire/commit/03aff88):
-  Add more type hinting 
+  Add more type hinting
   ([@ztellman](https://github.com/ztellman))
 
 [commit log](https://github.com/dakrone/cheshire/compare/5.0.1...5.0.2)
@@ -362,13 +370,13 @@ Place any breaking changes under a "BREAKING changes" list item
   Custom Encoders Changes
   ([@dakrone](https://github.com/dakrone))
   * Custom encoder functions were moved to the `cheshire.generate` namespace:
-    * `cheshire.custom/add-encoder` is now `cheshire.generate/add-encoder`
-    * `cheshire.custom/remove-encoder` is now `cheshire.generate/remove-encoder`
+	* `cheshire.custom/add-encoder` is now `cheshire.generate/add-encoder`
+	* `cheshire.custom/remove-encoder` is now `cheshire.generate/remove-encoder`
   * In addition, `cheshire.custom/encode` and `cheshire.custom/decode` are no longer
 necessary. Use `cheshire.core/encode` and `cheshire.core/decode` instead and
 those functions will pick up custom encoders while still preserving the same
 level of efficiency.
-  * The `cheshire.custom` namespace is now deprecated 
+  * The `cheshire.custom` namespace is now deprecated
 * Bump Jackson to v2.1.1
   ([@dakrone](https://github.com/dakrone))
 
@@ -405,7 +413,7 @@ level of efficiency.
 * Bump Jackson to v2.0.5
   ([@dakrone](https://github.com/dakrone))
 * [bacb3ac](https://github.com/dakrone/cheshire/commit/bacb3ac):
-  Add support for escaping non-ASCII chars when decoding 
+  Add support for escaping non-ASCII chars when decoding
   ([@dakrone](https://github.com/dakrone))
 * [52a700b](https://github.com/dakrone/cheshire/commit/52a700b):
   Add support for custom munging of keys when decoding
@@ -433,7 +441,7 @@ level of efficiency.
 * [20ebaa8](https://github.com/dakrone/cheshire/commit/20ebaa8):
   Add optional default pretty printer to json generator
   ([@drewr](https://github.com/drewr))
-* Support encoding with custom date format 
+* Support encoding with custom date format
   ([@dakrone](https://github.com/dakrone))
 
 [commit log](https://github.com/dakrone/cheshire/compare/3.1.0...4.0.0)
@@ -469,7 +477,7 @@ level of efficiency.
 * [6e4df40](https://github.com/dakrone/cheshire/commit/6e4df40):
   Generate symbols as strings, encoding non-resolvable symbol without throwing
   ([@dakrone](https://github.com/dakrone))
-* [#19](https://github.com/dakrone/cheshire/issues/19): 
+* [#19](https://github.com/dakrone/cheshire/issues/19):
   Fix custom encoding for Longs
   ([@dakrone](https://github.com/dakrone))
 
@@ -489,8 +497,8 @@ level of efficiency.
 
 # v2.2.0 - 2012-02-07
 
-* [#16](https://github.com/dakrone/cheshire/issues/16): 
-  Allow parsing floats into BigDecimal to retain precision 
+* [#16](https://github.com/dakrone/cheshire/issues/16):
+  Allow parsing floats into BigDecimal to retain precision
   ([@dakrone](https://github.com/dakrone))
 * Various performance tweaks
   ([@dakrone](https://github.com/dakrone))
@@ -542,9 +550,9 @@ level of efficiency.
   Support encoding of `BigDecimal`
   ([@CmdrDats](https://github.com/CmdrDats))
 * Don't attempt to parse `nil` things
-  ([@dakrone](https://github.com/dakrone) and [@zk](https://github.com/zk)) 
+  ([@dakrone](https://github.com/dakrone) and [@zk](https://github.com/zk))
 * [750ae7c](https://github.com/dakrone/cheshire/commit/750ae7c):
-  Improve error message when encoding fails 
+  Improve error message when encoding fails
   ([@dakrone](https://github.com/dakrone))
 
 [commit log](https://github.com/dakrone/cheshire/compare/2.0.2...2.0.3)
@@ -569,7 +577,7 @@ level of efficiency.
   ([@dakrone](https://github.com/dakrone))
 * Quality
   * Automated testing on Travis CI
-    ([@dakrone](https://github.com/dakrone))
+	([@dakrone](https://github.com/dakrone))
 
 [commit log](https://github.com/dakrone/cheshire/compare/2.0.0...2.0.1)
 
@@ -618,11 +626,11 @@ level of efficiency.
   Add cheshire puss to README :)
   ([@dakrone](https://github.com/dakrone))
 * [344e984](https://github.com/dakrone/cheshire/commit/344e984):
-  Stop using java for parsing 
+  Stop using java for parsing
   ([@hiredman](https://github.com/hiredman))
 * Quality
   * Add time tests, address reflection warnings, and turf unused code
-    ([@hiredman](https://github.com/hiredman))
+	([@hiredman](https://github.com/hiredman))
 
 [commit log](https://github.com/dakrone/cheshire/compare/1.1.0...1.1.1)
 
@@ -639,7 +647,7 @@ First world-consumption release of cheshire!
 * [215038d](https://github.com/dakrone/cheshire/commit/215038d):
   Add helpers for streams
   ([@dakrone](https://github.com/dakrone))
-* Add docs and cleanup docstrings 
+* Add docs and cleanup docstrings
   ([@dakrone](https://github.com/dakrone))
 
 [commit log](https://github.com/dakrone/cheshire/compare/fca4fbb871ba43b3a00db90d96dd3bc95aa00174...1.1.0)
