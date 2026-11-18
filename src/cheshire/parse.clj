@@ -45,20 +45,20 @@
              (recur coll#))
            (persistent! coll#))))))
 
-(defn lazily-parse-array [^JsonParser jp key-fn bd? array-coerce-fn]
+(defn lazily-parse-array [^JsonParser jp key-fn bd? array-coerce-fn chunk-size]
   (lazy-seq
-   (loop [chunk-idx 0, buf (chunk-buffer *chunk-size*)]
+   (loop [chunk-idx 0, buf (chunk-buffer chunk-size)]
+     (.nextToken jp)
      (if (identical? (.getCurrentToken jp) JsonToken/END_ARRAY)
        (chunk-cons (chunk buf) nil)
        (do
          (chunk-append buf (parse* jp key-fn bd? array-coerce-fn))
-         (.nextToken jp)
          (let [chunk-idx* (unchecked-inc chunk-idx)]
-           (if (< chunk-idx* *chunk-size*)
+           (if (< chunk-idx* chunk-size)
              (recur chunk-idx* buf)
              (chunk-cons
               (chunk buf)
-              (lazily-parse-array jp key-fn bd? array-coerce-fn)))))))))
+              (lazily-parse-array jp key-fn bd? array-coerce-fn chunk-size)))))))))
 
 (defn parse* [^JsonParser jp key-fn bd? array-coerce-fn]
   (condp identical? (.getCurrentToken jp)
@@ -93,8 +93,6 @@
       eof
 
       JsonToken/START_ARRAY
-      (do
-        (.nextToken jp)
-        (lazily-parse-array jp key-fn *use-bigdecimals?* array-coerce-fn))
+      (lazily-parse-array jp key-fn *use-bigdecimals?* array-coerce-fn *chunk-size*)
 
       (parse* jp key-fn *use-bigdecimals?* array-coerce-fn))))
