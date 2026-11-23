@@ -27,6 +27,23 @@
 
 (declare generate)
 
+(defn- with-inner-last
+  "Move the last nested array/list entry to the end, so :start-inner leaves that
+  array open regardless of the map's iteration order (only array-maps and other
+  ordered maps happen to put it last already)."
+  [obj]
+  (let [entries (vec obj)
+        idx (last (keep-indexed (fn [i e]
+                                  (let [v (val e)]
+                                    (when (and (sequential? v) (not (map? v)))
+                                      i)))
+                                entries))]
+    (if idx
+      (concat (subvec entries 0 idx)
+              (subvec entries (inc idx))
+              [(nth entries idx)])
+      obj)))
+
 (definline generate-basic-map
   [^JsonGenerator jg obj ^String date-format ^Exception e
    wholeness]
@@ -44,7 +61,9 @@
                                           :start
                                           :all))
                    jg#))
-               ~jg ~obj)
+               ~jg (if (= ~wholeness :start-inner)
+                     (with-inner-last ~obj)
+                     ~obj))
        (write-end-object ~jg ~wholeness))))
 
 (definline generate-key-fn-map
@@ -66,7 +85,9 @@
                                           :start
                                           :all))
                    jg#))
-               ~jg ~obj)
+               ~jg (if (= ~wholeness :start-inner)
+                     (with-inner-last ~obj)
+                     ~obj))
        (write-end-object ~jg ~wholeness))))
 
 (definline generate-map

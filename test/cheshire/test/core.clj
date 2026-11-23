@@ -311,6 +311,16 @@
             (json/write 2)
             (json/write 3)
             (json/write [] :end)
+            (json/write {:tail "tail info"} :end)))))
+  ;; :data is not last in iteration order here, but must still be left open.
+  (is (= "{\"head\":\"head info\",\"data\":[1,2,3],\"tail\":\"tail info\"}"
+         (.toString
+          (json/with-writer [(StringWriter.) nil]
+            (json/write (array-map :data [] :head "head info") :start-inner)
+            (json/write 1)
+            (json/write 2)
+            (json/write 3)
+            (json/write [] :end)
             (json/write {:tail "tail info"} :end))))))
 
 (deftest test-multiple-objs-in-file
