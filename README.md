@@ -1,7 +1,7 @@
 # Cheshire
 
 <img src="cheshire_puss.png" title=":)" align="left" />
-<!-- use italics to distiguish quote from other text -->
+<!-- use italics to distinguish quote from other text -->
 <i>
 'Cheshire Puss,' she began, rather timidly, as she did not at all know
 whether it would like the name: however, it only grinned a little
