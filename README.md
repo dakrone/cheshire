@@ -1,7 +1,7 @@
 # Cheshire
 
 <img src="cheshire_puss.png" title=":)" align="left" />
-<!-- use italics to distiguish quote from other text -->
+<!-- use italics to distinguish quote from other text -->
 <i>
 'Cheshire Puss,' she began, rather timidly, as she did not at all know
 whether it would like the name: however, it only grinned a little
@@ -350,7 +350,7 @@ created, and factories work exactly the same with custom encoding.
 - make it as fast as possible (ongoing)
 
 ## License
-Release under the MIT license. See LICENSE for the full license.
+Released under the MIT license. See LICENSE for the full license.
 
 ## Thanks
 Thanks go to Mark McGranaghan for clj-json and Jim Duey for the name
