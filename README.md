@@ -88,7 +88,7 @@ encoders.
 ;; => "{\"FOO\":\"bar\"}"
 
 ;; generate JSON without escaping the characters (by writing it to a file)
-(spit "foo.json" (json/generate-string {:foo "bar"} {:pretty true}))
+(spit "foo.json" (generate-string {:foo "bar"} {:pretty true}))
 ```
 
 In the event encoding fails, Cheshire will throw a `JsonGenerationException`.
@@ -325,7 +325,7 @@ A custom factory can be used like so:
 
 (binding [factory/*json-factory* (factory/make-json-factory
                                   {:allow-non-numeric-numbers true})]
-  (json/decode "{\"foo\":NaN}" true))
+  (core/decode "{\"foo\":NaN}" true))
 ```
 
 See the `default-factory-options` map in
