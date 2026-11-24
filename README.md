@@ -350,7 +350,7 @@ created, and factories work exactly the same with custom encoding.
 - make it as fast as possible (ongoing)
 
 ## License
-Release under the MIT license. See LICENSE for the full license.
+Released under the MIT license. See LICENSE for the full license.
 
 ## Thanks
 Thanks go to Mark McGranaghan for clj-json and Jim Duey for the name
